@@ -2,3 +2,35 @@
 
 Jeeplate documentation and notes in TWiki [[http://twiki.org/cgi-bin/view/TWiki04x01/TextFormattingRules][format]].
 
+---++ General notes
+
+Jeeplate is a Java EE Enterprise project that is basically a web application. 
+It can be used as a template for a project where a business process of a small 
+or medium size enterprise is modeled and captured as a software product.
+
+---+++ Testing
+
+* JUnit
+* For starters, H2 datasource and Jetty
+
+---+++ Logging
+
+* SLF4J with some implementation e.g. Log4J
+* Comes as a produced 
+
+---+++ Database
+
+* [[http://www.h2database.com/html/cheatSheet.html][H2]] database is used
+* H2 [[http://www.h2database.com/html/features.html#comparison][features]]
+* Since this is a template project the database is in-memory mode instead of 
+  embedded mode or standard installation. However, *not* in _server_mode
+* The test db should be accessible at http://localhost:8082/
+* ORM will be used, see description
+* Database should have _versioning_ scheme, and some version information should 
+  be also available in the database!
+
+---+++ Object-Relational Model (ORM)
+* Hibernate with H2. Remember ==persistence.xml==
+
+---+++ To be sorted
+mvn -DdownloadSource=true -DdownloadJavadocs=true eclipse:eclipse
