@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto;
+package org.sisto.jeeplate;
 
 import javax.ejb.Stateless;
 import javax.ejb.LocalBean;
