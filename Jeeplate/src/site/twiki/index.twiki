@@ -16,7 +16,7 @@ or medium size enterprise is modeled and captured as a software product.
 ---+++ Logging
 
 * SLF4J with some implementation e.g. Log4J
-* Comes as a produced 
+* As @Produces produced resource
 
 ---+++ Database
 
@@ -28,9 +28,36 @@ or medium size enterprise is modeled and captured as a software product.
 * ORM will be used, see description
 * Database should have _versioning_ scheme, and some version information should 
   be also available in the database!
+* H2 does not need to be started when it is embedded. Server mode requires 
+  starting, and it required when external database connections are used.
 
 ---+++ Object-Relational Model (ORM)
 * Hibernate with H2. Remember ==persistence.xml==
+* "non-jta" H2 datasource can be used for the time being and later ds configuration 
+  should be moved to container (container should manage it in production)
+* in hibernate connection url "...;INIT=runscript..." for population 
+
+---+++ Transactions
+
+* With container managed datasource (jta vs. non-jta)
+
+---+++ Caching
+
+* To be added later
 
 ---+++ To be sorted
 mvn -DdownloadSource=true -DdownloadJavadocs=true eclipse:eclipse
+
+---+++ Steps
+1. Project initialization. Documentation layout
+2. Project structure and initial Maven configuration
+3. JUnit with (in-memory) H2 test and Jetty test.
+4. Example EJB test with Servlet. WAR and EJB within EAR deployed to an AS. 
+   EAR requires ==application.xml== and WAR ==web.xml== and jboss-web.xml for 
+   setting the context root: http://localhost:8080/jeeplate/
+5. Tested with Java 8, Netbeans 8 and Wildfly 8.1.0.Final, works ok.
+
+
+_. Logging with SLF4J bound to simple, @Produces from EJB (+injection)
+_. Add hibernate and test it with an entity
+ 

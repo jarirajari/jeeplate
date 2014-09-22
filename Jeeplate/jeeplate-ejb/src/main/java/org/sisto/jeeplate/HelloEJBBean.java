@@ -18,14 +18,16 @@
  */
 package org.sisto.jeeplate;
 
-import javax.ejb.Stateless;
 import javax.ejb.LocalBean;
+import javax.ejb.Stateless;
 
-@Stateless
+@Stateless(name = "helloBean")
 @LocalBean
-public class NewSessionBean {
+public class HelloEJBBean {
 
-    public void businessMethod() {
+    public HelloEJBBean() {}
+    
+    public String sayHello() {
+        return ("Hello EJB!");
     }
-
 }
