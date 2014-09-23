@@ -20,32 +20,22 @@
         <module>jeeplate-ear</module>
     </modules>
     
+    <repositories>
+        <repository>
+            <id>JBoss Repository</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+    
     <dependencyManagement>
         <dependencies>
             <!-- Java EE -->
             <dependency>
-                <groupId>javax</groupId>
-                <artifactId>javaee-web-api</artifactId>
-                <version>7.0</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax</groupId>
-                <artifactId>javaee-api</artifactId>
-                <version>7.0</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency> 
-                <groupId>javax.enterprise</groupId> 
-                <artifactId>cdi-api</artifactId> 
-                <version>1.1</version> 
-                <scope>provided</scope>
-            </dependency> 
-            <dependency>  
-                <groupId>javax.ejb</groupId>  
-                <artifactId>javax.ejb-api</artifactId>  
-                <version>3.2</version>
-                <scope>provided</scope>
+                <groupId>org.jboss.spec</groupId>
+                <artifactId>jboss-javaee-7.0</artifactId>
+                <version>1.0.1.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <!-- Unit testing -->
             <dependency>
@@ -80,7 +70,12 @@
                 <version>4.3.5</version>
                 <scope>compile</scope>
             </dependency>
-
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.1.4.GA</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     

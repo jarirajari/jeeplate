@@ -56,8 +56,11 @@ mvn -DdownloadSource=true -DdownloadJavadocs=true eclipse:eclipse
    EAR requires ==application.xml== and WAR ==web.xml== and jboss-web.xml for 
    setting the context root: http://localhost:8080/jeeplate/
 5. Tested with Java 8, Netbeans 8 and Wildfly 8.1.0.Final, works ok.
-
-
-_. Logging with SLF4J bound to simple, @Produces from EJB (+injection)
-_. Add hibernate and test it with an entity
+6. Original idea was to use slf4J logging, but since Hibernate is using jboss-
+   logging and we are using Wildfly in development, we should use it too.
  
+---+++ Important!
+* *Remember* to have ==beans.xml== in both EJB and WAR. Also, make sure it has:
+  _bean-discovery-mode="all"_. Especially if you notice something like: 
+  "WELD-001408 Unsatisfied dependencies for type [Logger] with qualifiers 
+  [@Default] at injection point"!

@@ -20,7 +20,7 @@ package org.sisto.jeeplate.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import javax.ejb.EJB;
+import java.util.Date;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,16 +28,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.sisto.jeeplate.HelloEJBBean;
+import org.jboss.logging.Logger;
 
 @WebServlet(urlPatterns = {"/test"})
 public class HelloEJBServlet extends HttpServlet {
     
-    @EJB(name = "helloBean")
-    HelloEJBBean bean;
+    @Inject
+    private HelloEJBBean bean;
+    
+    @Inject
+    private transient Logger log;
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) 
     throws ServletException, IOException {
+        log.info(String.format("HTTP GET request received at %s", new Date()));
         try (PrintWriter out = res.getWriter()) {
             String body = String.format("<body>%s</body>", "EJB says hello!");
             String title = String.format("<title>%s</title>", bean.sayHello());

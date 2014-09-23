@@ -18,7 +18,6 @@
  */
 package org.sisto.jeeplate.webserver.jetty;
 
-import jdk.nashorn.internal.objects.NativeDebug;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.HttpClient;
@@ -29,6 +28,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class EmbeddedWebserverTest {
@@ -60,6 +60,7 @@ public class EmbeddedWebserverTest {
         webserver.stop();
     }
     
+    @Ignore
     @Test
     public void testWebserver() throws Exception {
         HttpClient browser = HttpClientBuilder.create().build(); 

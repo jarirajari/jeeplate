@@ -19,7 +19,6 @@
 package org.sisto.jeeplate.database.h2;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
@@ -27,6 +26,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class InMemoryH2Test {
@@ -51,6 +51,7 @@ public class InMemoryH2Test {
         /* First test */
     }
     
+    @Ignore
     @Test
     public void datasourceConnectsToDatabaseTest() {
         final String createTable = "CREATE TABLE IF NOT EXISTS test_table;";
