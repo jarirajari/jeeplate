@@ -51,6 +51,31 @@
                 <version>1.4.181</version>
                 <scope>compile</scope>
             </dependency>
+            <!-- Hibernate ORM and JPA API, Validator -->
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>4.3.6.Final</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>4.3.6.Final</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.1-api</artifactId>
+                <version>1.0.0.Final</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>5.1.2.Final</version>
+                <scope>provided</scope>
+            </dependency>
             <!-- Embedded webserver -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
@@ -127,6 +152,36 @@
                                         <type>jar</type>
                                     </artifactItem>
                                 </artifactItems>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.wildfly.plugins</groupId>
+                    <artifactId>wildfly-maven-plugin</artifactId>
+                    <version>1.0.2.Final</version>
+                    <executions>
+                        <execution>
+                            <id>add-datasource</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>add-resource</goal>
+                            </goals>
+                            <configuration>
+                                <address>subsystem=datasources,data-source=java:jboss/myDs</address>
+                                <resources>
+                                    <resource>
+                                        <properties>
+                                            <jndi-name>java:jboss/myDs</jndi-name>
+                                            <enabled>true</enabled>
+                                            <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+                                            <driver-class>org.h2.Driver</driver-class>
+                                            <driver-name>h2</driver-name>
+                                            <user-name>sa</user-name>
+                                            <password>sa</password>
+                                        </properties>
+                                    </resource>
+                                </resources>
                             </configuration>
                         </execution>
                     </executions>

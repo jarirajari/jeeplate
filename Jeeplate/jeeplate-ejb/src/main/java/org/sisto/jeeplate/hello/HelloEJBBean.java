@@ -16,26 +16,33 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.util;
+package org.sisto.jeeplate.hello;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
 import org.jboss.logging.Logger;
 
-@Dependent
-public class Resources {
+@Stateless
+public class HelloEJBBean {
+
+    @Inject
+    private transient Logger log;
     
-    /*
-     * Usage:
-     * 
-     * @Inject
-     * private transient Logger log;
-     */
-    @Produces
-    public Logger jbossLogger(InjectionPoint ip) {
-        final String name = ip.getMember().getDeclaringClass().getSimpleName();
-        
-        return Logger.getLogger(name);
+    public HelloEJBBean() {}
+    
+    public String sayHello() {
+        return ("Hello EJB!");
+    }
+    
+    @PostConstruct
+    public void init() {
+        log.info("HelloEJBBean@PostConstruct");
+    }
+    
+    @PreDestroy
+    public void lize() {
+        log.info("HelloEJBBean@PreDestroy");
     }
 }

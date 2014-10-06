@@ -16,33 +16,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate;
+package org.sisto.jeeplate.hello;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import org.jboss.logging.Logger;
 
 @Stateless
-public class HelloEJBBean {
-
+public class HelloService {
+    
     @Inject
     private transient Logger log;
     
-    public HelloEJBBean() {}
+    // TODO: Testing import javax.ejb.embeddable.EJBContainer;
     
-    public String sayHello() {
-        return ("Hello EJB!");
-    }
+    // Stateful, stateless, singleton, and message-driven beans 
+    // have different events
     
-    @PostConstruct
-    public void init() {
-        log.info("HelloEJBBean@PostConstruct");
-    }
-    
-    @PreDestroy
-    public void lize() {
-        log.info("HelloEJBBean@PreDestroy");
+    public void testHelloServiceLogging(HelloEntity he) {
+        String msg = (he == null) ? "null" : he.getMessage();
+        log.info(String.format("HelloService prints HelloEntity message: '%s'", msg));
     }
 }

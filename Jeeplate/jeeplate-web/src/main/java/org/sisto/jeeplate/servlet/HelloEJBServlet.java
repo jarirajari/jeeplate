@@ -27,7 +27,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.sisto.jeeplate.HelloEJBBean;
+
+import org.sisto.jeeplate.hello.HelloEJBBean;
+import org.sisto.jeeplate.hello.HelloEntity;
+import org.sisto.jeeplate.hello.HelloService;
 import org.jboss.logging.Logger;
 
 @WebServlet(urlPatterns = {"/test"})
@@ -39,9 +42,22 @@ public class HelloEJBServlet extends HttpServlet {
     @Inject
     private transient Logger log;
     
+    @Inject
+    private HelloEntity entity;
+    
+    @Inject
+    private HelloService service;
+    
+    private void testThisToo() {
+        HelloEntity he = entity.findOnlyOne();
+        service.testHelloServiceLogging(he);
+        he = null;
+    }
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) 
     throws ServletException, IOException {
+        this.testThisToo();
         log.info(String.format("HTTP GET request received at %s", new Date()));
         try (PrintWriter out = res.getWriter()) {
             String body = String.format("<body>%s</body>", "EJB says hello!");
