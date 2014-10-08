@@ -11,11 +11,11 @@ or medium size enterprise is modeled and captured as a software product.
 ---+++ Testing
 
 * JUnit
-* For starters, H2 datasource and Jetty
+* For starters, H2 in-memory datasource and Jetty
 
 ---+++ Logging
 
-* SLF4J with some implementation e.g. Log4J
+* jboss.logging because both Wildfly and Hibernate use it
 * As @Produces produced resource
 
 ---+++ Database
@@ -24,7 +24,7 @@ or medium size enterprise is modeled and captured as a software product.
 * H2 [[http://www.h2database.com/html/features.html#comparison][features]]
 * Since this is a template project the database is in-memory mode instead of 
   embedded mode or standard installation. However, *not* in _server_mode
-* The test db should be accessible at http://localhost:8082/
+* The test db should be accessible at http://localhost:8082/ (see util package)
 * ORM will be used, see description
 * Database should have _versioning_ scheme, and some version information should 
   be also available in the database!
@@ -35,7 +35,7 @@ or medium size enterprise is modeled and captured as a software product.
 * Hibernate with H2. Remember ==persistence.xml==
 * "non-jta" H2 datasource can be used for the time being and later ds configuration 
   should be moved to container (container should manage it in production)
-* in hibernate connection url "...;INIT=runscript..." for population 
+* moving on to JPA 2.1 for persistence (incl. persistence xml)
 
 ---+++ Transactions
 
@@ -58,6 +58,9 @@ mvn -DdownloadSource=true -DdownloadJavadocs=true eclipse:eclipse
 5. Tested with Java 8, Netbeans 8 and Wildfly 8.1.0.Final, works ok.
 6. Original idea was to use slf4J logging, but since Hibernate is using jboss-
    logging and we are using Wildfly in development, we should use it too.
+7. Configuring persistence in persistence.xml: moved from hibernate props to 
+   use JPA 2.1 specific ones. Note, that usage of 'none' for hbm2ddl!
+8. Basic setup seems to work, first phase complete.
  
 ---+++ Important!
 * *Remember* to have ==beans.xml== in both EJB and WAR. Also, make sure it has:

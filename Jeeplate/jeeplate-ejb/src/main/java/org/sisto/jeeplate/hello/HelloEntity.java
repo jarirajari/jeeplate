@@ -48,7 +48,6 @@ public class HelloEntity implements Serializable {
     @Inject
     protected HelloService hs;
     
-    
     // Container managed entity manager
     @Transient
     @PersistenceContext(unitName = "helloPU", 
