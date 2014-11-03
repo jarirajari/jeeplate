@@ -16,33 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.util;
+package org.sisto.jeeplate.user;
 
-import java.sql.SQLException;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import org.h2.tools.Server;
-
-@Singleton
-@Startup
-public class H2WebServer {
+public class SubUser extends User {
     
-    private Server h2ws;
-    
-    @PostConstruct
-    public void init() {
-        final String config = "-web";
-        try {
-            this.h2ws = Server.createWebServer(config).start();
-        } catch (SQLException ex) { }
-    }
-    
-    @PreDestroy
-    public void lize() {
-        try {
-            this.h2ws.stop();
-        } catch (NullPointerException ex) { }
-    }
 }

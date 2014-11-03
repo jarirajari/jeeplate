@@ -16,33 +16,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.util;
+package org.sisto.jeeplate.domain;
 
-import java.sql.SQLException;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import org.h2.tools.Server;
+import java.io.Serializable;
 
-@Singleton
-@Startup
-public class H2WebServer {
-    
-    private Server h2ws;
-    
-    @PostConstruct
-    public void init() {
-        final String config = "-web";
-        try {
-            this.h2ws = Server.createWebServer(config).start();
-        } catch (SQLException ex) { }
-    }
-    
-    @PreDestroy
-    public void lize() {
-        try {
-            this.h2ws.stop();
-        } catch (NullPointerException ex) { }
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.SequenceGenerator;
+
+public class ObjectSequenceGenerator extends SequenceGenerator {
+
+    @Override
+    public Serializable generate(SessionImplementor session, Object obj) {
+        return super.generate(session, obj).toString();
     }
 }

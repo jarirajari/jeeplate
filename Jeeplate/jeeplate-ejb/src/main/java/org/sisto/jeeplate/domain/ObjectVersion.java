@@ -16,33 +16,33 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.util;
+package org.sisto.jeeplate.domain;
 
-import java.sql.SQLException;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import org.h2.tools.Server;
-
-@Singleton
-@Startup
-public class H2WebServer {
+public class ObjectVersion {
     
-    private Server h2ws;
+    public static final Long DEFAULT_VERSION = 0L;
+    private Long version = DEFAULT_VERSION;
     
-    @PostConstruct
-    public void init() {
-        final String config = "-web";
-        try {
-            this.h2ws = Server.createWebServer(config).start();
-        } catch (SQLException ex) { }
+    public ObjectVersion(Long id) {
+        this.version = id;
     }
     
-    @PreDestroy
-    public void lize() {
-        try {
-            this.h2ws.stop();
-        } catch (NullPointerException ex) { }
+    // value type setter
+    // write should be 'null' protected because
+    // the value is initialized with default or empty value!
+    public void version(Long newVersion) {
+        if (newVersion == null) {
+            this.version = DEFAULT_VERSION;
+        } else {
+            this.version = newVersion;
+        }
+        
+        return;
     }
+    
+    // value type getter
+    public Long version() {
+        return (this.version);
+    }
+    
 }

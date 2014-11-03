@@ -16,35 +16,64 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.hello;
+package org.sisto.jeeplate.user;
 
-import javax.ejb.Stateless;
-import javax.enterprise.inject.Instance;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import org.jboss.logging.Logger;
-import org.sisto.jeeplate.user.User;
 
-@Stateless
-public class HelloService {
+@RequestScoped
+public class User {
     
     @Inject
     private transient Logger log;
     
     @Inject
-    @New(User.class)
-    private Instance<User> users;
+    @New
+    private UserData data;
     
-    public String testHelloServiceLogging() {
+    /*
+    UserModel
+    UserView
+    UserControl
+    UserData
+    UserRules
+    UserLogic
+    */
+    
+    public User createUser() {
+        this.data.create();
         
-        User test = users.get();
-        log.info("START: "+test.toString());
-        test.createUser();log.info("1: "+test.toString());
-        test.readUser();log.info("2: "+test.toString());
-        test.updateUser();log.info("3: "+test.toString());
-        test.deleteUser();log.info("4: "+test.toString());
-        log.info("END "+test.toString());
-        
-        return "HelloService";
+        return this;
     }
+    
+    public User readUser() {
+        this.data.read();
+        
+        return this;
+    }
+    
+    public User updateUser(){
+        this.data.update();
+        
+        return this;
+    }
+    
+    public User deleteUser() {
+        this.data.delete();
+        
+        return this;
+    }
+    
+    public String testPrint() {
+        return "testprint()@User";
+    }
+    
+    @Override
+    public String toString() {
+        return "User: id="+this.data.getId();
+    }
+    
 }
+

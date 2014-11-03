@@ -26,6 +26,8 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
@@ -44,42 +46,28 @@ public class HelloEntity implements Serializable {
     @Inject
     protected Logger log;
     
-    @Transient
-    @Inject
-    protected HelloService hs;
-    
-    // Container managed entity manager
-    @Transient
-    @PersistenceContext(unitName = "helloPU", 
-            type = PersistenceContextType.TRANSACTION)
-    protected EntityManager em;
-    
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    
     @Version
     private Long version;
+    
     @Column(name = "message")
     private String message;
     
     @PostConstruct
     public void init() {
-        this.log.info("HelloEntity@PostConstruct");
-    }
-    
-    public HelloEntity findOnlyOne() {
-        Long pkid = 1L;
-        HelloEntity only = this.em.find(HelloEntity.class, pkid);
         
-        return only;
     }
     
+    /**
+     * Getter and setter are used for references
+     * prop() and prop(type) are used for value (for get and set)
+     */
     @Id
     public Long getId() {
-        return this.id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
+        return id;
     }
     
     public Long getVersion() {
@@ -121,4 +109,6 @@ public class HelloEntity implements Serializable {
             return (this);
         }
     }
+
+
 }

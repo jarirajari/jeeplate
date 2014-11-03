@@ -29,6 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class InMemoryH2Test {
     
     private static DataSource ds;
@@ -51,7 +52,6 @@ public class InMemoryH2Test {
         /* First test */
     }
     
-    @Ignore
     @Test
     public void datasourceConnectsToDatabaseTest() {
         final String createTable = "CREATE TABLE IF NOT EXISTS test_table;";
@@ -62,6 +62,4 @@ public class InMemoryH2Test {
             Assert.fail(sqle.getMessage());
         }
     }
-    
-    
 }

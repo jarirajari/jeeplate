@@ -3,40 +3,66 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence 
   http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-  <!-- Many persistence unit: first one is used for testing -->
-  <persistence-unit name="helloPU" transaction-type="JTA">
-    <!-- Hibernate 4.3+, not org.hibernate.ejb.HibernatePersistence -->
-    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-    <!-- For 'transaction-type="JTA"' use 'jta-data-source' vs. 
-         resource local use 'non-jta-data-source' -->
-    <jta-data-source>java:jboss/datasources/h2test</jta-data-source>
-    <shared-cache-mode>NONE</shared-cache-mode>
-    <validation-mode>NONE</validation-mode>
-    <properties>
-      <!-- JPA -->
-      <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-      <!-- Installed DS to WF by hand, did not work with 'INIT=RUNSCRIPT...' -->
-      <!-- H2 drops your database if there no connections: DB_CLOSE_DELAY=-1 -->
-      <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:h2test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;TRACE_LEVEL_SYSTEM_OUT=3;"/>
-      <property name="javax.persistence.jdbc.user" value="sa"/>
-      <property name="javax.persistence.jdbc.password" value="sa"/>
-      <!-- JPA 2.1 -->
-      <property name="javax.persistence.schema-generation.create-database-schemas" value="true"/>
-      <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
-      <property name="javax.persistence.schema-generation.create-source" value="metadata"/>
-      <property name="javax.persistence.schema-generation.drop-source" value="metadata"/>
-      <property name="javax.persistence.sql-load-script-source" value="db/scripts/ddl/populate-db.sql"/>
-      <!-- Hibernate -->
-      <property name="hibernate.archive.autodetection" value="class"/>
-      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
-      <property name="hibernate.show_sql" value="true"/>
-      <property name="hibernate.format_sql" value="true"/>
-      <property name="hibernate.hbm2ddl.auto" value="none"/>
-      <!--
-      <property name="hibernate.hbm2ddl.import_files" value="classpath:db/scripts/ddl/populate-db.sql"/>
-      -->
-      <!-- Wildfly debugging -->
-      <property name="wildfly.jpa.twophasebootstrap" value="false" />
-    </properties>
-  </persistence-unit>
+    <!-- Many persistence unit: first one is used for testing -->
+    <persistence-unit name="h2PU" transaction-type="JTA">
+        <!-- Hibernate 4.3+, not org.hibernate.ejb.HibernatePersistence -->
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <!-- For 'transaction-type="JTA"' use 'jta-data-source' vs. 
+        resource local use 'non-jta-data-source' -->
+        <jta-data-source>java:jboss/datasources/h2test</jta-data-source>
+        <shared-cache-mode>NONE</shared-cache-mode>
+        <validation-mode>NONE</validation-mode>
+        <properties>
+            <!-- JPA -->
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <!-- Installed DS to WF by hand, did not work with 'INIT=RUNSCRIPT...' -->
+            <!-- H2 drops your database if there no connections: DB_CLOSE_DELAY=-1 -->
+            <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:h2test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;TRACE_LEVEL_SYSTEM_OUT=3;"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.password" value="sa"/>
+            <!-- JPA 2.1 -->
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+            <property name="javax.persistence.schema-generation.create-database-schemas" value="true"/>
+            <property name="javax.persistence.schema-generation.create-source" value="metadata"/>
+            <property name="javax.persistence.schema-generation.drop-source" value="metadata"/>
+            <property name="javax.persistence.sql-load-script-source" value="db/scripts/ddl/populate-db.sql"/>
+            <!-- Hibernate -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
+            <!-- Wildfly -->
+            <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />
+            
+        </properties>
+    </persistence-unit>
+  
+    <persistence-unit name="pgPU" transaction-type="JTA">
+        <!-- Hibernate 4.3+, not org.hibernate.ejb.HibernatePersistence -->
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <jta-data-source>java:jboss/datasources/PostgreDS</jta-data-source>
+        <shared-cache-mode>NONE</shared-cache-mode>
+        <validation-mode>NONE</validation-mode>
+        <properties>
+            <!-- JPA -->
+            <property name="javax.persistence.jdbc.driver" value="postgres"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost/postgres"/>
+            <property name="javax.persistence.jdbc.user" value="postgres"/>
+            <property name="javax.persistence.jdbc.password" value="appelsiini"/>
+            <!-- JPA 2.1 -->
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+            <property name="javax.persistence.schema-generation.create-database-schemas" value="true"/>
+            <property name="javax.persistence.schema-generation.create-source" value="metadata"/>
+            <property name="javax.persistence.schema-generation.drop-source" value="metadata"/>
+            <property name="javax.persistence.sql-load-script-source" value="db/scripts/ddl/populate-db.sql"/>
+            <!-- Hibernate -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="false"/>
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
+            <!-- Wildfly -->
+            <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />
+            
+        </properties>
+    </persistence-unit>
 </persistence>

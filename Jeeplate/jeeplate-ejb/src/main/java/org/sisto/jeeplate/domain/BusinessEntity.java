@@ -16,35 +16,43 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.hello;
+package org.sisto.jeeplate.domain;
 
-import javax.ejb.Stateless;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.New;
 import javax.inject.Inject;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+import javax.persistence.Version;
 import org.jboss.logging.Logger;
-import org.sisto.jeeplate.user.User;
 
-@Stateless
-public class HelloService {
+@MappedSuperclass
+@Access(AccessType.FIELD)
+public abstract class BusinessEntity {
+    @Transient
+    public transient static Long DEFAULT_ID = 0L;
     
     @Inject
     private transient Logger log;
     
-    @Inject
-    @New(User.class)
-    private Instance<User> users;
+    @Id
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    private Long id = 0L;
+    @Version
+    private Long version = 0L;
     
-    public String testHelloServiceLogging() {
-        
-        User test = users.get();
-        log.info("START: "+test.toString());
-        test.createUser();log.info("1: "+test.toString());
-        test.readUser();log.info("2: "+test.toString());
-        test.updateUser();log.info("3: "+test.toString());
-        test.deleteUser();log.info("4: "+test.toString());
-        log.info("END "+test.toString());
-        
-        return "HelloService";
+    public Long getId() {
+        return (this.id);
+    }
+    
+    public boolean isDefaultId() {
+        return (this.id == DEFAULT_ID);
+    }
+    
+    public void reset() {
+        this.id = DEFAULT_ID;
     }
 }

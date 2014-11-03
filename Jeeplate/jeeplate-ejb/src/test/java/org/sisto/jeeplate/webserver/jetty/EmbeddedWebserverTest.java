@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class EmbeddedWebserverTest {
     
     private static final int SERVER_PORT = 8888;
@@ -60,7 +61,6 @@ public class EmbeddedWebserverTest {
         webserver.stop();
     }
     
-    @Ignore
     @Test
     public void testWebserver() throws Exception {
         HttpClient browser = HttpClientBuilder.create().build(); 

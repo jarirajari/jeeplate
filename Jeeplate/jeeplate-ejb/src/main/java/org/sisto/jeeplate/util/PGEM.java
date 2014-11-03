@@ -18,31 +18,18 @@
  */
 package org.sisto.jeeplate.util;
 
-import java.sql.SQLException;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import org.h2.tools.Server;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Singleton
-@Startup
-public class H2WebServer {
-    
-    private Server h2ws;
-    
-    @PostConstruct
-    public void init() {
-        final String config = "-web";
-        try {
-            this.h2ws = Server.createWebServer(config).start();
-        } catch (SQLException ex) { }
-    }
-    
-    @PreDestroy
-    public void lize() {
-        try {
-            this.h2ws.stop();
-        } catch (NullPointerException ex) { }
-    }
-}
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
+
+@Qualifier
+@Retention(RUNTIME)
+@Target({METHOD, FIELD, PARAMETER, TYPE})
+public @interface PGEM {}
