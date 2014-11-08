@@ -48,14 +48,20 @@ public class UserEntity extends BusinessEntity implements Serializable {
         private void defaults() {
             this.object.name = "";
         }
-
+        
+        public UserEntityBuilder withId(Long id) {
+            this.object.id = id;
+            
+            return (this);
+        }
+        
         public UserEntityBuilder withName(String sname) {
             this.object.name = sname;
+            
             return (this);
         }
 
         public UserEntity build() {
-            
             
             return (this.object);
         }

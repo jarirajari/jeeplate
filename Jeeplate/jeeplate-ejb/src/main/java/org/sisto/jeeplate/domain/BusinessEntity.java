@@ -40,9 +40,9 @@ public abstract class BusinessEntity {
     
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE)
-    private Long id = 0L;
+    protected Long id = 0L;
     @Version
-    private Long version = 0L;
+    protected Long version = 0L;
     
     public Long getId() {
         return (this.id);

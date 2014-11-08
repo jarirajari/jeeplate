@@ -22,9 +22,10 @@ import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import org.jboss.logging.Logger;
+import org.sisto.jeeplate.domain.BusinessObject;
 
 @RequestScoped
-public class User {
+public class User extends BusinessObject<User> {
     
     @Inject
     private transient Logger log;
@@ -42,25 +43,32 @@ public class User {
     UserLogic
     */
     
-    public User createUser() {
+    public User bind(Long id) {
+        
+        this.data.bind(id);
+        
+        return this;
+    }
+    
+    public User create() {
         this.data.create();
         
         return this;
     }
     
-    public User readUser() {
+    public User read() {
         this.data.read();
         
         return this;
     }
     
-    public User updateUser(){
+    public User update(){
         this.data.update();
         
         return this;
     }
     
-    public User deleteUser() {
+    public User delete() {
         this.data.delete();
         
         return this;

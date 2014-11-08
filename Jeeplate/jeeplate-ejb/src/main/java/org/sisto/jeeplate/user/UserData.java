@@ -33,10 +33,19 @@ public class UserData {
     @Inject
     private BusinessEntityStore<UserEntity> store;
     
-    private UserEntity entity = new UserEntity();
+    private UserEntity entity = UserEntity.newUserEntityBuilder().build();
     
     public Long getId() {
         return (entity.getId());
+    }
+    
+    @Transactional
+    public Boolean bind(Long id) {
+        UserEntity tmp = UserEntity.newUserEntityBuilder().withId(id).build();
+        
+        this.entity = this.store.bind(tmp);
+        log.info("Bound"+this.entity.hashCode()+", "+this.entity.toString());
+        return Boolean.TRUE;
     }
     
     @Transactional

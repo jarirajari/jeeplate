@@ -39,10 +39,11 @@ public class HelloService {
         
         User test = users.get();
         log.info("START: "+test.toString());
-        test.createUser();log.info("1: "+test.toString());
-        test.readUser();log.info("2: "+test.toString());
-        test.updateUser();log.info("3: "+test.toString());
-        test.deleteUser();log.info("4: "+test.toString());
+        test.create();log.info("1: "+test.toString());
+        test.read();log.info("2: "+test.toString());
+        test.update();log.info("3: "+test.toString());
+        test.delete();log.info("4: "+test.toString());
+        test.bind(1L);log.info("RE-1: "+test.toString());
         log.info("END "+test.toString());
         
         return "HelloService";

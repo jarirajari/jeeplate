@@ -52,6 +52,17 @@ public class BusinessEntityStore<T extends BusinessEntity> {
      * Creates an object in database
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public T bind(T be) throws PersistenceException  {
+        
+        T bound = this.safeFind(be);
+        
+        return bound;
+    }
+    
+    /**
+     * Creates an object in database
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public T create(T be) throws PersistenceException  {
         T created = be;
         boolean isNotInDB = this.isNew(be);
