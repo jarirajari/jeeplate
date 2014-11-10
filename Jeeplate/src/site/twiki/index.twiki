@@ -70,3 +70,6 @@ mvn -DdownloadSource=true -DdownloadJavadocs=true eclipse:eclipse
   _bean-discovery-mode="all"_. Especially if you notice something like: 
   "WELD-001408 Unsatisfied dependencies for type [Logger] with qualifiers 
   [@Default] at injection point"!
+
+---+++ JSF
+* WildFly Java EE 7 application server has builtin JSF 2.2s
