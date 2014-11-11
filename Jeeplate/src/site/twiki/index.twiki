@@ -72,4 +72,5 @@ mvn -DdownloadSource=true -DdownloadJavadocs=true eclipse:eclipse
   [@Default] at injection point"!
 
 ---+++ JSF
-* WildFly Java EE 7 application server has builtin JSF 2.2s
+* WildFly Java EE 7 application server has builtin JSF 2.2
+* To resolve namespace issues make sure Netbeans has the JSF framework installed

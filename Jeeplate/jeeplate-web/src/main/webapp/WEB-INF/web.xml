@@ -14,7 +14,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>facesServlet</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
     <context-param>
         <!-- empty HTML input fields are empty strings not null -->
