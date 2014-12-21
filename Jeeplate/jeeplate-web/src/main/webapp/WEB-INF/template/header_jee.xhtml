@@ -1,0 +1,288 @@
+<!--
+ ! Jeeplate
+ ! Copyright (C) 2014 Jari Kuusisto
+ ! 
+ ! This program is free software: you can redistribute it and/or modify
+ ! it under the terms of the GNU General Public License as published by
+ ! the Free Software Foundation, either version 3 of the License, or
+ ! (at your option) any later version.
+ ! 
+ ! This program is distributed in the hope that it will be useful,
+ ! but WITHOUT ANY WARRANTY; without even the implied warranty of
+ ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ ! GNU General Public License for more details.
+ ! 
+ ! You should have received a copy of the GNU General Public License
+ ! along with this program. If not, see <http://www.gnu.org/licenses/>.
+ ! 
+ !-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:h="http://xmlns.jcp.org/jsf/html" 
+      xmlns:f="http://xmlns.jcp.org/jsf/core" 
+      xmlns:p="http://primefaces.org/ui" >
+    <body>
+        <h:form id="menubarForm">
+            <p:growl id="growlMessages" showDetail="true" life="3000" />
+
+            <p:menubar>
+                <p:menuitem id="logo">
+                    <p:outputLabel>
+                        <p:graphicImage style="height:25px;width:25px" value="resources/images/football.png" />
+                    </p:outputLabel>
+                    <p:outputLabel value="JEE" />
+                </p:menuitem>
+
+                <f:facet name="options">
+                    <p:splitButton value="JEE USER2" immediate="true" rendered="#{mgr.authenticated()}" actionListener="#{buttonView.save}" icon="ui-icon-disk">
+                        <p:menuitem value="Change credentials..." onclick="PF('credentialsDlg').show();" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Update localisation..." onclick="PF('localisationDlg').show();" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Modify account settings..." action="account" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
+                    </p:splitButton>
+
+                    <p:splitButton value="admin" immediate="true" rendered="#{mgr.authenticated()}" actionListener="#{oracle.noop()}" icon="ui-icon-disk">
+                        <p:menuitem value="sysadmin" onclick="JS.handleRoleSwitch('roleDlg','roleForm:roleNewrole','#{mgr.sysadmin()}');" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="user" onclick="JS.handleRoleSwitch('roleDlg','roleForm:roleNewrole','user');" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
+                    </p:splitButton>
+
+                    <p:commandButton value="Sign up" rendered="#{not mgr.authenticated()}" icon="ui-icon-disk"
+                                     onclick="PF('signupDlg').show();">
+                    </p:commandButton>
+
+                    <p:commandButton value="Sign in" rendered="#{not mgr.authenticated()}" icon="ui-icon-disk"
+                                     onclick="PF('signinDlg').show();">
+                    </p:commandButton>
+
+                    <p:commandButton value="Sign out" rendered="#{mgr.authenticated()}" icon="ui-icon-disk"
+                                     ajax="false" action="#{mgr.doLogout}">
+                    </p:commandButton>
+
+                </f:facet>
+            </p:menubar>
+        </h:form>
+
+        <p:dialog rendered="#{not mgr.authenticated()}" modal="true" header="Sign up" widgetVar="signupDlg" resizable="false">
+            <h:form id="signupForm">
+                <h:panelGrid id="signup" columns="1" >
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column colspan="2">
+                                <p:outputPanel >
+                                    Register by filling out info below <p:commandLink value="link" />. 
+                                </p:outputPanel>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+
+                    <p:outputLabel for="signupEmail" value="Email:" />
+                    
+                    <p:inputText styleClass="signupEmail" id="signupEmail" value="#{mgr.username}" required="true" >
+                        <p:graphicImage style="height:25px;width:25px" value="resources/images/football.png" />
+                        <f:validateLength minimum="1" />
+                    </p:inputText>
+                    <p:watermark for="signupEmail" value="user.name@email.com" />
+
+                    <p:outputLabel for="signupMobile" value="Mobile:" />
+                    
+                    <p:password id="signupMobile" value="#{mgr.password}" required="true">
+                        <p:graphicImage style="height:25px;width:25px" value="resources/images/football.png" />
+                    </p:password>
+                    <p:watermark for="signupMobile" value="+358 12 3456789" />
+
+                    <p:commandLink value="Terms &amp; Conditions" />
+                    <p:outputPanel id="signupResult">
+                        <h:message for="signupResult" styleClass="ui-outputlabel ui-widget ui-state-error" />
+                    </p:outputPanel>
+
+                    <p:outputLabel value="" />
+                    <p:outputPanel>
+                        <p:commandButton value="Sign up" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
+                                         update="signup" action="#{mgr.submit}" />
+
+                        <p:commandButton value="Cancel" immediate="true" onclick="PF('signupDlg').hide();" 
+                                         update="signup,signupResult"/>
+                    </p:outputPanel>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog><!-- Sign up dialog -->
+
+        <p:dialog rendered="#{not mgr.authenticated()}" modal="true" header="Sign in" widgetVar="signinDlg" resizable="false">
+            <h:form id="signinForm">
+                <h:panelGrid id="signin" columns="1">
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column colspan="2">
+                                <p:outputPanel >
+                                    Register by filling out info below <p:commandLink value="link" />. 
+                                </p:outputPanel>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+
+                    <p:outputLabel for="username" value="Username:" />
+                    <p:inputText id="username" value="#{mgr.username}" required="true" >
+                        <f:validateLength minimum="1" />
+                    </p:inputText>
+                    <p:watermark for="username" value="user.name@email.com" />
+
+                    <p:outputLabel for="password" value="Password:" />
+                    <p:password id="password" value="#{mgr.password}" required="true" />
+                    <p:watermark for="password" value="" />
+
+                    <p:commandLink value="Reset password?" />
+                    <p:outputPanel id="signinResult">
+                        <h:message for="signinResult" styleClass="ui-outputlabel ui-widget ui-state-error" />
+                    </p:outputPanel>
+                    <p:outputLabel value="" />
+                    <p:outputPanel>
+                        <p:commandButton value="Sign in" oncomplete="JS.handleLoginRequest('signinDlg', xhr, status, args)" 
+                                         update="signin" action="#{mgr.submit}">
+
+                        </p:commandButton>
+                        <p:commandButton value="Cancel" immediate="true" onclick="PF('signinDlg').hide();" 
+                                         update="signin,signinResult"/>
+                    </p:outputPanel>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog><!-- Sign in dialog -->
+        
+        <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Change Password" widgetVar="credentialsDlg" resizable="false">
+            <h:form id="credentialsForm">
+                <h:panelGrid id="credentials" columns="2" >
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column colspan="2">
+                                <p:outputPanel >
+                                    Change pw by filling out info below <p:commandLink value="link" />. 
+                                </p:outputPanel>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+                    
+                    <h:outputLabel for="credentialsUsername" value="Username:" />
+                    <h:inputText id="credentialsUsername" value="info@sis.to" readonly="true"/>
+                    
+                    <p:outputLabel for="credentialsPassword" value="Old password:" />
+                    <p:password id="credentialsPassword" value="" required="true" />
+
+                    <p:outputLabel for="credentialsNewPassword" value="New password:" />
+                    <p:inputText id="credentialsNewPassword" value="***" required="true" >
+                        <f:validateLength minimum="1" />
+                    </p:inputText>
+                    
+                    <p:outputLabel for="credentialsVerifyPassword" value="Verify it:" />
+                    <p:inputText id="credentialsVerifyPassword" value="***" required="true" >
+                        <f:validateLength minimum="1" />
+                    </p:inputText>
+                    
+                    <p:outputLabel for="credentialsResetSecret1" value="Reset secret:" />
+                    <p:inputText id="credentialsResetSecret1" value="absd" required="true" >
+                        <f:validateLength minimum="4" />
+                    </p:inputText>
+                    
+                    <p:outputLabel for="credentialsResetSecret2" value="Reset secret:" />
+                    <p:inputText id="credentialsResetSecret2" value="4ddd" required="true" >
+                        <f:validateLength minimum="1" />
+                    </p:inputText>
+                    
+                    <p:commandLink value="Terms &amp; Conditions" />
+                    <p:outputPanel id="credentialsResult">
+                        <h:message for="credentialsResult" styleClass="ui-outputlabel ui-widget ui-state-error" />
+                    </p:outputPanel>
+
+                    <p:outputLabel value="" />
+                    <p:outputPanel>
+                        <p:commandButton value="Change" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
+                                         update="credentials" action="#{mgr.submit}" />
+
+                        <p:commandButton value="Cancel" immediate="true" onclick="PF('signupDlg').hide();" 
+                                         update="credentials,credentialsResult"/>
+                    </p:outputPanel>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog><!-- Credentials dialog -->
+
+         <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Update Localisation" widgetVar="localisationDlg" resizable="false">
+            <h:form id="localisationForm">
+                <h:panelGrid id="localisation" columns="2" >
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column colspan="2">
+                                <p:outputPanel >
+                                    Change pw by filling out info below <p:commandLink value="link" />. 
+                                </p:outputPanel>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+                    
+                    <h:outputLabel for="localisationLanguage" value="Language:" />
+                    <h:inputText id="localisationLanguage" value="Suomi" readonly="true"/>
+                    
+                    <p:outputLabel for="localisationTimezone" value="Timezone:" />
+                    <p:inputText id="localisationTimezone" value="UTC" required="true" />
+                    
+                    <p:outputLabel for="localisationCountry" value="Country:" />
+                    <p:inputText id="localisationCountry" value="Finland" required="false" >
+                        <f:validateLength minimum="1" />
+                    </p:inputText>
+
+                    <p:outputLabel for="localisationCity" value="City:" />
+                    <p:inputText id="localisationCity" value="Helsinki" required="false" >
+                        <f:validateLength minimum="1" />
+                    </p:inputText>
+                    
+                    <p:commandLink value="Terms &amp; Conditions" />
+                    <p:outputPanel id="localisationResult">
+                        <h:message for="localisationResult" styleClass="ui-outputlabel ui-widget ui-state-error" />
+                    </p:outputPanel>
+
+                    <p:outputLabel value="" />
+                    <p:outputPanel>
+                        <p:commandButton value="Update" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
+                                         update="localisation" action="#{mgr.submit}" />
+
+                        <p:commandButton value="Cancel" immediate="true" onclick="PF('signupDlg').hide();" 
+                                         update="localisation,localisationResult"/>
+                    </p:outputPanel>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog><!-- Localisation dialog -->
+        
+        <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Switch Role" widgetVar="roleDlg" resizable="false">
+            <h:form id="roleForm">
+                <h:panelGrid id="role" columns="1" >
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column colspan="2">
+                                <p:outputPanel >
+                                    <h:outputText value="Switch role to"/>
+                                    <h:outputLabel id="roleNewrole" value="" />
+                                </p:outputPanel>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+                    
+                    <h:outputLabel for="roleUsername" value="Username:" />
+                    <h:inputText id="roleUsername" value="jari" readonly="true"/>
+                    
+                    <p:outputLabel for="rolePassword" value="Password:" />
+                    <p:password id="rolePassword" value="vv" required="true" />
+                    
+                    <p:commandLink value="Terms &amp; Conditions" />
+                    <p:outputPanel id="roleResult">
+                        <h:message for="roleResult" styleClass="ui-outputlabel ui-widget ui-state-error" />
+                    </p:outputPanel>
+
+                    <p:outputLabel value="" />
+                    <p:outputPanel>
+                        <p:commandButton value="Switch" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
+                                         update="role" action="#{mgr.submit}" />
+
+                        <p:commandButton value="Cancel" immediate="true" onclick="PF('signupDlg').hide();" 
+                                         update="role,roleResult"/>
+                    </p:outputPanel>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog><!-- Role dialog -->
+    </body>
+</html>
