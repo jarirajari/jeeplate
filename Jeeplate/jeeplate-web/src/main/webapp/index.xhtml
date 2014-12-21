@@ -1,20 +1,97 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" 
       xmlns:h="http://xmlns.jcp.org/jsf/html" 
       xmlns:f="http://xmlns.jcp.org/jsf/core" 
-      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" 
-      xmlns:p="http://primefaces.org/ui"  >
-    <h:head>
-        <title>Hello World!</title>
-    </h:head> 
-    <body>
-        <h:form>
-            <h:inputText id="name" value="#{name}" pt:placeholder="What's your name?" />
-            <h:commandButton value="Submit" />
-            <h:outputText value="Hello, #{name}" rendered="#{not empty name}" />
-            <h:outputText value="#{oracle.saysWho}" />
-            <p:clock />
-        </h:form>
-    </body>
-</html>
+      xmlns:ui="http://java.sun.com/jsf/facelets" 
+      xmlns:p="http://primefaces.org/ui" >
+    <h:body>
 
+        <ui:composition template="WEB-INF/template/template_jee.xhtml">
+            <!-- Override template content -->
+            <ui:define name="content">
+                <div>
+                    <h:form>
+                        <h:inputText id="name" value="#{name}"  />
+                        <h:commandButton value="Submit" />
+                        <h:outputText value="Hello, #{name}" rendered="#{not empty name}" />
+                        <h:outputText value="#{oracle.saysWho}" />
+                        <p>
+                            <h:outputText value="Login is #{mgr.authenticated()}"></h:outputText>
+                            <h:outputText value="#{msg['jee.title']}"></h:outputText>
+                        </p>
+                        <p>
+                            <h:outputFormat value="#{msg['dynamic.test']}">
+                                <f:param value="param" />
+                            </h:outputFormat>
+                        </p>
+                    </h:form>       
+                </div>
+                <div>
+                    <h:form id="ftest">
+                        <p:commandButton value="View Oracle" actionListener="#{oracle.open}" onclick="PF(':dlg').show()">
+                        </p:commandButton>
+                    </h:form>
+                    <!-- timezones -->
+                    <p:outputLabel for="timezone" value="Timezone:"/>
+                    <p:selectOneMenu id="timezone" value="defaultz" effect="fade" var="t" filter="true" filterMatchMode="startsWith">
+                        <f:selectItems value="#{oracle.timezones}" var="ts" itemValue="#{ts}" />
+                    </p:selectOneMenu>
+                    <br />
+                    <!-- countries -->
+                    <p:outputLabel for="country" value="Country:"/>
+                    <p:selectOneMenu id="country" value="defaultz" effect="fade" var="c" filter="true" filterMatchMode="startsWith">
+                        <f:selectItems value="#{oracle.countries}" var="cs" itemValue="#{cs}" />
+                    </p:selectOneMenu>
+                    <br />
+                    <p:outputLabel for="lcountry" value="Loc Country:"/>
+                    <p:selectOneMenu id="lcountry" value="defaultz" effect="fade" var="lc" filter="true" filterMatchMode="startsWith">
+                        <f:selectItems value="#{oracle.localizedCountries()}" var="lcs" itemValue="#{lcs}" />
+                    </p:selectOneMenu>
+                    <br />
+                    <!-- languages -->
+                    <p:outputLabel for="language" value="Language:"/>
+                    <p:selectOneMenu id="language" value="defaultz" effect="fade" var="l" filter="true" filterMatchMode="startsWith">
+                        <f:selectItems value="#{oracle.languages}" var="ls" itemValue="#{ls}" />
+                    </p:selectOneMenu>
+                    <br />
+                    <p:outputLabel for="llanguage" value="Loc Language:"/>
+                    <p:selectOneMenu id="llanguage" value="defaultz" effect="fade" var="ll" filter="true" filterMatchMode="startsWith">
+                        <f:selectItems value="#{oracle.localizedLanguages()}" var="lls" itemValue="#{lls}" />
+                    </p:selectOneMenu>
+                    <br />
+                </div>
+                <h:form>
+
+                    <p:growl id="message" showDetail="true" />
+
+                    <p:commandButton value="Destroy the World" actionListener="#{dialogView.destroyWorld}" update="message">
+                        <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                    </p:commandButton>
+
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </h:form>
+                <h:form>
+                    <br />
+                    <p:commandLink styleClass="changeLang" action="none"  onclick="PF('test').show()"  >
+                        <p:graphicImage value="#{language.flagImageString}" />
+                        <p:inplace widgetVar="test" effect="none" label="">
+
+                            <h:selectOneMenu styleClass="selectLang" valueChangeListener="#{language.changeLanguage}">
+                                <p:ajax update="@all" />
+                                <f:selectItems value="#{language.availableLanguages}" />
+                            </h:selectOneMenu>
+                        </p:inplace>
+                    </p:commandLink>
+                </h:form>
+
+            </ui:define>
+            <ui:define name="footer" rendered="false" />
+        </ui:composition>
+
+    </h:body>
+
+</html>

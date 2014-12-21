@@ -1,0 +1,21 @@
+.selectLang {
+    width: 150px !important;
+    font-family: monospace, "Courier" !important;
+}
+
+.changeLang {
+    z-index: 22;
+    float: right;
+    display: block;
+}
+
+// Modal opacity
+.ui-widget-overlay {
+    filter:alpha(opacity=80) !important;  /* works in IE 7 */
+    opacity: 0.5 !important;  /* works in Firefox */
+}
+
+.signupEmail input {
+    //background: url('resources/images/football.png') 0 0 no-repeat;
+    background-color: red;
+}
