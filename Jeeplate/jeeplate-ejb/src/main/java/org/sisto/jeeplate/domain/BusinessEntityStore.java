@@ -30,6 +30,7 @@ import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.TransactionRequiredException;
 import org.jboss.logging.Logger;
 import javax.persistence.EntityNotFoundException;
+import org.sisto.jeeplate.util.H2EM;
 import org.sisto.jeeplate.util.PGEM;
 
 @Stateful

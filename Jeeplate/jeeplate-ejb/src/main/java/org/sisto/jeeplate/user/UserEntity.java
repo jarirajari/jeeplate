@@ -21,16 +21,37 @@ package org.sisto.jeeplate.user;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.security.shiro.Salt;
 
 /**
  * Business object model for an actual business object
  */
 @Entity
-@Table(name = "jee_user")
+@Table(name = "system_users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "username")})
 public class UserEntity extends BusinessEntity implements Serializable {
     
-    public String name = "";
+    protected String username;
+    protected String salt;
+    protected String password;
+    
+    /*
+    @Enumerated(EnumType.STRING)
+    protected ApplicationRoles.Role role;
+    */
+    
+    
+    /*
+    
+    username (Actor as login), and embedded
+    + ActorRole -> act_pw, act_salt, act_role (Role.ACTOR)
+    + DirectorRole -> dir_pw, dir_salt, dir_role (Role.DIR...)
+    + AdministratorRole -> adm_pw, adm_salt, adm_role (Role.ADM...) 
+    
+    */
     
     public static UserEntityBuilder newUserEntityBuilder() {
         return (new UserEntityBuilder());
@@ -39,6 +60,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
     public static class UserEntityBuilder {
 
         private UserEntity object;
+        private Sha256Hash hasher;
 
         public UserEntityBuilder() {
             this.object = new UserEntity();
@@ -46,7 +68,9 @@ public class UserEntity extends BusinessEntity implements Serializable {
         }
 
         private void defaults() {
-            this.object.name = "";
+            this.object.username = "";
+            this.object.password = "";
+            this.object.salt = "";
         }
         
         public UserEntityBuilder withId(Long id) {
@@ -55,13 +79,28 @@ public class UserEntity extends BusinessEntity implements Serializable {
             return (this);
         }
         
-        public UserEntityBuilder withName(String sname) {
-            this.object.name = sname;
+        public UserEntityBuilder withName(String name) {
+            this.object.username = name;
             
             return (this);
         }
-
+        
+        public UserEntityBuilder withPassword(String password) {
+            this.object.password = password;
+            
+            return (this);
+        }
+        
+        private String getSaltedAndHashedPassword() {
+            final int hashIterations = 1;
+            this.hasher = new Sha256Hash(this.object.password, this.object.salt, hashIterations);
+            
+            return (this.hasher.toHex());
+        }
+        
         public UserEntity build() {
+            this.object.salt = Salt.getSaltString();
+            this.object.password = this.getSaltedAndHashedPassword();
             
             return (this.object);
         }

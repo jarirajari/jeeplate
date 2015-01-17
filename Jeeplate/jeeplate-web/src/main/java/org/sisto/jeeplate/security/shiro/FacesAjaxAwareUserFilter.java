@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.jsf;
+package org.sisto.jeeplate.security.shiro;
 
 import java.io.IOException;
 
@@ -27,9 +27,18 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.web.filter.authc.UserFilter;
 
-@WebFilter
 public class FacesAjaxAwareUserFilter extends UserFilter {
 
+    private String name = "FacesAjaxAwareUserFilter";
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public String getName() {
+        return (this.name);
+    }
+    
     private static final String FACES_REDIRECT_XML =  ""+
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
             "<partial-response>"+

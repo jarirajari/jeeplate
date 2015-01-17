@@ -37,6 +37,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.SavedRequest;
 import org.apache.shiro.web.util.WebUtils;
 import org.jboss.logging.Logger;
@@ -101,14 +102,12 @@ public class SystemManager {
         SecurityUtils.getSubject().logout();
         try {
             FacesContext fcontext = FacesContext.getCurrentInstance();
-        ExternalContext econtext = fcontext.getExternalContext();
-HttpServletRequest hreq = (HttpServletRequest)econtext.getRequest();
+            ExternalContext econtext = fcontext.getExternalContext();
+            HttpServletRequest hreq = (HttpServletRequest) econtext.getRequest();
 
-        // invalidating sess
-       
-        econtext.invalidateSession();
-
-        econtext.redirect(hreq.getContextPath()+"/");
+            // invalidating sess
+            econtext.invalidateSession();
+            econtext.redirect(hreq.getContextPath() + "/");
         } catch (IOException ioe) {
         
         } 
@@ -123,11 +122,13 @@ HttpServletRequest hreq = (HttpServletRequest)econtext.getRequest();
         FacesContext fcontext = FacesContext.getCurrentInstance();
         RequestContext rcontext = RequestContext.getCurrentInstance();
         ExternalContext econtext = fcontext.getExternalContext();
+        
         try {
-            SecurityUtils.getSubject().login(new UsernamePasswordToken(username, password, remember));
+            Subject subject = SecurityUtils.getSubject();
+            subject.login(new UsernamePasswordToken(username, password, remember));
             HttpServletRequest hreq = (HttpServletRequest)econtext.getRequest();
             SavedRequest savedRequest = WebUtils.getAndClearSavedRequest(hreq);
-            log.error("Jee submit to: "+hreq.getContextPath()+"/restricted.xhtml");
+            log.error("Jee submit to : "+hreq.getContextPath()+"/restricted.xhtml");
             econtext.redirect(savedRequest != null ? savedRequest.getRequestUrl() : hreq.getContextPath()+"/restricted.xhtml");
         }
         catch (AuthenticationException e) {

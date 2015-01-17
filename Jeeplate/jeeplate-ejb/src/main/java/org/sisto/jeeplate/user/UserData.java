@@ -34,6 +34,10 @@ public class UserData {
     private BusinessEntityStore<UserEntity> store;
     
     private UserEntity entity = UserEntity.newUserEntityBuilder().build();
+    private UserEntity hashed = UserEntity.newUserEntityBuilder()
+            .withName("hashis")
+            .withPassword("good")
+            .build();
     
     public Long getId() {
         return (entity.getId());
@@ -51,15 +55,18 @@ public class UserData {
     @Transactional
     public Boolean create() {
         log.info("Initial"+this.entity.hashCode()+", "+this.entity.toString());
-        this.entity.name = "test0c";
+        // Hash test with request /test
+        this.store.create(this.hashed);
+        this.entity.username = "test0c";
         this.entity = this.store.create(entity);
+        
         log.info("Created"+this.entity.hashCode()+", "+this.entity.toString());
         return Boolean.TRUE;
     }
     
     @Transactional
     public Boolean read() {
-        this.entity.name = "test2r";
+        this.entity.username = "test2r";
         this.entity = this.store.read(entity);
         log.info("Read"+this.entity.hashCode()+", "+this.entity.toString());
         return Boolean.TRUE;
@@ -67,7 +74,7 @@ public class UserData {
     
     @Transactional
     public Boolean update() {
-        this.entity.name = "test3u";
+        this.entity.username = "test3u";
         this.entity = this.store.update(entity);
         log.info("Updated"+this.entity.hashCode()+", "+this.entity.toString());
         return Boolean.TRUE;
@@ -75,7 +82,7 @@ public class UserData {
     
     @Transactional
     public Boolean delete() {
-        this.entity.name = "test4c";
+        this.entity.username = "test4c";
         this.entity = this.store.delete(entity);
         log.info("Deleted"+this.entity.hashCode()+", "+this.entity.toString());
         return Boolean.TRUE;
