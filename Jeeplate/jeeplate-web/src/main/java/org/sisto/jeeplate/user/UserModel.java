@@ -18,41 +18,39 @@
  */
 package org.sisto.jeeplate.user;
 
-import java.io.Serializable;
+import java.beans.Transient;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
-import org.sisto.jeeplate.data.UserData;
+import javax.enterprise.inject.New;
+import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
+import org.sisto.jeeplate.data.UserData;
+import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.generic.Model;
 import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.rules.UserRule;
 
-@Dependent
-public class User implements Serializable {
-
-    @Inject
-    private transient StringLogger log;
+@Named
+@ViewScoped
+public class UserModel { // model view control are backing beans => BACKING MVC?
     
     @Inject
-    private UserData data;
+    transient private StringLogger log;
     
     @Inject
-    private UserRule rule;
+    @New
+    private UserData backing;
+    private Map<Long, UserData> all;
     
-    @Inject
-    private UserLogic logic; // or requirements
-    
-    public User() {
-        
+    @PostConstruct
+    private void init() {
+        this.all = this.backing.findAllUsers();
     }
-    
-    public Boolean updateUserName() {
-        Boolean updated = Boolean.FALSE;
-        
-        if (this.rule.isAllowedToDoIt() && this.logic.businessReq()) {
-            updated = Boolean.TRUE;
-        } else {
-            updated = Boolean.FALSE;
-        }
-        
-        return updated;
-    }   
+
+    public Map<Long, UserData> allUsers() {
+        return (this.backing.findAllUsers());
+    }
+
 }

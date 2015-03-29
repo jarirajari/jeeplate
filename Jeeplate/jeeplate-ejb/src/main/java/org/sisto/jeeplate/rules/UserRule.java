@@ -16,29 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.hello;
+package org.sisto.jeeplate.rules;
 
 import javax.ejb.Stateless;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.New;
-import javax.inject.Inject;
-import org.jboss.logging.Logger;
-import org.sisto.jeeplate.data.UserData;
 
 @Stateless
-public class HelloService {
-    
-    @Inject
-    private transient Logger log;
-    
-    @Inject
-    private UserData user;
-    
-    public String testHelloServiceLogging() {
-        
-        log.info("creating a test user account!");
-        user.testHashing();
-        
-        return "HelloService";
+public class UserRule {
+    // contains shiro permission Java8 style
+    public Boolean isAllowedToDoIt() {
+        return Boolean.TRUE;
     }
 }

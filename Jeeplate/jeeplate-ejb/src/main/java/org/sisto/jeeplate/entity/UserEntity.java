@@ -16,10 +16,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.entity;
 
 import java.io.Serializable;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import org.apache.shiro.crypto.hash.Sha256Hash;
@@ -34,15 +41,28 @@ import org.sisto.jeeplate.security.shiro.Salt;
         @UniqueConstraint(columnNames = "username")})
 public class UserEntity extends BusinessEntity implements Serializable {
     
+    @Id
+    @SequenceGenerator(name = "user_seq", allocationSize = 1)
+    @GeneratedValue(generator = "user_seq", strategy = GenerationType.SEQUENCE)
+    protected Long id;
     protected String username;
     protected String salt;
     protected String password;
     
-    /*
-    @Enumerated(EnumType.STRING)
-    protected ApplicationRoles.Role role;
-    */
+    @PostLoad
+    @PostPersist
+    @PostUpdate
+    private void updateParentId() {
+        super.setId(this.id);
+    }
     
+    public String getUsername() {
+        return (this.username);
+    }
+    
+    public void setUsername(String setUsername) {
+        this.username = setUsername;
+    }
     
     /*
     

@@ -16,8 +16,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.domain;
 
-public class SubUser extends User {
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+
+@MappedSuperclass
+public abstract class ObjectEntity {
+    
+    @Transient
+    public transient static Long DEFAULT_ID = 0L;
+    
+    @Transient
+    public transient static Long DEFAULT_VN = 0L;
+    
+    public abstract Object identity();
+    
+    public abstract boolean isDefault();
+    
+    public abstract void reset();
     
 }

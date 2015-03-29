@@ -22,6 +22,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import org.jboss.logging.Logger;
+import org.sisto.jeeplate.logging.StringLogger;
 
 @Dependent
 public class Resources {
@@ -37,5 +38,12 @@ public class Resources {
         final String name = ip.getMember().getDeclaringClass().getSimpleName();
         
         return Logger.getLogger(name);
+    }
+    
+    @Produces
+    public StringLogger stringLogger(InjectionPoint ip) {
+        final String name = ip.getMember().getDeclaringClass().getSimpleName();
+        
+        return (new StringLogger(name));
     }
 }

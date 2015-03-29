@@ -20,17 +20,30 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"   
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:ui="http://java.sun.com/jsf/facelets">
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
     <h:body>
 
         <ui:composition template="WEB-INF/template/template_jee.xhtml">
             <!-- Override template content -->
             <ui:define name="content">
                 <p>Restricted.xhtml default content</p>
+                <h:form>
+                    <p>
+                        <p:outputLabel for="users" value="Users: " />
+                        <h:selectOneMenu id="users">
+                            <f:selectItems value="#{userModel.allUsers().values()}" var="users" itemLabel="#{users.entity.username}" itemValue="#{users.entity.id}" />
+                        </h:selectOneMenu>
+                        <p:outputLabel for="groups" value="Groups: " />
+                        <h:selectOneMenu id="groups">
+                            <f:selectItems value="#{userGroupModel.allGroups()}" var="groups" itemLabel="#{groups.key}" itemValue="#{groups.value}" />
+                        </h:selectOneMenu>
+                        <p:commandButton value="Lisää" actionListener="#{userController.addUserToGroups()}"/>
+                    </p>
+                </h:form>
             </ui:define>
             <ui:define name="footer" rendered="false" />
         </ui:composition>
-
     </h:body>
-
 </html>

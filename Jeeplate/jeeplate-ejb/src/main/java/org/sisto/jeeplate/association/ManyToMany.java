@@ -16,29 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.hello;
+package org.sisto.jeeplate.association;
 
-import javax.ejb.Stateless;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.New;
-import javax.inject.Inject;
-import org.jboss.logging.Logger;
-import org.sisto.jeeplate.data.UserData;
-
-@Stateless
-public class HelloService {
+/**
+ * one2one
+ * one2many
+ * many2one
+ * many2many
+ */
+public interface ManyToMany {
     
-    @Inject
-    private transient Logger log;
-    
-    @Inject
-    private UserData user;
-    
-    public String testHelloServiceLogging() {
-        
-        log.info("creating a test user account!");
-        user.testHashing();
-        
-        return "HelloService";
-    }
 }

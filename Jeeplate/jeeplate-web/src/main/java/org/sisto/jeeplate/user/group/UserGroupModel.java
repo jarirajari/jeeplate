@@ -16,43 +16,47 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.user.group;
 
-import java.io.Serializable;
-import javax.enterprise.context.Dependent;
-import org.sisto.jeeplate.data.UserData;
+import java.util.Map;
+import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
+import org.sisto.jeeplate.data.UserData;
+import org.sisto.jeeplate.data.UserGroupData;
+import org.sisto.jeeplate.generic.Model;
 import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.rules.UserRule;
+import org.sisto.jeeplate.user.UserModel;
 
-@Dependent
-public class User implements Serializable {
-
-    @Inject
-    private transient StringLogger log;
+@Named
+@ViewScoped
+public class UserGroupModel {
     
     @Inject
-    private UserData data;
+    transient private StringLogger log;
     
     @Inject
-    private UserRule rule;
+    private UserGroupData backingBean;
     
-    @Inject
-    private UserLogic logic; // or requirements
-    
-    public User() {
-        
+    public UserGroupData getBacking() {
+        return (this.backingBean);
     }
     
-    public Boolean updateUserName() {
-        Boolean updated = Boolean.FALSE;
+    public void setBackingBean(UserGroupData ugd) {
+        this.backingBean = ugd;
+    }
+    
+    public Map<Long, UserGroupData> allGroups() {
+        return (this.backingBean.findAllUserGroups());
+    }
+    
+    public void addToGroup(Long user) {
         
-        if (this.rule.isAllowedToDoIt() && this.logic.businessReq()) {
-            updated = Boolean.TRUE;
-        } else {
-            updated = Boolean.FALSE;
-        }
+
+    }
+    
+    public void removeFromGroup(Long user) {
         
-        return updated;
-    }   
+
+    }
 }

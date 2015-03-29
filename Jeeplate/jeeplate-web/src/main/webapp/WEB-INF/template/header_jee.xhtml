@@ -56,7 +56,17 @@
                     <p:commandButton value="Sign out" rendered="#{mgr.authenticated()}" icon="ui-icon-disk"
                                      ajax="false" action="#{mgr.doLogout}">
                     </p:commandButton>
-
+                    
+                    <!-- Primefaces' splitbutton cannot process dynamic lists, so we use this -->
+                    <h:outputLabel for="syslang" value="syslang"/>
+                   
+                        <p:inplace id="syslang" widgetVar="test" effect="none" label="#{language.getLocalisedLanguage()}">
+                            <h:selectOneMenu styleClass="selectLang" valueChangeListener="#{language.changeLanguage}">
+                                <p:ajax update="@all" />
+                                <f:selectItems value="#{language.availableLanguages}" />
+                            </h:selectOneMenu>
+                        </p:inplace>
+                    
                 </f:facet>
             </p:menubar>
         </h:form>

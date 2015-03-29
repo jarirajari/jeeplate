@@ -16,29 +16,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.hello;
+package org.sisto.jeeplate.user;
 
-import javax.ejb.Stateless;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.New;
-import javax.inject.Inject;
-import org.jboss.logging.Logger;
-import org.sisto.jeeplate.data.UserData;
+import javax.faces.bean.ViewScoped;
+import javax.inject.Named;
+import org.sisto.jeeplate.user.group.UserGroupModel;
 
-@Stateless
-public class HelloService {
+@Named
+@ViewScoped
+public class UserController {
     
-    @Inject
-    private transient Logger log;
-    
-    @Inject
-    private UserData user;
-    
-    public String testHelloServiceLogging() {
+    public void addUserToGroups() {
         
-        log.info("creating a test user account!");
-        user.testHashing();
-        
-        return "HelloService";
     }
 }

@@ -18,41 +18,42 @@
  */
 package org.sisto.jeeplate.domain;
 
-import javax.inject.Inject;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.persistence.Version;
-import org.jboss.logging.Logger;
 
 @MappedSuperclass
 @Access(AccessType.FIELD)
-public abstract class BusinessEntity {
+public abstract class BusinessEntity extends ObjectEntity {
+    
     @Transient
-    public transient static Long DEFAULT_ID = 0L;
+    protected Long transientSuperId = DEFAULT_ID;
     
-    @Inject
-    private transient Logger log;
-    
-    @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE)
-    protected Long id = 0L;
     @Version
-    protected Long version = 0L;
+    protected Long version = DEFAULT_VN;
     
     public Long getId() {
-        return (this.id);
+        return (this.transientSuperId);
     }
     
-    public boolean isDefaultId() {
-        return (this.id == DEFAULT_ID);
+    public void setId(Long id) {
+        this.transientSuperId = id;
     }
     
+    @Override
+    public Long identity() {
+        return (this.getId());
+    }
+    
+    @Override
+    public boolean isDefault() {
+        return (this.getId().equals(DEFAULT_ID));
+    }
+    
+    @Override
     public void reset() {
-        this.id = DEFAULT_ID;
+        this.transientSuperId = DEFAULT_ID;
     }
 }

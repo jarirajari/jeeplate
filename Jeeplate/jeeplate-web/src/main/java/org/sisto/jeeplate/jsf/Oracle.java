@@ -40,6 +40,7 @@ public class Oracle {
     private Map<String,String> timezones = new LinkedHashMap<>(); // Almost all
     private Map<String,String> countries = new LinkedHashMap<>(); // ISO 3166-2
     private Map<String,String> languages = new LinkedHashMap<>(); // ISO 639-2
+    private Map<String,String> systemLanguages = new LinkedHashMap<>(); // ISO 639-2
     private final String[] supportedLanguages = {"fi", "en"}; // ISO 639-2
             
     @PostConstruct
@@ -47,6 +48,10 @@ public class Oracle {
         this.populateTimezones();
         this.populateCountries();
         this.populateLanguages();
+        for (String lang : supportedLanguages) {
+            Locale systemLocale = new Locale(lang);
+            this.systemLanguages.put(systemLocale.getDisplayCountry(), lang);
+        }
     }
     
     private void populateTimezones() {
@@ -118,7 +123,11 @@ public class Oracle {
     public Map<String,String> getLanguages() {
         return (this.languages);
     }
-
+    
+    public Map<String,String> getSystemLanguages() {
+        return (this.systemLanguages);
+    }
+    
     public Map<String,String> localizedCountries() {
         Map<String,String> localized = new TreeMap<>();
         Locale viewLocale = FacesContext.getCurrentInstance().getViewRoot().getLocale();

@@ -16,29 +16,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.hello;
+package org.sisto.jeeplate.converter;
 
-import javax.ejb.Stateless;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.New;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
 import javax.inject.Inject;
-import org.jboss.logging.Logger;
+import javax.inject.Named;
 import org.sisto.jeeplate.data.UserData;
 
-@Stateless
-public class HelloService {
-    
+@Named("userToNameConverter")
+public class UserDataConverter implements Converter {
+
     @Inject
-    private transient Logger log;
+    private UserData bean;
     
-    @Inject
-    private UserData user;
-    
-    public String testHelloServiceLogging() {
-        
-        log.info("creating a test user account!");
-        user.testHashing();
-        
-        return "HelloService";
+    @Override
+    public Object getAsObject(FacesContext fc, UIComponent uic, String string) {
+        return null;
     }
+
+    @Override
+    public String getAsString(FacesContext fc, UIComponent uic, Object o) {
+        UserData ud = (UserData) o;
+        
+        return (ud.getEntity().getUsername());
+    }
+
 }

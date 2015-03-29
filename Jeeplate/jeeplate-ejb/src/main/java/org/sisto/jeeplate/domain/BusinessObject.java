@@ -24,4 +24,5 @@ public abstract class BusinessObject<T> {
     public abstract T update();
     public abstract T delete();
     public abstract T bind(Long id);
+    public abstract T find();
 }

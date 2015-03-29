@@ -16,12 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain;
+package org.sisto.jeeplate.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.ejb.Stateful;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -32,72 +28,36 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.TransactionRequiredException;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.LockTimeoutException;
-import javax.persistence.PessimisticLockException;
-import javax.persistence.QueryTimeoutException;
-import javax.persistence.TypedQuery;
 import org.jboss.logging.Logger;
-import org.sisto.jeeplate.logging.StringLogger;
+import javax.persistence.EntityNotFoundException;
+import org.sisto.jeeplate.domain.ObjectEntity;
+import org.sisto.jeeplate.domain.ObjectId;
 import org.sisto.jeeplate.util.H2EM;
 import org.sisto.jeeplate.util.PGEM;
 
 @Stateful
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
-public class BusinessEntityStore<T extends BusinessEntity> {
+public class EntityStore<T extends ObjectEntity> {
     
     @Inject
-    private transient StringLogger log;
+    private transient Logger log;
     
     @Inject
     @PGEM
     private EntityManager em;
     
     private EntityManager em() {
-        
-        if (this.em == null) {
-            log.error("%s has null EntityManager!", this.getClass().getCanonicalName());
-        }
-        
-        return (this.em);
+            
+        return this.em;
     }
     
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public List<T> executeQuery(final Class<T> target, final String JPQLQuery, final Map<String, Object> JPQLParams) throws PersistenceException  {
-        
-        TypedQuery<T> q = this.em().createQuery(JPQLQuery, target);
-        List<T> queryResult = new ArrayList();
-        Set<String> params = JPQLParams.keySet();
-        
-        for (String param : params) {
-            Object o = JPQLParams.get(param);
-            if (o != null) {
-                q.setParameter(param, o);
-            }
-        }
-        try {
-            queryResult = q.getResultList();
-        } catch (QueryTimeoutException | TransactionRequiredException |
-                 PessimisticLockException | LockTimeoutException ex) { 
-            /*
-             * QueryTimeoutException if the query execution exceeds the query timeout
-	     * TransactionRequiredException if a lock mode has been set and there is no transaction
-	     * PessimisticLockException if pessimistic locking fails and the transaction is rolled back
-	     * LockTimeoutException if pessimistic locking fails and only the statement is rolled back
-             */
-            log.error("BusinessEntityStore.executeQuery: "+ex.getMessage());
-        }
-        
-        return (queryResult);
-    }
-    
+    /**
+     * Creates an object in database
+     */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public T bind(T be) throws PersistenceException  {
-        T bound = be;
         
-        if (be != null) {
-            bound = this.safeFind(be);
-        }
+        T bound = this.safeFind(be);
         
         return bound;
     }
@@ -177,9 +137,8 @@ public class BusinessEntityStore<T extends BusinessEntity> {
             isNew = true;
         } else {
             try {
-                T tmp = (T) this.em().find(be.getClass(), be.getId());
+                T tmp = (T) this.em().find(be.getClass(), be.identity());
                 isNew = (tmp == null) ? true : false;
-                log.info("isNew entity, " + tmp.toString());
             } catch (IllegalArgumentException iae) {
                 isNew = false;
                 log.warn("isNew error: " + iae.getMessage());
@@ -231,7 +190,7 @@ public class BusinessEntityStore<T extends BusinessEntity> {
                 if (isManaged) {
                     found = be;
                 } else {
-                    found = (T) this.em().find(be.getClass(), be.getId());
+                    found = (T) this.em().find(be.getClass(), be.identity());
                 }
             } catch (IllegalArgumentException ex) {
                 log.debug(ex.getMessage());

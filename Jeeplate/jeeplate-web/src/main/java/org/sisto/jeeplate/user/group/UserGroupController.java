@@ -16,43 +16,35 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.user.group;
 
-import java.io.Serializable;
-import javax.enterprise.context.Dependent;
-import org.sisto.jeeplate.data.UserData;
+import javax.enterprise.inject.New;
+import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.rules.UserRule;
+import org.sisto.jeeplate.user.UserModel;
 
-@Dependent
-public class User implements Serializable {
-
-    @Inject
-    private transient StringLogger log;
+@Named
+@ViewScoped
+public class UserGroupController {
     
     @Inject
-    private UserData data;
+    transient private StringLogger log;
     
     @Inject
-    private UserRule rule;
+    private UserModel user;
     
     @Inject
-    private UserLogic logic; // or requirements
+    private UserGroupModel group;
     
-    public User() {
-        
+    public Boolean addToGroup(Long user) {
+        log.info("UserGroupController+add -> "+user);
+        return Boolean.FALSE;
     }
     
-    public Boolean updateUserName() {
-        Boolean updated = Boolean.FALSE;
-        
-        if (this.rule.isAllowedToDoIt() && this.logic.businessReq()) {
-            updated = Boolean.TRUE;
-        } else {
-            updated = Boolean.FALSE;
-        }
-        
-        return updated;
-    }   
+    public Boolean removeFromGroup(Long user) {
+        log.info("UserGroupController-rem -> "+user);
+        return Boolean.FALSE;
+    }
 }

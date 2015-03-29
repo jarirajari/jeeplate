@@ -18,41 +18,14 @@
  */
 package org.sisto.jeeplate.user;
 
-import java.io.Serializable;
-import javax.enterprise.context.Dependent;
-import org.sisto.jeeplate.data.UserData;
+import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
-import org.sisto.jeeplate.logging.StringLogger;
+import javax.inject.Named;
 import org.sisto.jeeplate.rules.UserRule;
 
-@Dependent
-public class User implements Serializable {
-
+@Named
+@ViewScoped
+public class UserView {
     @Inject
-    private transient StringLogger log;
-    
-    @Inject
-    private UserData data;
-    
-    @Inject
-    private UserRule rule;
-    
-    @Inject
-    private UserLogic logic; // or requirements
-    
-    public User() {
-        
-    }
-    
-    public Boolean updateUserName() {
-        Boolean updated = Boolean.FALSE;
-        
-        if (this.rule.isAllowedToDoIt() && this.logic.businessReq()) {
-            updated = Boolean.TRUE;
-        } else {
-            updated = Boolean.FALSE;
-        }
-        
-        return updated;
-    }   
+    private UserRule rules; // what should be rendered
 }

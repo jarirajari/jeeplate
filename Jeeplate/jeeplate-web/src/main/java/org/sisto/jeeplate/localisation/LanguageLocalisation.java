@@ -103,6 +103,10 @@ public class LanguageLocalisation implements Serializable {
         return String.format("resources/images/flags/%s.png", flag);
     }
     
+    public String getLocalisedLanguage() {
+        return (this.serverLocale.getDisplayLanguage());
+    }
+    
     public String getLanguage() {
         return this.serverLocale.getLanguage();
     }

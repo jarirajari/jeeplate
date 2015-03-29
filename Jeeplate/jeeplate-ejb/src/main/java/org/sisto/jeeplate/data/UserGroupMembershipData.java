@@ -16,43 +16,35 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.data;
 
 import java.io.Serializable;
-import javax.enterprise.context.Dependent;
-import org.sisto.jeeplate.data.UserData;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
-import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.rules.UserRule;
+import org.jboss.logging.Logger;
+import org.sisto.jeeplate.domain.BusinessEntityStore;
+import org.sisto.jeeplate.entity.UserGroupMembershipEntity;
 
-@Dependent
-public class User implements Serializable {
-
-    @Inject
-    private transient StringLogger log;
+@SessionScoped
+public class UserGroupMembershipData implements Serializable {
     
     @Inject
-    private UserData data;
+    private transient Logger log;
     
     @Inject
-    private UserRule rule;
+    private transient BusinessEntityStore<UserGroupMembershipEntity> store;
     
-    @Inject
-    private UserLogic logic; // or requirements
+    private transient UserGroupMembershipEntity entity;
     
-    public User() {
-        
+    public void setEntity(UserGroupMembershipEntity uge) {
+        this.entity = uge;
     }
     
-    public Boolean updateUserName() {
-        Boolean updated = Boolean.FALSE;
-        
-        if (this.rule.isAllowedToDoIt() && this.logic.businessReq()) {
-            updated = Boolean.TRUE;
-        } else {
-            updated = Boolean.FALSE;
-        }
-        
-        return updated;
-    }   
+    public UserGroupMembershipEntity getEntity() {
+        return (this.entity);
+    }
+    
+    public void test() {
+        this.entity.addMembership(null, null);
+    }
 }
