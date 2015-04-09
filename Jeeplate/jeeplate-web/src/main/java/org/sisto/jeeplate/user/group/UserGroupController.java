@@ -39,12 +39,12 @@ public class UserGroupController {
     private UserGroupModel group;
     
     public Boolean addToGroup(Long user) {
-        log.info("UserGroupController+add -> "+user);
+        log.info("UserGroupController+add -> "+user+"");
         return Boolean.FALSE;
     }
     
     public Boolean removeFromGroup(Long user) {
-        log.info("UserGroupController-rem -> "+user);
+        log.info("UserGroupController-rem -> "+user+"");
         return Boolean.FALSE;
     }
 }

@@ -31,16 +31,54 @@
                 <p>Restricted.xhtml default content</p>
                 <h:form>
                     <p>
+                        <p:outputLabel for="domains" value="Domains: " />
+                        <h:selectOneMenu id="domains">
+                            <f:selectItems value="#{userModel.allUsers().values()}" var="users" itemLabel="#{users.entity.username}" itemValue="#{users.entity.id}" />
+                        </h:selectOneMenu>
+                        <br />
+                        <p:outputLabel for="domain" value="Add domain: " />
+                        <h:inputText id="domain" />
+                        <br />
                         <p:outputLabel for="users" value="Users: " />
                         <h:selectOneMenu id="users">
                             <f:selectItems value="#{userModel.allUsers().values()}" var="users" itemLabel="#{users.entity.username}" itemValue="#{users.entity.id}" />
                         </h:selectOneMenu>
+                        <br />
+                        <p:outputLabel for="user" value="Add user: " />
+                        <h:inputText id="user" />
+                        <br />
                         <p:outputLabel for="groups" value="Groups: " />
                         <h:selectOneMenu id="groups">
-                            <f:selectItems value="#{userGroupModel.allGroups()}" var="groups" itemLabel="#{groups.key}" itemValue="#{groups.value}" />
+                            <f:selectItems value="#{userGroupModel.allGroups().values()}" var="groups" itemLabel="#{groups.entity.groupname}" itemValue="#{groups.entity.id}" noSelectionValue="none"/>
                         </h:selectOneMenu>
-                        <p:commandButton value="Lisää" actionListener="#{userController.addUserToGroups()}"/>
+                        <br />
+                        <p:outputLabel for="group" value="Add group: " />
+                        <h:inputText id="group" />
+                        <br />
                     </p>
+                    <p:commandButton value="Lähetä" actionListener="#{userController.addUserToGroups()}" icon="fa fa-edit" type="button"/>
+                </h:form>
+                <h:form id="add">
+                    <p>
+                        <p:outputLabel for="input2" value="Text: " />
+                        <h:inputText id="input2" value="#{restrictedView.input}"/>
+                        <h:outputText value="#{restrictedView.selectedUser}" />
+                        <p:outputLabel for="users2" value="Add user" />
+                        <p:selectOneMenu id="users2" disabled="false" value="#{restrictedView.selectedUser}" immediate="true">
+                            <f:selectItem itemLabel="User" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{userModel.allUsers().values()}" var="users" itemLabel="#{users.entity.username}" itemValue="#{users.entity.id}"/>
+
+                        </p:selectOneMenu>
+                        <p:outputLabel for="groups2" value=" to group " />
+                        <p:selectOneMenu id="groups2" disabled="false" value="#{restrictedView.selectedGroup}">
+                            <f:selectItem itemLabel="Group" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{userGroupModel.allGroups().values()}" var="groups" itemLabel="#{groups.entity.groupname}" itemValue="#{groups.entity.id}" noSelectionValue="none" />
+                        </p:selectOneMenu>
+                        <br />
+                    </p>
+                    <p:commandButton value="Lisää käyttäjä ryhmään" action="#{restrictedView.addToGroup()}">
+                        
+                    </p:commandButton>
                 </h:form>
             </ui:define>
             <ui:define name="footer" rendered="false" />

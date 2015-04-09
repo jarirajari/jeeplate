@@ -19,14 +19,13 @@
 package org.sisto.jeeplate.user.group;
 
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.sisto.jeeplate.data.UserData;
 import org.sisto.jeeplate.data.UserGroupData;
-import org.sisto.jeeplate.generic.Model;
+import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.user.UserModel;
 
 @Named
 @ViewScoped
@@ -36,27 +35,34 @@ public class UserGroupModel {
     transient private StringLogger log;
     
     @Inject
-    private UserGroupData backingBean;
+    private UserGroupData backing;
+    private Map<Long, UserGroupData> all;
+    private Long selected = BusinessEntity.DEFAULT_ID;
     
-    public UserGroupData getBacking() {
-        return (this.backingBean);
+    @PostConstruct
+    private void init() {
+        this.all = this.backing.findAllUserGroups();
     }
     
-    public void setBackingBean(UserGroupData ugd) {
-        this.backingBean = ugd;
+    public void setSelected(Long ud) {
+        
+        this.selected = ud;
+    }
+    
+    public Long getSelected() {
+        
+        return (this.selected);
     }
     
     public Map<Long, UserGroupData> allGroups() {
-        return (this.backingBean.findAllUserGroups());
+        return (this.backing.findAllUserGroups());
     }
     
     public void addToGroup(Long user) {
-        
-
+        log.debug("trying to add user %s", String.valueOf(user));
     }
     
     public void removeFromGroup(Long user) {
-        
-
+        log.debug("trying to rem user %s", String.valueOf(user));
     }
 }

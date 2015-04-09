@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.enterprise.context.Dependent;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -45,6 +44,13 @@ public class UserGroupData implements Serializable {
     @Inject
     private UserGroupMembershipData usersGroups;
     
+    private transient final UserGroupEntity hashed = UserGroupEntity.newUserGroupEntityBuilder()
+            .withName("vip-group")
+            .build();
+    private transient final UserGroupEntity hashed2 = UserGroupEntity.newUserGroupEntityBuilder()
+            .withName("basic-group")
+            .build();
+    
     public UserGroupData() {}
     
     protected UserGroupData(UserGroupEntity uge) {
@@ -58,28 +64,31 @@ public class UserGroupData implements Serializable {
     public UserGroupEntity getEntity() {
         return (this.entity);
     }
+    
     // User(E) <-membership-> MapOfUsergroups(E) <-membership-> Usergroup(E)
     
     public Boolean addNewGroupMember(Long userId) {
         boolean added = false;
         
+        // create member and membership => usersGroups
         
         return added;
     }
     
     public Boolean removeOldMember(Long userId) {
         boolean added = false;
-        // create member and membership => add them
         
+        // create member and membership => usersGroups
         
         return added;
     }
     
     @Transactional
     public Boolean testHashing() {
-        //builder!
-        //this.store.create(this.hashed);
-        //this.store.create(this.hashed2);
+        
+        this.store.create(this.hashed);
+        this.store.create(this.hashed2);
+        
         return Boolean.TRUE;
     }
     
@@ -90,7 +99,19 @@ public class UserGroupData implements Serializable {
         final List<UserGroupEntity> result = this.store.executeQuery(UserGroupEntity.class, query, params);
         
         return (result.stream()
-                .collect(Collectors.toMap(UserGroupEntity::getId, (e) -> new UserGroupData(e))));
+                .collect(Collectors.toMap(UserGroupEntity::getId, UserGroupData::new)));
+    }
+    
+    @Transactional
+    public Map<Long, UserGroupData> findOneUserGroup(final Long withId) {
+        final String query = "SELECT uge FROM UserGroupEntity uge WHERE uge.id = :groupId";
+        final Map<String, Object> params = new HashMap<String, Object>() {{
+            put("groupId", withId);
+        }};
+        final List<UserGroupEntity> result = this.store.executeQuery(UserGroupEntity.class, query, params);
+        
+        return (result.stream()
+                .collect(Collectors.toMap(UserGroupEntity::getId, UserGroupData::new)));
     }
     
     @Transactional

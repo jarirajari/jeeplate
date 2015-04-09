@@ -19,18 +19,25 @@
 package org.sisto.jeeplate.entity;
 
 import java.io.Serializable;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import org.sisto.jeeplate.data.UserData;
 import org.sisto.jeeplate.data.UserGroupData;
 import org.sisto.jeeplate.domain.BusinessEntity;
 
 @Entity
-@Table(name = "map_of_user_groups")
+@Access(AccessType.FIELD)
+@Table(name = "system_user_group_membership")
 public class UserGroupMembershipEntity extends BusinessEntity implements Serializable {
     @Id
     @SequenceGenerator(name = "user_group_membership_seq", allocationSize = 1)
@@ -45,8 +52,14 @@ public class UserGroupMembershipEntity extends BusinessEntity implements Seriali
      */
     
     private Long ref_user;
-    
     private Long ref_group;
+    
+    @PostLoad
+    @PostPersist
+    @PostUpdate
+    private void updateParentId() {
+        super.setId(this.id);
+    }
 
     public void addMembership(UserData user, UserGroupData group) {
         group.getEntity().getId();

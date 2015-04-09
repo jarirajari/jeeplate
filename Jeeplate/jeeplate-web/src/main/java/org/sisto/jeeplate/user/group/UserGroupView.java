@@ -24,5 +24,5 @@ import javax.inject.Named;
 @Named
 @ViewScoped
 public class UserGroupView {
-    
+    // rules for rendering
 }

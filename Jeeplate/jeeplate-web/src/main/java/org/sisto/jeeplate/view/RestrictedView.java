@@ -18,27 +18,90 @@
  */
 package org.sisto.jeeplate.view;
 
-import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
 import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.user.UserModel;
-import org.sisto.jeeplate.user.group.UserGroupModel;
 
-@Named("restricted")
+@Named
 @ViewScoped
-public class RestrictedView {
+public class RestrictedView implements Serializable {
     
-    // group different model etc objects
+    // Grouping different model etc objects & instances, models are general
     
     @Inject
     transient private StringLogger log;
     
-    @Inject
-    private UserModel userModel;
+    private Object selectedUser;
+    private Long selectedGroup;
+    private String input;
     
-    @Inject
-    private UserGroupModel userGroupModel;
-
+    @PostConstruct
+    private void init() {
+        log.info("init"+this.toString());
+    }
     
+    public String getInput()
+    {
+        log.info("getinput"+this.toString());
+        return input;
+    }
+ 
+    public void setInput(String input)
+    {
+        log.info("setinput"+this.toString());
+        this.input = input;
+    }
+    
+    public void setSelectedUser(Object ud) {
+        if(ud!=null){
+        log.info("setud"+this.toString());
+        }
+        this.selectedUser = ud;
+        if(ud!=null){
+        log.info("sel ud"+selectedUser.toString());
+        }
+    }
+    
+    public Object getSelectedUser() {
+        if(this.selectedUser!=null)
+            log.info("getud"+this.selectedUser.toString());
+        return (this.selectedUser);
+    }
+    
+    public void setSelectedGroup(Long ud) {
+        
+        this.selectedGroup = ud;
+    }
+    
+    public Long getSelectedGroup() {
+        
+        return (this.selectedGroup);
+    }
+    
+    public Boolean addToGroup() {
+        log.info("RestrictedView+add -> u="+this.getSelectedUser()+"g="+selectedGroup+"; "+this.toString());
+        return Boolean.FALSE;
+    }
+    
+    public void debug_HTTP_POST() {
+        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance()
+                                 .getExternalContext().getRequest();
+        Map<String, String[]> params =  req.getParameterMap();
+        Set<String> keys = params.keySet();
+        
+        log.info("HTTP_POST:");
+        for (String key : keys) {
+            String[] val = params.get(key);
+            
+            log.info("%s = %s", key, Arrays.toString(val));
+        }
+    }
 }

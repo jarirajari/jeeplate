@@ -27,33 +27,72 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import org.sisto.jeeplate.domain.BusinessEntity;
-import org.sisto.jeeplate.domain.ObjectEntity;
 
 @Entity
 @Access(AccessType.FIELD)
+@Table(name = "system_groups", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "groupname")})
 public class UserGroupEntity extends BusinessEntity implements Serializable {
     @Id
     @SequenceGenerator(name="user_group_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_group_seq", strategy = GenerationType.SEQUENCE)
     private Long id;
+    private String groupname;
     
-    private UserGroupMembershipEntity userGroups;
-    
-    @Override
-    public Long identity() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    @PostLoad
+    @PostPersist
+    @PostUpdate
+    private void updateParentId() {
+        super.setId(this.id);
     }
+    
+    public String getGroupname() {
+        return this.groupname;
+    }
+    
+    public void setGroupname(String name) {
+        this.groupname = name;
+    }
+    
+    public static UserGroupEntityBuilder newUserGroupEntityBuilder() {
+        return (new UserGroupEntityBuilder());
+    }
+    
+    public static class UserGroupEntityBuilder {
+        
+        private UserGroupEntity object;
 
-    @Override
-    public boolean isDefault() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+        public UserGroupEntityBuilder() {
+            this.object = new UserGroupEntity();
+            this.defaults();
+        }
 
-    @Override
-    public void reset() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        private void defaults() {
+            this.object.groupname = "";
+        }
+        
+        public UserGroupEntityBuilder withId(Long id) {
+            this.object.id = id;
+            
+            return (this);
+        }
+        
+        public UserGroupEntityBuilder withName(String name) {
+            this.object.groupname = name;
+            
+            return (this);
+        }
+        
+        public UserGroupEntity build() {
+            
+            return (this.object);
+        }
     }
-    
 }

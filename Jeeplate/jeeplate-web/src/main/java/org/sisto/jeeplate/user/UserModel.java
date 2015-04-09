@@ -19,8 +19,10 @@
 package org.sisto.jeeplate.user;
 
 import java.beans.Transient;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.New;
@@ -41,14 +43,15 @@ public class UserModel { // model view control are backing beans => BACKING MVC?
     
     @Inject
     @New
-    private UserData backing;
+    private UserData backing;  
     private Map<Long, UserData> all;
+    
     
     @PostConstruct
     private void init() {
         this.all = this.backing.findAllUsers();
     }
-
+    
     public Map<Long, UserData> allUsers() {
         return (this.backing.findAllUsers());
     }

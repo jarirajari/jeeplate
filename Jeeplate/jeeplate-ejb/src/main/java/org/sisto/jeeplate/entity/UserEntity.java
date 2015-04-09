@@ -19,6 +19,8 @@
 package org.sisto.jeeplate.entity;
 
 import java.io.Serializable;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,6 +39,7 @@ import org.sisto.jeeplate.security.shiro.Salt;
  * Business object model for an actual business object
  */
 @Entity
+@Access(AccessType.FIELD)
 @Table(name = "system_users", uniqueConstraints = {
         @UniqueConstraint(columnNames = "username")})
 public class UserEntity extends BusinessEntity implements Serializable {

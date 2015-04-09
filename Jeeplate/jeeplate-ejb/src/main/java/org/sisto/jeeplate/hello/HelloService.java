@@ -24,6 +24,7 @@ import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import org.jboss.logging.Logger;
 import org.sisto.jeeplate.data.UserData;
+import org.sisto.jeeplate.data.UserGroupData;
 
 @Stateless
 public class HelloService {
@@ -33,11 +34,14 @@ public class HelloService {
     
     @Inject
     private UserData user;
+    @Inject
+    private UserGroupData group;
     
     public String testHelloServiceLogging() {
         
-        log.info("creating a test user account!");
+        log.info("creating a test users and groups!");
         user.testHashing();
+        group.testHashing();
         
         return "HelloService";
     }
