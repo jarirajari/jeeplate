@@ -28,6 +28,9 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
+import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.domain.user.group.UserGroupData;
+import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.logging.StringLogger;
 
 @Named
@@ -38,47 +41,43 @@ public class RestrictedView implements Serializable {
     
     @Inject
     transient private StringLogger log;
-    
-    private Object selectedUser;
+    @Inject
+    private UserGroupMembershipData membership;
+    private Long selectedUser;
     private Long selectedGroup;
     private String input;
     
     @PostConstruct
     private void init() {
-        log.info("init"+this.toString());
+        this.selectedUser  = 0L;
+        this.selectedGroup = 0L;
     }
     
-    public String getInput()
-    {
-        log.info("getinput"+this.toString());
+    public String getInput() {
         return input;
     }
  
-    public void setInput(String input)
-    {
-        log.info("setinput"+this.toString());
-        this.input = input;
-    }
-    
-    public void setSelectedUser(Object ud) {
-        if(ud!=null){
-        log.info("setud"+this.toString());
-        }
-        this.selectedUser = ud;
-        if(ud!=null){
-        log.info("sel ud"+selectedUser.toString());
+    public void setInput(String input) {
+        if (input != null) {
+            this.input = input;
         }
     }
     
-    public Object getSelectedUser() {
-        if(this.selectedUser!=null)
-            log.info("getud"+this.selectedUser.toString());
+    public Long getSelectedUser() {
+        
         return (this.selectedUser);
     }
     
+    public void setSelectedUser(Long user) {
+        if (user != null){
+            this.selectedUser = user;
+        }
+    }
+    
     public void setSelectedGroup(Long ud) {
-        
-        this.selectedGroup = ud;
+        if (ud != null) {
+            this.selectedGroup = ud;
+        }
     }
     
     public Long getSelectedGroup() {
@@ -87,7 +86,10 @@ public class RestrictedView implements Serializable {
     }
     
     public Boolean addToGroup() {
-        log.info("RestrictedView+add -> u="+this.getSelectedUser()+"g="+selectedGroup+"; "+this.toString());
+        if (this.selectedUser != null && this.selectedGroup != null) {
+            log.info("RestrictedView+UserGroupController -> add =>> u="+this.getSelectedUser()+"g="+this.getSelectedGroup()+"; "+this.toString());
+            membership.addNewMember(selectedUser, selectedGroup);
+        }
         return Boolean.FALSE;
     }
     

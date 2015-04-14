@@ -16,53 +16,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user.group;
+package org.sisto.jeeplate.domain.user;
 
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ViewScoped;
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.sisto.jeeplate.data.UserGroupData;
-import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.logging.StringLogger;
 
 @Named
-@ViewScoped
-public class UserGroupModel {
+@RequestScoped
+public class UserModel { // model view control are backing beans => BACKING MVC?
     
     @Inject
     transient private StringLogger log;
     
     @Inject
-    private UserGroupData backing;
-    private Map<Long, UserGroupData> all;
-    private Long selected = BusinessEntity.DEFAULT_ID;
+    @New
+    private UserData backing;  
+    private Map<Long, UserData> all;
+    
     
     @PostConstruct
     private void init() {
-        this.all = this.backing.findAllUserGroups();
+        this.all = this.backing.findAllUsers();
     }
     
-    public void setSelected(Long ud) {
-        
-        this.selected = ud;
+    public Map<Long, UserData> allUsers() {
+        return (this.backing.findAllUsers());
     }
-    
-    public Long getSelected() {
-        
-        return (this.selected);
-    }
-    
-    public Map<Long, UserGroupData> allGroups() {
-        return (this.backing.findAllUserGroups());
-    }
-    
-    public void addToGroup(Long user) {
-        log.debug("trying to add user %s", String.valueOf(user));
-    }
-    
-    public void removeFromGroup(Long user) {
-        log.debug("trying to rem user %s", String.valueOf(user));
-    }
+
 }

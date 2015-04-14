@@ -16,19 +16,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.data;
+package org.sisto.jeeplate.domain.user.group;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.ejb.Init;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.jboss.logging.Logger;
+import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
-import org.sisto.jeeplate.entity.UserGroupEntity;
+import org.sisto.jeeplate.domain.user.group.UserGroupEntity;
 
 @SessionScoped
 public class UserGroupData implements Serializable {
@@ -51,7 +56,9 @@ public class UserGroupData implements Serializable {
             .withName("basic-group")
             .build();
     
-    public UserGroupData() {}
+    public UserGroupData() {
+        this.entity = UserGroupEntity.defaultUserGroupEntity();
+    }
     
     protected UserGroupData(UserGroupEntity uge) {
         this.entity = uge;
@@ -67,22 +74,6 @@ public class UserGroupData implements Serializable {
     
     // User(E) <-membership-> MapOfUsergroups(E) <-membership-> Usergroup(E)
     
-    public Boolean addNewGroupMember(Long userId) {
-        boolean added = false;
-        
-        // create member and membership => usersGroups
-        
-        return added;
-    }
-    
-    public Boolean removeOldMember(Long userId) {
-        boolean added = false;
-        
-        // create member and membership => usersGroups
-        
-        return added;
-    }
-    
     @Transactional
     public Boolean testHashing() {
         
@@ -93,13 +84,14 @@ public class UserGroupData implements Serializable {
     }
     
     @Transactional
-    public Map<Long, UserGroupData> findAllUserGroups() {
+    public List<UserGroupData> findAllUserGroups() {
         final String query = "SELECT uge FROM UserGroupEntity uge";
         final Map<String, Object> params = new HashMap<>();
         final List<UserGroupEntity> result = this.store.executeQuery(UserGroupEntity.class, query, params);
         
         return (result.stream()
-                .collect(Collectors.toMap(UserGroupEntity::getId, UserGroupData::new)));
+                .map(UserGroupData::new)
+                .collect(Collectors.toList()));
     }
     
     @Transactional
@@ -121,13 +113,13 @@ public class UserGroupData implements Serializable {
     
     @Transactional
     public UserGroupData bind(Long id) {
+        UserGroupEntity entity = UserGroupEntity.newUserGroupEntityBuilder().renovate(id);
+        UserGroupEntity group = this.store.bind(entity);
+        Optional<UserGroupEntity> bound = Optional.ofNullable(group);
         
-        /* also create and bind UserGroup here before anything !?!?!? */
-        
-        UserGroupEntity tmp = null; // UserGroupEntity.newUserGroupEntityBuilder().withId(id).build();
-        
-        this.entity = this.store.bind(tmp);
-        log.info("Bound UserGroupData "+this.entity.hashCode()+", "+this.entity.toString());
+        if(bound.isPresent()) {
+            this.setEntity(group);
+        }
         
         return (this);
     }

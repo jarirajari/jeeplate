@@ -16,44 +16,35 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.domain.user.group;
 
-import java.beans.Transient;
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.New;
-import javax.faces.bean.ViewScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.sisto.jeeplate.data.UserData;
-import org.sisto.jeeplate.domain.BusinessEntity;
-import org.sisto.jeeplate.generic.Model;
 import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.domain.user.UserModel;
 
 @Named
-@ViewScoped
-public class UserModel { // model view control are backing beans => BACKING MVC?
+@RequestScoped
+public class UserGroupController {
     
     @Inject
     transient private StringLogger log;
     
     @Inject
-    @New
-    private UserData backing;  
-    private Map<Long, UserData> all;
+    private UserModel user;
     
+    @Inject
+    private UserGroupModel group;
     
-    @PostConstruct
-    private void init() {
-        this.all = this.backing.findAllUsers();
+    public Boolean addToGroup(Long user) {
+        log.info("UserGroupController+add -> "+user+"");
+        return Boolean.FALSE;
     }
     
-    public Map<Long, UserData> allUsers() {
-        return (this.backing.findAllUsers());
+    public Boolean removeFromGroup(Long user) {
+        log.info("UserGroupController-rem -> "+user+"");
+        return Boolean.FALSE;
     }
-
 }

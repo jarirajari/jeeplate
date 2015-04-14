@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.data;
+package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -28,10 +28,12 @@ import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.jboss.logging.Logger;
+import org.sisto.jeeplate.domain.user.group.UserGroupData;
+import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
-import org.sisto.jeeplate.entity.UserEntity;
-import org.sisto.jeeplate.entity.UserGroupEntity;
-import org.sisto.jeeplate.user.User;
+import org.sisto.jeeplate.domain.user.UserEntity;
+import org.sisto.jeeplate.domain.user.group.UserGroupEntity;
+import org.sisto.jeeplate.domain.user.User;
 
 @SessionScoped
 public class UserData implements Serializable {
@@ -75,7 +77,7 @@ public class UserData implements Serializable {
     
     @Transactional
     public Map<Long, UserGroupData> findGroupsUserBelongsTo() {
-        this.usersGroups.test();
+        
         return null;
     }
     
@@ -125,10 +127,9 @@ public class UserData implements Serializable {
     
     @Transactional
     public UserData bind(Long id) {
-        UserEntity tmp = UserEntity.newUserEntityBuilder().withId(id).build();
+        UserEntity tmp = UserEntity.newUserEntityBuilder().renovate(id);
         
         this.entity = this.store.bind(tmp);
-        log.info("Bound UserData "+this.entity.hashCode()+", "+this.entity.toString());
         
         return (this);
     }

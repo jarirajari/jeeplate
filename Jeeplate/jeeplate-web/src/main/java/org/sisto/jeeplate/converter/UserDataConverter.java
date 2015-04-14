@@ -23,7 +23,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.sisto.jeeplate.data.UserData;
+import org.sisto.jeeplate.domain.user.UserData;
 
 @Named("userToNameConverter")
 public class UserDataConverter implements Converter {

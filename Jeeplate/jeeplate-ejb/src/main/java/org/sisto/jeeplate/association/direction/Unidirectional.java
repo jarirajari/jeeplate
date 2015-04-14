@@ -16,14 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.association.direction;
 
-import javax.ejb.Stateless;
-
-@Stateless
-public class UserLogic {
-    // contains business requirements!
-    public Boolean businessReq() {
-        return Boolean.TRUE;
-    }
+public interface Unidirectional {
+    
 }

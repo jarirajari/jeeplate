@@ -16,19 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user.group;
+package org.sisto.jeeplate.association.cardinality;
 
-import java.io.Serializable;
-import javax.enterprise.context.Dependent;
-import org.sisto.jeeplate.domain.BusinessObject;
-
-/**
- * User <---> UserGroup <---> Group per domain <---> PermissionGroup <---> Permission
- * 
- * 
- */
-@Dependent
-public class UserGroup implements Serializable {
-
-
+public interface ManyToOne {
+    
 }

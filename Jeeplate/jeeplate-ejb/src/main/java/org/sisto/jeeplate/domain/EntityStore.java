@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.entity;
+package org.sisto.jeeplate.domain;
 
 import javax.ejb.Stateful;
 import javax.ejb.TransactionAttribute;

@@ -16,23 +16,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user.group;
+package org.sisto.jeeplate.domain.user;
 
-import java.io.Serializable;
-import javax.enterprise.context.Dependent;
-import org.sisto.jeeplate.data.UserData;
-import org.sisto.jeeplate.data.UserGroupData;
-
-@Dependent
-public class UserGroupMembership implements Serializable {
-    
-    public UserGroupMembership() {}
-    public UserGroupMembership(UserData user, UserGroupData group) {
-        
+public class UserTypes {
+    public enum Type {
+        APPLICATION,
+        SYSTEM;
     }
-    
-    public void test() {
-        
-    }
-    
 }

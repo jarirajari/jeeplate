@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.entity;
+package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
 import javax.persistence.Access;
@@ -55,7 +55,8 @@ public class UserEntity extends BusinessEntity implements Serializable {
     @PostLoad
     @PostPersist
     @PostUpdate
-    private void updateParentId() {
+    @Override
+    protected void updateParentId() {
         super.setId(this.id);
     }
     
@@ -86,6 +87,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
         private Sha256Hash hasher;
 
         public UserEntityBuilder() {
+            
             this.object = new UserEntity();
             this.defaults();
         }
@@ -94,12 +96,6 @@ public class UserEntity extends BusinessEntity implements Serializable {
             this.object.username = "";
             this.object.password = "";
             this.object.salt = "";
-        }
-        
-        public UserEntityBuilder withId(Long id) {
-            this.object.id = id;
-            
-            return (this);
         }
         
         public UserEntityBuilder withName(String name) {
@@ -122,8 +118,17 @@ public class UserEntity extends BusinessEntity implements Serializable {
         }
         
         public UserEntity build() {
+            
+            this.object.id = null;
             this.object.salt = Salt.getSaltString();
             this.object.password = this.getSaltedAndHashedPassword();
+            
+            return (this.object);
+        }
+        
+        public UserEntity renovate(Long id) {
+            
+            this.object.id = id;
             
             return (this.object);
         }

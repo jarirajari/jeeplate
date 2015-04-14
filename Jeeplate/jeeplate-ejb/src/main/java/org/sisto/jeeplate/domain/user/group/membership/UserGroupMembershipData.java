@@ -16,25 +16,33 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.data;
+package org.sisto.jeeplate.domain.user.group.membership;
 
 import java.io.Serializable;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
-import org.jboss.logging.Logger;
+import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
-import org.sisto.jeeplate.entity.UserGroupMembershipEntity;
+import org.sisto.jeeplate.logging.StringLogger;
 
 @SessionScoped
 public class UserGroupMembershipData implements Serializable {
     
     @Inject
-    private transient Logger log;
+    private transient StringLogger log;
     
     @Inject
     private transient BusinessEntityStore<UserGroupMembershipEntity> store;
     
     private transient UserGroupMembershipEntity entity;
+    
+    public UserGroupMembershipData() {
+        this.entity = UserGroupMembershipEntity.defaultUserGroupMembershipEntity();
+    }
+    
+    protected UserGroupMembershipData(UserGroupMembershipEntity uge) {
+        this.entity = uge;
+    }
     
     public void setEntity(UserGroupMembershipEntity uge) {
         this.entity = uge;
@@ -44,7 +52,16 @@ public class UserGroupMembershipData implements Serializable {
         return (this.entity);
     }
     
-    public void test() {
-        this.entity.addMembership(null, null);
+    @Transactional
+    public Boolean addNewMember(Long user, Long toGroup) {
+        UserGroupMembershipEntity member = UserGroupMembershipEntity
+                .newUserGroupMembershipEntityBuilder()
+                .group(toGroup)
+                .member(user)
+                .build();
+        this.setEntity(this.store.create(member));
+        
+        return Boolean.TRUE;
     }
+    
 }

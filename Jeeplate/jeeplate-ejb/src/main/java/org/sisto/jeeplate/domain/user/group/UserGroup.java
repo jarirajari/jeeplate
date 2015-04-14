@@ -16,14 +16,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.association;
+package org.sisto.jeeplate.domain.user.group;
+
+import java.io.Serializable;
+import javax.enterprise.context.Dependent;
+import org.sisto.jeeplate.domain.BusinessObject;
 
 /**
- * one2one
- * one2many
- * many2one
- * many2many
+ * User <---> UserGroup <---> Group per domain <---> PermissionGroup <---> Permission
+ * 
+ * 
  */
-public interface ManyToMany {
-    
+@Dependent
+public class UserGroup implements Serializable {
+
+
 }

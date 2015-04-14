@@ -16,43 +16,39 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.domain.user.group;
 
-import java.io.Serializable;
-import javax.enterprise.context.Dependent;
-import org.sisto.jeeplate.data.UserData;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.enterprise.context.RequestScoped;
 import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.rules.UserRule;
 
-@Dependent
-public class User implements Serializable {
-
-    @Inject
-    private transient StringLogger log;
+@Named
+@RequestScoped
+public class UserGroupModel {
     
     @Inject
-    private UserData data;
+    transient private StringLogger log;
     
     @Inject
-    private UserRule rule;
+    private UserGroupData backing;
+    private List<UserGroupData> allGroups;
     
-    @Inject
-    private UserLogic logic; // or requirements
-    
-    public User() {
-        
+    @PostConstruct
+    private void init() {
+        log.info("# UserGroupModel-init");
+        this.allGroups = this.backing.findAllUserGroups();
     }
     
-    public Boolean updateUserName() {
-        Boolean updated = Boolean.FALSE;
-        
-        if (this.rule.isAllowedToDoIt() && this.logic.businessReq()) {
-            updated = Boolean.TRUE;
-        } else {
-            updated = Boolean.FALSE;
-        }
-        
-        return updated;
-    }   
+    @PreDestroy
+    private void lize() {
+        log.info("# UserGroupModel-lize");
+    }
+    
+    public List<UserGroupData> getAllGroups() {
+        return (this.backing.findAllUserGroups());
+    }
 }

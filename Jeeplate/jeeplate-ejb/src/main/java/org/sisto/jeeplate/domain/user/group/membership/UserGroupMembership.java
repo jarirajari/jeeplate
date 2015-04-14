@@ -16,33 +16,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.hello;
+package org.sisto.jeeplate.domain.user.group.membership;
 
-import javax.ejb.Stateless;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.New;
-import javax.inject.Inject;
-import org.jboss.logging.Logger;
-import org.sisto.jeeplate.domain.user.UserData;
-import org.sisto.jeeplate.domain.user.group.UserGroupData;
-
-@Stateless
-public class HelloService {
+import java.io.Serializable;
+ 
+public class UserGroupMembership implements Serializable {
     
-    @Inject
-    private transient Logger log;
-    
-    @Inject
-    private UserData user;
-    @Inject
-    private UserGroupData group;
-    
-    public String testHelloServiceLogging() {
-        
-        log.info("creating a test users and groups!");
-        user.testHashing();
-        group.testHashing();
-        
-        return "HelloService";
-    }
 }

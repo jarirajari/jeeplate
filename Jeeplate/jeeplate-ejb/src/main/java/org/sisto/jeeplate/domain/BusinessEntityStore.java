@@ -37,7 +37,6 @@ import javax.persistence.LockTimeoutException;
 import javax.persistence.PessimisticLockException;
 import javax.persistence.QueryTimeoutException;
 import javax.persistence.TypedQuery;
-import org.jboss.logging.Logger;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.H2EM;
 import org.sisto.jeeplate.util.PGEM;
@@ -94,9 +93,13 @@ public class BusinessEntityStore<T extends BusinessEntity> {
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public T bind(T be) throws PersistenceException  {
         T bound = be;
+        boolean actualEntity = (be == null) ? false : true;
         
-        if (be != null) {
+        if (actualEntity) {
             bound = this.safeFind(be);
+        } else {
+            log.error("BusinessEntityStore requires at least default entity!");
+            throw new PersistenceException("BusinessEntityStore requires at least default entity (now null)!");
         }
         
         return bound;

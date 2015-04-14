@@ -16,13 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user.group;
+package org.sisto.jeeplate.domain.user;
 
-import javax.faces.bean.ViewScoped;
 import javax.inject.Named;
+import javax.enterprise.context.RequestScoped;
 
 @Named
-@ViewScoped
-public class UserGroupView {
-    // rules for rendering
+@RequestScoped
+public class UserController {
+    
 }

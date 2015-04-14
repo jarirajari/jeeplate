@@ -16,14 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.association.direction;
 
-import javax.faces.bean.ViewScoped;
-import javax.inject.Named;
-import org.sisto.jeeplate.user.group.UserGroupModel;
-
-@Named
-@ViewScoped
-public class UserController {
+public interface Bidirectional {
     
 }

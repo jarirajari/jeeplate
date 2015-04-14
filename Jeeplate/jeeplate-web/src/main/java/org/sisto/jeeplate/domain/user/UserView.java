@@ -16,12 +16,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.association;
+package org.sisto.jeeplate.domain.user;
 
-/**
- * unidirectional
- * bidirectional
- */
-public interface Unidirectional {
-    
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.enterprise.context.RequestScoped;
+import org.sisto.jeeplate.rules.UserRule;
+
+@Named
+@RequestScoped
+public class UserView {
+    @Inject
+    private UserRule rules; // what should be rendered
 }

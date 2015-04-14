@@ -16,11 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.domain.user;
 
-public class UserTypes {
-    public enum Type {
-        APPLICATION,
-        SYSTEM;
-    }
+/**
+ *
+ * @author Jari
+ */
+public class UserRoles {
+    
 }

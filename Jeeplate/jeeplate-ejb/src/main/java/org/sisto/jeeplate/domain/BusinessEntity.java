@@ -34,6 +34,8 @@ public abstract class BusinessEntity extends ObjectEntity {
     @Version
     protected Long version = DEFAULT_VN;
     
+    protected abstract void updateParentId();
+    
     public Long getId() {
         return (this.transientSuperId);
     }

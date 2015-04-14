@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.entity;
+package org.sisto.jeeplate.domain.user.group;
 
 
 import java.io.Serializable;
@@ -49,7 +49,8 @@ public class UserGroupEntity extends BusinessEntity implements Serializable {
     @PostLoad
     @PostPersist
     @PostUpdate
-    private void updateParentId() {
+    @Override
+    protected void updateParentId() {
         super.setId(this.id);
     }
     
@@ -61,6 +62,10 @@ public class UserGroupEntity extends BusinessEntity implements Serializable {
         this.groupname = name;
     }
     
+    public static UserGroupEntity defaultUserGroupEntity() {
+        return (new UserGroupEntityBuilder()).build();
+    }
+    
     public static UserGroupEntityBuilder newUserGroupEntityBuilder() {
         return (new UserGroupEntityBuilder());
     }
@@ -70,18 +75,13 @@ public class UserGroupEntity extends BusinessEntity implements Serializable {
         private UserGroupEntity object;
 
         public UserGroupEntityBuilder() {
+            
             this.object = new UserGroupEntity();
             this.defaults();
         }
 
         private void defaults() {
             this.object.groupname = "";
-        }
-        
-        public UserGroupEntityBuilder withId(Long id) {
-            this.object.id = id;
-            
-            return (this);
         }
         
         public UserGroupEntityBuilder withName(String name) {
@@ -91,6 +91,15 @@ public class UserGroupEntity extends BusinessEntity implements Serializable {
         }
         
         public UserGroupEntity build() {
+            
+            this.object.id = null;
+            
+            return (this.object);
+        }
+        
+        public UserGroupEntity renovate(Long id) {
+            
+            this.object.id = id;
             
             return (this.object);
         }

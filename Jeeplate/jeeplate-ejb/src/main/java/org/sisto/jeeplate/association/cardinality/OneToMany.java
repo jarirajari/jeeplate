@@ -16,12 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.user;
+package org.sisto.jeeplate.association.cardinality;
 
-/**
- *
- * @author Jari
- */
-public class UserRoles {
+public interface OneToMany {
     
 }
