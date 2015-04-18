@@ -21,6 +21,7 @@ package org.sisto.jeeplate.domain.user;
 import java.io.Serializable;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -49,8 +50,10 @@ public class UserEntity extends BusinessEntity implements Serializable {
     @GeneratedValue(generator = "user_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
     protected String username;
-    protected String salt;
-    protected String password;
+    protected String msisdn;
+    // requires later a reference to a person or organsation individual
+    @Embedded
+    protected UserCredential credential;
     
     @PostLoad
     @PostPersist
@@ -66,6 +69,18 @@ public class UserEntity extends BusinessEntity implements Serializable {
     
     public void setUsername(String setUsername) {
         this.username = setUsername;
+    }
+
+    public String getMsisdn() {
+        return msisdn;
+    }
+
+    public void setMsisdn(String msisdn) {
+        this.msisdn = msisdn;
+    }
+
+    public UserCredential getCredential() {
+        return credential;
     }
     
     /*
@@ -84,7 +99,6 @@ public class UserEntity extends BusinessEntity implements Serializable {
     public static class UserEntityBuilder {
 
         private UserEntity object;
-        private Sha256Hash hasher;
 
         public UserEntityBuilder() {
             
@@ -94,34 +108,25 @@ public class UserEntity extends BusinessEntity implements Serializable {
 
         private void defaults() {
             this.object.username = "";
-            this.object.password = "";
-            this.object.salt = "";
+            this.object.msisdn = "";
+            this.object.credential = new UserCredential();
         }
         
-        public UserEntityBuilder withName(String name) {
+        public UserEntityBuilder withUsername(String name) {
             this.object.username = name;
             
             return (this);
         }
         
         public UserEntityBuilder withPassword(String password) {
-            this.object.password = password;
+            this.object.credential.refresh(password);
             
             return (this);
         }
         
-        private String getSaltedAndHashedPassword() {
-            final int hashIterations = 1;
-            this.hasher = new Sha256Hash(this.object.password, this.object.salt, hashIterations);
-            
-            return (this.hasher.toHex());
-        }
-        
         public UserEntity build() {
             
-            this.object.id = null;
-            this.object.salt = Salt.getSaltString();
-            this.object.password = this.getSaltedAndHashedPassword();
+            this.object.id = null;     
             
             return (this.object);
         }

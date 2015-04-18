@@ -31,9 +31,6 @@ import org.jboss.logging.Logger;
 import org.sisto.jeeplate.domain.user.group.UserGroupData;
 import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
-import org.sisto.jeeplate.domain.user.UserEntity;
-import org.sisto.jeeplate.domain.user.group.UserGroupEntity;
-import org.sisto.jeeplate.domain.user.User;
 
 @SessionScoped
 public class UserData implements Serializable {
@@ -53,11 +50,11 @@ public class UserData implements Serializable {
     private UserGroupMembershipData usersGroups;
     
     private transient final UserEntity hashed = UserEntity.newUserEntityBuilder()
-            .withName("hashis")
+            .withUsername("hashis")
             .withPassword("good")
             .build();
     private transient final UserEntity hashed2 = UserEntity.newUserEntityBuilder()
-            .withName("un")
+            .withUsername("un")
             .withPassword("pw")
             .build();
     
