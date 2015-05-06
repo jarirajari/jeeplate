@@ -57,6 +57,10 @@ public class UserData implements Serializable {
             .withUsername("un")
             .withPassword("pw")
             .build();
+    private transient final UserEntity hashed3 = UserEntity.newUserEntityBuilder()
+            .withUsername("user@na.me")
+            .withPassword("pw")
+            .build();
     
     public UserData() {}
     
@@ -100,6 +104,26 @@ public class UserData implements Serializable {
                 .collect(Collectors.toMap(UserEntity::getId, UserData::new)));
     }
     
+    @Transactional
+    public Boolean noUserWithEmail(final String emailAddress) {
+        final String query = "SELECT COUNT(ue) FROM UserEntity ue WHERE ue.username = :username";
+        final Map<String, Object> params = new HashMap<String, Object>() {{
+            put("username", emailAddress);
+        }};
+        final List<Long> result = this.store.executeCustomQuery(Long.class, query, params);
+        Long count = 0L;
+        Boolean used = Boolean.TRUE;
+        
+        if (! result.isEmpty()) {
+            count = result.get(0);
+            if (count == 0L) {
+                used = Boolean.FALSE;
+            }
+        }
+        
+        return used;
+    }
+    
     public Boolean changeName(String name) {
         if (this.user.updateUserName()) {
             this.entity.setUsername(name);
@@ -107,13 +131,13 @@ public class UserData implements Serializable {
         } else {
             return Boolean.FALSE;
         }
-        
     }
     
     @Transactional
     public Boolean testHashing() {
         this.store.create(this.hashed);
         this.store.create(this.hashed2);
+        this.store.create(this.hashed3);
         return Boolean.TRUE;
     }
     

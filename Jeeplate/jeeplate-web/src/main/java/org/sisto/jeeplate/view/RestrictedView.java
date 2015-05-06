@@ -28,8 +28,6 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
-import org.sisto.jeeplate.domain.user.UserData;
-import org.sisto.jeeplate.domain.user.group.UserGroupData;
 import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.logging.StringLogger;
 

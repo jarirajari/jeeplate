@@ -20,3 +20,18 @@
     //background: url('resources/images/football.png') 0 0 no-repeat;
     background-color: red;
 }
+
+.disable-scroll .ui-dialog-content {
+  overflow: hidden !important;
+}
+
+.ui-wizard-step-title-custom {
+    text-align: center;
+    font-size: 18px;
+    line-height: 23px;
+    height: 23px;
+    width: 23px;
+    margin: 0 3px 0 0;
+    padding: 0.4em;
+    float: left;
+}

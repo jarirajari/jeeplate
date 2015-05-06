@@ -18,10 +18,9 @@
  */
 package org.sisto.jeeplate.domain.user;
 
-/**
- *
- * @author Jari
- */
-public class UserRoles {
-    
+public class UserType {
+    public enum Type {
+        APPLICATION,
+        SYSTEM;
+    }
 }

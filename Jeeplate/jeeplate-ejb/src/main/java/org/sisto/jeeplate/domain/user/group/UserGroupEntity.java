@@ -20,7 +20,6 @@ package org.sisto.jeeplate.domain.user.group;
 
 
 import java.io.Serializable;
-import java.util.Map;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;

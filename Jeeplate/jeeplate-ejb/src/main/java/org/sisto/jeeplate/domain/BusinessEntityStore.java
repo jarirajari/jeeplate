@@ -62,6 +62,34 @@ public class BusinessEntityStore<T extends BusinessEntity> {
     }
     
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public <S> List<S> executeCustomQuery(final Class<S> target, final String JPQLQuery, final Map<String, Object> JPQLParams) throws PersistenceException {
+        TypedQuery<S> q = this.em().createQuery(JPQLQuery, target);
+        List<S> queryResult = new ArrayList();
+        Set<String> params = JPQLParams.keySet();
+        
+        for (String param : params) {
+            Object o = JPQLParams.get(param);
+            if (o != null) {
+                q.setParameter(param, o);
+            }
+        }
+        try {
+            queryResult = q.getResultList();
+        } catch (QueryTimeoutException | TransactionRequiredException |
+                 PessimisticLockException | LockTimeoutException ex) { 
+            /*
+             * QueryTimeoutException if the query execution exceeds the query timeout
+	     * TransactionRequiredException if a lock mode has been set and there is no transaction
+	     * PessimisticLockException if pessimistic locking fails and the transaction is rolled back
+	     * LockTimeoutException if pessimistic locking fails and only the statement is rolled back
+             */
+            log.error("BusinessEntityStore.executeCustomQuery: "+ex.getMessage());
+        }
+        
+        return (queryResult);
+    }
+    
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public List<T> executeQuery(final Class<T> target, final String JPQLQuery, final Map<String, Object> JPQLParams) throws PersistenceException  {
         
         TypedQuery<T> q = this.em().createQuery(JPQLQuery, target);

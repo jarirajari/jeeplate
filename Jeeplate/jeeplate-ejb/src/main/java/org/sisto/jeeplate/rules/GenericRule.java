@@ -16,16 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.user;
+package org.sisto.jeeplate.rules;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.enterprise.context.RequestScoped;
-import org.sisto.jeeplate.rules.GenericRule;
+import javax.ejb.Stateless;
 
-@Named
-@RequestScoped
-public class UserView {
-    @Inject
-    private GenericRule rules; // what should be rendered
+@Stateless
+public class GenericRule {
+    // contains shiro permission Java8 style
+    public Boolean isAllowedToDoIt() {
+        return Boolean.TRUE;
+    }
 }

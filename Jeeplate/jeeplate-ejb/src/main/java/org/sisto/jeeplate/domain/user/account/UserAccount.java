@@ -16,11 +16,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.user;
+package org.sisto.jeeplate.domain.user.account;
 
-public class UserTypes {
-    public enum Type {
-        APPLICATION,
-        SYSTEM;
-    }
+import javax.enterprise.context.Dependent;
+
+@Dependent
+public class UserAccount {
+    
 }

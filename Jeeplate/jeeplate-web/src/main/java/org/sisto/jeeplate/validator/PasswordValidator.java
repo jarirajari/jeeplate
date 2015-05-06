@@ -16,16 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.user;
+package org.sisto.jeeplate.validator;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.enterprise.context.RequestScoped;
-import org.sisto.jeeplate.rules.GenericRule;
-
-@Named
-@RequestScoped
-public class UserView {
-    @Inject
-    private GenericRule rules; // what should be rendered
+public class PasswordValidator {
+    
 }

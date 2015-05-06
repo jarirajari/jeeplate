@@ -16,16 +16,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.user;
+package org.sisto.jeeplate.util;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.enterprise.context.RequestScoped;
-import org.sisto.jeeplate.rules.GenericRule;
-
-@Named
-@RequestScoped
-public class UserView {
-    @Inject
-    private GenericRule rules; // what should be rendered
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import javax.enterprise.util.Nonbinding;
+import javax.inject.Qualifier;
+ 
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface ApplicationProperty {
+    
+    @Nonbinding // mandatory
+    String name();
+    @Nonbinding // mandatory
+    String defaultValue();
 }

@@ -16,14 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.rules;
+package org.sisto.jeeplate.validator;
 
-import javax.ejb.Stateless;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.FacesValidator;
+import javax.faces.validator.Validator;
+import javax.faces.validator.ValidatorException;
 
-@Stateless
-public class UserRule {
-    // contains shiro permission Java8 style
-    public Boolean isAllowedToDoIt() {
-        return Boolean.TRUE;
+@FacesValidator("mobileValidator")
+public class MobileValidator implements Validator {
+    @Override
+    public void validate(FacesContext fc, UIComponent c, Object o) throws ValidatorException {
+        
     }
 }

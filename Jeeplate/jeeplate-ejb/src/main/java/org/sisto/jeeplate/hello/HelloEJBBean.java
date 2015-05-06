@@ -23,6 +23,7 @@ import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import org.jboss.logging.Logger;
+import org.sisto.jeeplate.util.ApplicationProperty;
 
 @Stateless
 public class HelloEJBBean {
@@ -30,10 +31,15 @@ public class HelloEJBBean {
     @Inject
     private transient Logger log;
     
+    @Inject
+    @ApplicationProperty(name = "test.message", defaultValue = "test msg prop ok")
+    private String myProperty;
+    
     public HelloEJBBean() {}
     
     public String sayHello() {
-        return ("Hello EJB!");
+        
+        return ("Hello EJB! with prop="+myProperty);
     }
     
     @PostConstruct

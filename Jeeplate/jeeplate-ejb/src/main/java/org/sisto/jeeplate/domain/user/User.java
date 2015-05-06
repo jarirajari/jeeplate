@@ -22,7 +22,7 @@ import java.io.Serializable;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.rules.UserRule;
+import org.sisto.jeeplate.rules.GenericRule;
 
 @Dependent
 public class User implements Serializable {
@@ -34,14 +34,12 @@ public class User implements Serializable {
     private UserData data;
     
     @Inject
-    private UserRule rule;
+    private GenericRule rule;
     
     @Inject
     private UserLogic logic; // or requirements
     
-    public User() {
-        
-    }
+    
     
     public Boolean updateUserName() {
         Boolean updated = Boolean.FALSE;

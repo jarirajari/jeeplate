@@ -16,16 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.user;
+package org.sisto.jeeplate.validator;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.enterprise.context.RequestScoped;
-import org.sisto.jeeplate.rules.GenericRule;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.FacesValidator;
+import javax.faces.validator.Validator;
+import javax.faces.validator.ValidatorException;
 
-@Named
-@RequestScoped
-public class UserView {
-    @Inject
-    private GenericRule rules; // what should be rendered
+@FacesValidator("usernameValidator")
+public class UsernameValidator  implements Validator {
+    @Override
+    public void validate(FacesContext fc, UIComponent c, Object o) throws ValidatorException {
+        
+    }
 }

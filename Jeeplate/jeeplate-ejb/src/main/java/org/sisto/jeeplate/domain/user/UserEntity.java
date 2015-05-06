@@ -49,15 +49,13 @@ public class UserEntity extends BusinessEntity implements Serializable {
     @SequenceGenerator(name = "user_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
-    protected String username;
-    protected String msisdn;
+    protected String username; // email address
+    protected String mobile; // mobile msisdn
     // requires later a reference to a person or organsation individual
     @Embedded
     protected UserCredential credential;
     
-    @PostLoad
-    @PostPersist
-    @PostUpdate
+    @PostLoad @PostPersist @PostUpdate
     @Override
     protected void updateParentId() {
         super.setId(this.id);
@@ -71,12 +69,12 @@ public class UserEntity extends BusinessEntity implements Serializable {
         this.username = setUsername;
     }
 
-    public String getMsisdn() {
-        return msisdn;
+    public String getMobile() {
+        return mobile;
     }
 
-    public void setMsisdn(String msisdn) {
-        this.msisdn = msisdn;
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public UserCredential getCredential() {
@@ -108,7 +106,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
 
         private void defaults() {
             this.object.username = "";
-            this.object.msisdn = "";
+            this.object.mobile = "";
             this.object.credential = new UserCredential();
         }
         
