@@ -34,10 +34,8 @@ public class ApplicationPropertyProvider {
     
     @Inject
     private transient StringLogger log;
-    //@Inject
-    //private PropertyFileResolver fileResolver;
     private Map<String, String> properties = new HashMap<>();
-    private static String APPLICATION_PROPS = "application.properties";
+    private static final String APPLICATION_PROPS = "application.properties";
     
     @PostConstruct
     private void loadProperties() {
@@ -47,7 +45,7 @@ public class ApplicationPropertyProvider {
         File file = (propertyFile == null) ? null : new File(propertyFile);
           
         try (FileInputStream fis = new FileInputStream(file)) {
-             
+            
             props.load(fis);
         } catch (NullPointerException | IOException e) {
             log.error("Unable to load application properties: " + e);

@@ -31,6 +31,7 @@ import org.primefaces.event.FlowEvent;
 import org.sisto.jeeplate.domain.user.User;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.util.Email;
 
 @Named
 @ViewScoped
@@ -38,6 +39,9 @@ public class RegistrationView implements Serializable {
     
     @Inject
     transient private StringLogger log;
+    
+    @Inject
+    transient private Email emailSender;
     
     @Inject
     private UserData user;
@@ -117,7 +121,14 @@ public class RegistrationView implements Serializable {
     public boolean accountForEmailExists(String enteredUserEmailAddress) {
         log.info("accountForEmailExists="+enteredUserEmailAddress);
         
-        return (user.noUserWithEmail(enteredUserEmailAddress));
+        boolean exists = user.noUserWithEmail(enteredUserEmailAddress);
+        
+        if (exists) {
+            emailSender.sendMessage("Greeting from Jeeplate!", "Account already exists!", 
+                                    "jee@pla.te", enteredUserEmailAddress);
+        }
+        
+        return exists;
     }
     
     public String onFlowProcess(FlowEvent event) {

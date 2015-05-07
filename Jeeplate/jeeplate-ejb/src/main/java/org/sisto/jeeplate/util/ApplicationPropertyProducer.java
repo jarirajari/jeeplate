@@ -18,19 +18,10 @@
  */
 package org.sisto.jeeplate.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
-import org.sisto.jeeplate.logging.StringLogger;
 
 @Dependent
 public class ApplicationPropertyProducer {
