@@ -18,6 +18,9 @@
  */
 package org.sisto.jeeplate.util;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.mail.Session;
@@ -44,25 +47,31 @@ public class Email {
     @Resource(mappedName = EMAIL_JNDI_RESOURCE)
     private Session mailSession;
 
-    public void sendMessage(String subject, String content, String source, String destination) {
-        MimeMessage m = constructEmail(subject, content, source, destination);
-
+    public void sendMessage(MimeMessage m) {
+        
         try {
             MockTransport.send(m);
-            log.info("Sent email: '%s' '%s' '%s'", source, destination, subject);
+            log.info("Sent email succesfully!");
         } catch (MessagingException e) {
-            log.error("Error sending email: '%s' '%s' '%s'", source, destination, subject);
+            log.error("Error sending email!");
         }
     }
     
     private static class MockTransport {
-        public static void send(MimeMessage m) throws MessagingException {
-            System.out.println("-> MOCK EMAIL SERVER ->");
-            System.out.flush();
+        public static void send(MimeMessage m) throws MessagingException {       
+            try {
+                System.out.println("MOCK EMAIL");
+                //System.out.println("TO:       "+m.getAllRecipients()[0]);
+                System.out.println("SUBJECT:  "+m.getSubject());
+                System.out.println("CONTENT:  "+m.getContent());
+                System.out.flush();
+            } catch (IOException | NullPointerException e) {
+                throw new MessagingException(e.getMessage());
+            }
         }
     }
 
-    private MimeMessage constructEmail(String subject, String content, String source, String destination) {
+    public MimeMessage constructEmail(String subject, String content, String source, String destination) {
         MimeMessage m = buildEmail(source, destination);
         try {
             m.setSubject(subject);
@@ -84,15 +93,21 @@ public class Email {
             m.setFrom(from);
             m.setRecipients(Message.RecipientType.TO, to);
             m.setSentDate(new java.util.Date());
-        } catch (MessagingException e) {
+        } catch (MessagingException | NullPointerException e) {
+            
             log.error("Could not build email template!");
         }
 
         return m;
     }
 
-    private InternetAddress convertStringToAddress(String username) throws AddressException {
-        InternetAddress converted = new InternetAddress(username);
+    private InternetAddress convertStringToAddress(String username) {
+        InternetAddress converted;
+        try {
+            converted = new InternetAddress(username);
+        } catch (AddressException ae) {
+            converted = new InternetAddress();
+        }
 
         return converted;
     }

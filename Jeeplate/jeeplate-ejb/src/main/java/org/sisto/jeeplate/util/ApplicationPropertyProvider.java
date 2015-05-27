@@ -39,7 +39,7 @@ public class ApplicationPropertyProvider {
     
     @PostConstruct
     private void loadProperties() {
-        // System property from Wildfly configuration
+        // System property from Wildfly configuration (standalone.xml)
         Properties props = new Properties();
         String propertyFile = System.getProperty(APPLICATION_PROPS);
         File file = (propertyFile == null) ? null : new File(propertyFile);

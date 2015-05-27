@@ -20,12 +20,14 @@ package org.sisto.jeeplate.view;
 
 import java.beans.Transient;
 import java.io.Serializable;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.mail.internet.MimeMessage;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.sisto.jeeplate.domain.user.User;
@@ -39,12 +41,11 @@ public class RegistrationView implements Serializable {
     
     @Inject
     transient private StringLogger log;
-    
     @Inject
     transient private Email emailSender;
-    
     @Inject
-    private UserData user;
+    transient private UserData user;
+    
     private String email;
     private String mobile;
     private String username;
@@ -124,8 +125,9 @@ public class RegistrationView implements Serializable {
         boolean exists = user.noUserWithEmail(enteredUserEmailAddress);
         
         if (exists) {
-            emailSender.sendMessage("Greeting from Jeeplate!", "Account already exists!", 
+            MimeMessage m = emailSender.constructEmail("Greeting from Jeeplate!", "Account already exists!", 
                                     "jee@pla.te", enteredUserEmailAddress);
+            emailSender.sendMessage(m);
         }
         
         return exists;

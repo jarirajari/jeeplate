@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.ejb.Stateful;
+import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
@@ -41,7 +42,7 @@ import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.H2EM;
 import org.sisto.jeeplate.util.PGEM;
 
-@Stateful
+@Stateless
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class BusinessEntityStore<T extends BusinessEntity> {
     

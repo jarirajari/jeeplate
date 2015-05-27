@@ -80,7 +80,7 @@
                     <!-- Send email if information is correct -->
                     <p:tab id="signupWzdStart" title="Register Account">
                         <p:panel header="Register Account2">
-                            <p:messages />
+                            <p:messages showDetail="true" showIcon="false"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="Email:" />
                                 <p:inputText value="#{registrationView.email}" required="true" />
@@ -89,9 +89,9 @@
                                 <p:inputText value="#{registrationView.mobile}" required="true" />
 
                                 <h:outputText value="I Accept Terms and Conditions:" />
-                                <p:selectBooleanCheckbox value="#{registrationView.iacceptTermsAndConditions}" />
+                                <p:selectBooleanCheckbox value="#{registrationView.iacceptTermsAndConditions}" required="true"/>
                                 
-                                <h:inputHidden id="hidden" value="#{registrationView.hidden}" />
+                                <h:inputHidden id="signupWzdHidden" value="#{registrationView.hidden}" />
                             </h:panelGrid>                            
                         </p:panel>
                     </p:tab>
@@ -106,9 +106,9 @@
                                 <h:outputText value="Retype Password:" />
                                 <p:password id="resetFormPwRetyped" label="ret pw" value="#{registrationView.password}" required="true" feedback="false"/>
 
-                                <h:outputText value="Domain Code: #{registrationView.accountForEmailExists(registrationView.email)}" />
+                                <h:outputText value="Domain Code: " />
                                 <p:inputText value="#{registrationView.securitycode}" required="true" >
-                                    <f:param name="" value="" />
+                                    <f:param name="signupWzdHidden" value="#{registrationView.hidden}" />
                                 </p:inputText>
                             </h:panelGrid>
                         </p:panel>
@@ -118,7 +118,6 @@
                         <p:panel header="Account Registered2">
                             <p:messages />
                             <h:panelGrid columns="2" columnClasses="label, value">
-                                <h:outputText value="Account registered!" />
                                 <p:outputLabel value="Close by choosing next!"/>
                             </h:panelGrid>
                         </p:panel>
@@ -319,7 +318,7 @@
             </h:form>
         </p:dialog><!-- /Localisation dialog -->
         <!-- Role dialog -->
-        <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Switch Role" widgetVar="roleDlg" resizable="false">
+        <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Sign as" widgetVar="roleDlg" resizable="false">
             <h:form id="roleForm">
                 <h:panelGrid id="role" columns="1" >
                     <f:facet name="header">
@@ -361,7 +360,7 @@
                 <p:growl id="resetFormGrowl" sticky="true" showDetail="true"/>
                 <p:wizard widgetVar="resetWzdWizard" flowListener="#{passwordView.onFlowProcess}" backLabel="Cancel" nextLabel="OK" showNavBar="true">
                     <!-- Send email if information is correct -->
-                    <p:tab id="resetWzdStart" title="Account Details">
+                    <p:tab id="resetWzd0" title="Account Details">
                         <p:panel header="Account Details2">
                             <p:messages />
                             <h:panelGrid columns="2" columnClasses="label, value">
@@ -371,15 +370,15 @@
                                 <h:outputText value="Mobile:" />
                                 <p:inputText value="#{passwordView.mobile}" required="true" />
 
-                                <h:outputText value="I am human:" />
+                                <h:outputText value="I am human:" /><!-- Waiting for new Re-captcha integration from Primefaces -->
                                 <p:selectBooleanCheckbox value="#{passwordView.iamhuman}" />
                                 
-                                <h:inputHidden id="hidden" value="#{passwordView.hidden}" />
+                                <h:inputHidden id="hidden1" value="#{passwordView.actionsecret}" />
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
                     <!-- Input security code from email -->
-                    <p:tab id="resetWzdChange" title="Change Password">
+                    <p:tab id="resetWzd1" title="Change Password">
                         <p:panel header="Change Password2">
                             <p:messages showDetail="true" showIcon="false"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
@@ -390,14 +389,14 @@
                                 <p:password id="resetFormPwRetyped" label="ret pw" value="#{passwordView.password}" required="true" feedback="false"/>
 
                                 <h:outputText value="Reset Code:" />
-                                <p:inputText value="#{passwordView.securitycode}" required="true" >
-                                    <f:param name="" value="" />
-                                </p:inputText>
+                                <p:inputText value="#{passwordView.resettoken}" required="true" />
+                                
+                                <h:inputHidden id="hidden2" value="#{passwordView.actionsecret}" />
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
                     <!--  -->
-                    <p:tab id="resetWzdInfo" title="Password changed" >
+                    <p:tab id="resetWzd2" title="Password changed" >
                         <p:panel header="Password now changed">
                             <p:messages />
                             <h:panelGrid columns="2" columnClasses="label, value">
@@ -406,7 +405,7 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
-                    <p:tab id="resetWzdStop"  title="" titleStyleClass="ui-wizard-step-title-custom fa fa-lock fa-2x">
+                    <p:tab id="resetWzd9"  title="" titleStyleClass="ui-wizard-step-title-custom fa fa-lock fa-2x">
                     </p:tab>
                 </p:wizard>
             </h:form>

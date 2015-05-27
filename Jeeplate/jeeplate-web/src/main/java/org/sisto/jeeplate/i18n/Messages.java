@@ -29,7 +29,6 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import javax.faces.context.FacesContext;
 
-
 public class Messages extends ResourceBundle {
     
     protected static final String BUNDLE_NAME = "org.sisto.jeeplate.i18n.messages";
@@ -52,6 +51,7 @@ public class Messages extends ResourceBundle {
     }
 
     protected static class UTF8Control extends Control {
+        @Override
         public ResourceBundle newBundle
             (String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
                 throws IllegalAccessException, InstantiationException, IOException

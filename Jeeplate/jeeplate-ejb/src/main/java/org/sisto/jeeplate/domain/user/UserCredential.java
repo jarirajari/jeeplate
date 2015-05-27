@@ -24,24 +24,33 @@ import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import org.apache.shiro.crypto.RandomNumberGenerator;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.apache.shiro.util.ByteSource;
 import org.sisto.jeeplate.security.shiro.Salt;
 
 @Embeddable
 public class UserCredential implements Serializable {
+    @Transient
+    protected static final String RESET = "";
+    @Transient
+    protected static final int EXPIRATION_PERIOD = 24 * 60 * 60 * 1000; //ms
     protected String salt;
     protected String password; // hashed with salt
-    protected String resetResponseToken;
+    protected String passwordResetToken;
     @Temporal(TemporalType.TIMESTAMP)
-    protected Date resetRequestTimestamp;
-    protected Boolean resetRequested;
+    protected Date passwordResetTimestamp;
     
     public UserCredential() {
-        this.salt = "";
-        this.password = "";
-        this.resetResponseToken = "";
-        this.resetRequestTimestamp = new Date();
-        this.resetRequested = Boolean.FALSE;
+        this.salt = RESET;
+        this.password = RESET;
+        this.passwordResetToken = RESET;
+        this.passwordResetTimestamp = UserCredential.now();
+    }
+    
+    private static Date now() {
+        return (new Date());
     }
     
     public void refresh(String newPassword) {
@@ -66,20 +75,20 @@ public class UserCredential implements Serializable {
         this.password = password;
     }
 
-    public String getResetResponseToken() {
-        return resetResponseToken;
+    public String getPasswordResetToken() {
+        return passwordResetToken;
     }
 
-    public void setResetResponseToken(String resetResponseToken) {
-        this.resetResponseToken = resetResponseToken;
+    public void setPasswordResetToken(String passwordResetToken) {
+        this.passwordResetToken = passwordResetToken;
     }
 
-    public Date getResetRequestTimestamp() {
-        return resetRequestTimestamp;
+    public Date getPasswordResetTimestamp() {
+        return passwordResetTimestamp;
     }
 
-    public void setResetRequestTimestamp(Date resetRequestTimestamp) {
-        this.resetRequestTimestamp = resetRequestTimestamp;
+    public void setPasswordResetTimestamp(Date passwordResetTimestamp) {
+        this.passwordResetTimestamp = passwordResetTimestamp;
     }
     
     private static String getSaltedAndHashedPassword(String salt, String password) {
@@ -87,5 +96,26 @@ public class UserCredential implements Serializable {
         Sha256Hash hasher = new Sha256Hash(password, salt, hashIterations);
 
         return (hasher.toHex());
+    }
+    
+    public void resetToken() {
+        this.passwordResetToken = UserCredential.generateRandomNumberToken();
+    }
+    
+    public void resetTimestamp () {
+        this.passwordResetTimestamp = UserCredential.now();
+    }
+    
+    public Boolean resetIsValid() {
+        return true;
+    }
+
+    private static String generateRandomNumberToken() {
+        final int length=16;
+        RandomNumberGenerator rng = new SecureRandomNumberGenerator();
+        ByteSource bs = rng.nextBytes(length);
+        String randomStringHex16 = bs.toHex();
+        
+        return randomStringHex16;
     }
 }

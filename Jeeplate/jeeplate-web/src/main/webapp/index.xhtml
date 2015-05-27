@@ -67,7 +67,7 @@
                     <p:growl id="message" showDetail="true" />
 
                     <p:commandButton value="Destroy the World" actionListener="#{dialogView.destroyWorld}" update="message">
-                        <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                        <p:confirm header="Confirmation" message="#{msg['software.language']} Are you sure?" icon="ui-icon-alert" />
                     </p:commandButton>
 
                     <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">

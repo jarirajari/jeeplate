@@ -19,8 +19,10 @@
 package org.sisto.jeeplate.logging;
 
 import java.util.Arrays;
+import javax.enterprise.context.Dependent;
 import org.jboss.logging.Logger;
 
+@Dependent
 public class StringLogger {
     
     public static final String[] EMPTY_ARRAY = new String[0];

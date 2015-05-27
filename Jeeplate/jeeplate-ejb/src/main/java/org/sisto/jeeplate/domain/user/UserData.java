@@ -26,28 +26,38 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
+import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
-import org.jboss.logging.Logger;
 import org.sisto.jeeplate.domain.user.group.UserGroupData;
 import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
+import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.util.ApplicationProperty;
+import org.sisto.jeeplate.util.Email;
+import org.sisto.jeeplate.util.EmailMessage;
 
 @SessionScoped
 public class UserData implements Serializable {
-
+    
     @Inject
-    private transient Logger log;
+    private transient StringLogger log;
     
-    @Inject @New
-    private transient BusinessEntityStore<UserEntity> store;
-    
-    private transient UserEntity entity;
+    @Inject @ApplicationProperty(name = "test.message", defaultValue = "jee@pla.te")
+    private String systemEmailAddress;
     
     @Inject
     private User user;
     
     @Inject
+    private Email emailSender;
+    
+    @Inject
     private UserGroupMembershipData usersGroups;
+    
+    @Inject @New
+    private transient BusinessEntityStore<UserEntity> store;
+    
+    private UserEntity entity;
     
     private transient final UserEntity hashed = UserEntity.newUserEntityBuilder()
             .withUsername("hashis")
@@ -62,7 +72,9 @@ public class UserData implements Serializable {
             .withPassword("pw")
             .build();
     
-    public UserData() {}
+    public UserData() {
+        this.entity = UserEntity.newUserEntityBuilder().build();
+    }
     
     public UserData(UserEntity ue) {
         this.entity = ue;
@@ -79,7 +91,7 @@ public class UserData implements Serializable {
     @Transactional
     public Map<Long, UserGroupData> findGroupsUserBelongsTo() {
         
-        return null;
+        return new HashMap<>();
     }
     
     @Transactional
@@ -105,23 +117,96 @@ public class UserData implements Serializable {
     }
     
     @Transactional
+    public UserData findOneUser(final String emailAddress) {
+        final List<Long> result = this.findUserByEmail(emailAddress);
+        UserData oneUser;
+                
+        if (! result.isEmpty() && result.size() == 1) {
+            Long id = result.get(0);
+            oneUser = this.bind(id);
+        } else {
+            oneUser = this;
+        }
+        
+        return oneUser;
+    }
+    
+    private void sendPasswordResetEmailForUser(EmailMessage em) {
+        String secret = this.entity.getCredential().getPasswordResetToken();
+        String subject = em.getSubject();
+        // Convention and loose contract that '${secret}' will be replaced
+        String content = em.getContent().replace("${secret}", secret);
+        MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress, this.entity.username);
+        // add or replace reset token to email if old user i.e. valid reset req
+        
+        emailSender.sendMessage(mm);
+    }
+    
+    @Transactional
+    public String initializePasswordReset(EmailMessage messageForOldUser, EmailMessage messageForNewUser) {
+        assert this.entity != null;
+        boolean userExists =! this.entity.isDefault();
+        String resetToken;
+        EmailMessage message;
+        UserCredential uc;
+        
+        if (userExists) {
+            uc = this.entity.getCredential();
+            uc.resetToken();
+            uc.resetTimestamp();
+            resetToken = uc.getPasswordResetToken();
+        } else {
+            resetToken = "";
+        }
+        if (! userExists) {
+            message = messageForNewUser;
+        } else {
+            message = messageForOldUser;
+        }
+        sendPasswordResetEmailForUser(message);
+        
+        return resetToken;
+    }
+    
+    @Transactional
+    public Boolean completePasswordReset(String typedPassword, String emailedResetToken, String hiddenActionSecret) {
+        assert this.entity != null;
+        UserCredential uc = this.entity.getCredential();
+        Boolean changed = Boolean.FALSE;
+        
+        if (uc.resetIsValid()) {
+            if (uc.getPasswordResetToken().equals(emailedResetToken)) {
+                uc.refresh(typedPassword);
+                uc.resetToken();
+                uc.resetTimestamp();
+                changed = Boolean.TRUE;
+            }
+        }
+        
+        return changed;
+    }
+    
+    @Transactional
     public Boolean noUserWithEmail(final String emailAddress) {
-        final String query = "SELECT COUNT(ue) FROM UserEntity ue WHERE ue.username = :username";
+        final List<Long> result = this.findUserByEmail(emailAddress);
+        Boolean noUser = Boolean.TRUE;
+        
+        if (! result.isEmpty() && result.size() == 1) {
+            noUser = Boolean.FALSE;
+        }
+        
+        return noUser;
+    }
+    
+    @Transactional
+    public List<Long> findUserByEmail(final String emailAddress) {
+        final String query = "SELECT ue.id FROM UserEntity ue WHERE ue.username = :username";
         final Map<String, Object> params = new HashMap<String, Object>() {{
             put("username", emailAddress);
         }};
         final List<Long> result = this.store.executeCustomQuery(Long.class, query, params);
-        Long count = 0L;
-        Boolean used = Boolean.TRUE;
         
-        if (! result.isEmpty()) {
-            count = result.get(0);
-            if (count == 0L) {
-                used = Boolean.FALSE;
-            }
-        }
-        
-        return used;
+        return result;
     }
     
     public Boolean changeName(String name) {
@@ -132,6 +217,28 @@ public class UserData implements Serializable {
             return Boolean.FALSE;
         }
     }
+    
+    @Transactional
+    public void switchPassword() {
+        
+        // Many phases.
+        
+        // resetToken (delete old + create new)
+        // resetRequestTimestamp (this time)
+        // client generates and keeps local secret
+        // email is sent to the user with email-secret
+        // type new pw along with email-secret and secret
+        // valid token and valid ie. not expired
+        // send email to user about end result
+        // finished
+    }
+    
+    public void existingToken() {
+        UserEntity ue = this.getEntity();
+        ue.getCredential().resetToken();
+    }
+    
+
     
     @Transactional
     public Boolean testHashing() {
