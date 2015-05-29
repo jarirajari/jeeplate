@@ -118,26 +118,23 @@ public class UserData implements Serializable {
     
     @Transactional
     public UserData findOneUser(final String emailAddress) {
-        final List<Long> result = this.findUserByEmail(emailAddress);
-        UserData oneUser;
+        final List<UserEntity> result = this.findUserByEmail(emailAddress);
                 
-        if (! result.isEmpty() && result.size() == 1) {
-            Long id = result.get(0);
-            oneUser = this.bind(id);
-        } else {
-            oneUser = this;
+        if ((result != null) && (result.isEmpty() == false) && (result.size() == 1)) {
+            UserEntity id = result.get(0);
+            this.entity = id;
+       } else {
+            log.error("Finding one user by email address failed!");
         }
         
-        return oneUser;
+        return (this);
     }
     
-    private void sendPasswordResetEmailForUser(EmailMessage em) {
-        String secret = this.entity.getCredential().getPasswordResetToken();
+    private void sendPasswordResetEmailForUser(EmailMessage em, String secret) {
         String subject = em.getSubject();
         // Convention and loose contract that '${secret}' will be replaced
         String content = em.getContent().replace("${secret}", secret);
         MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress, this.entity.username);
-        // add or replace reset token to email if old user i.e. valid reset req
         
         emailSender.sendMessage(mm);
     }
@@ -148,22 +145,22 @@ public class UserData implements Serializable {
         boolean userExists =! this.entity.isDefault();
         String resetToken;
         EmailMessage message;
-        UserCredential uc;
+        UserCredential uc  = this.entity.getCredential();
         
         if (userExists) {
-            uc = this.entity.getCredential();
             uc.resetToken();
-            uc.resetTimestamp();
-            resetToken = uc.getPasswordResetToken();
-        } else {
-            resetToken = "";
+            uc.resetTimestamp();  
         }
-        if (! userExists) {
-            message = messageForNewUser;
-        } else {
+        if (userExists) {
             message = messageForOldUser;
+            resetToken = uc.getPasswordResetToken();
+            log.debug("Password reset requested for an existing user.");
+        } else {
+            message = messageForNewUser;
+            resetToken = "";
+            log.error("Password reset requested for a user that has no account!");
         }
-        sendPasswordResetEmailForUser(message);
+        sendPasswordResetEmailForUser(message, resetToken);
         
         return resetToken;
     }
@@ -188,7 +185,7 @@ public class UserData implements Serializable {
     
     @Transactional
     public Boolean noUserWithEmail(final String emailAddress) {
-        final List<Long> result = this.findUserByEmail(emailAddress);
+        final List<UserEntity> result = this.findUserByEmail(emailAddress);
         Boolean noUser = Boolean.TRUE;
         
         if (! result.isEmpty() && result.size() == 1) {
@@ -199,12 +196,12 @@ public class UserData implements Serializable {
     }
     
     @Transactional
-    public List<Long> findUserByEmail(final String emailAddress) {
-        final String query = "SELECT ue.id FROM UserEntity ue WHERE ue.username = :username";
+    public List<UserEntity> findUserByEmail(final String emailAddress) {
+        final String query = "SELECT ue FROM UserEntity ue WHERE ue.username = :username";
         final Map<String, Object> params = new HashMap<String, Object>() {{
             put("username", emailAddress);
         }};
-        final List<Long> result = this.store.executeCustomQuery(Long.class, query, params);
+        final List<UserEntity> result = this.store.executeCustomQuery(UserEntity.class, query, params);
         
         return result;
     }

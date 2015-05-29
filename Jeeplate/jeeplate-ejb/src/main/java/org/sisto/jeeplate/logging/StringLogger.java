@@ -36,16 +36,15 @@ public class StringLogger {
         this.jbossLogger = Logger.getLogger(clazz.getName());
     }
     
-    private static String buildMessage(String format, String ... args) {
+    private static String buildMessage(String text, String ... args) {
         int size = args.length;
-        StringBuilder sb = new StringBuilder("");
-        
         boolean onlyBody = (size <= 0);
+        StringBuilder sb = new StringBuilder("");
 
         if (onlyBody) {
-            sb.append(format);
+            sb.append(text.replaceAll("%s", ""));
         } else {
-            sb.append(String.format(format, Arrays.asList(args).toArray()));
+            sb.append(String.format(text, Arrays.asList(args).toArray()));
         }
         
         return (sb.toString());
@@ -57,7 +56,6 @@ public class StringLogger {
 
     public void warn(String format , String... args) {
         this.jbossLogger.warn(buildMessage(format, args));
-        
     }
 
     public void info(String format , String... args) {

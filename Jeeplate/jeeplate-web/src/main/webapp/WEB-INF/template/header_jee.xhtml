@@ -73,7 +73,7 @@
         </h:form>
         <!-- /Menubar -->
         <!-- Signup dialog -->
-        <p:dialog rendered="true" widgetVar="signupWzd" header="Sign up" modal="true" styleClass="disable-scroll" width="600px">
+        <p:dialog closable="false" rendered="true" widgetVar="signupWzd" header="Sign up" modal="true" styleClass="disable-scroll" width="600px">
             <h:form id="signupForm">
                 <p:growl id="signupFormGrowl" sticky="true" showDetail="true"/>
                 <p:wizard widgetVar="signupWzdWizard" flowListener="#{registrationView.onFlowProcess}" backLabel="Cancel" nextLabel="OK" showNavBar="true">
@@ -123,9 +123,12 @@
                         </p:panel>
                     </p:tab>
                     <p:tab id="signupWzdStop"  title="" titleStyleClass="ui-wizard-step-title-custom fa fa-check fa-2x">
+
                     </p:tab>
                 </p:wizard>
+                
             </h:form>
+            
         </p:dialog>
         <!--<p:dialog rendered="{not mgr.authenticated()}" modal="true" header="Sign up" widgetVar="signupDlg" resizable="false">
             <h:form id="signupForm">
@@ -213,14 +216,12 @@
                     
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Sign in" icon="fa fa-check" 
-                                         oncomplete="JS.handleLoginRequest('signinDlg', xhr, status, args)" 
-                                         update="signin" action="#{mgr.submit}">
-
-                        </p:commandButton>
                         <p:commandButton value="Cancel" icon="fa fa-close" 
                                          immediate="true" onclick="PF('signinDlg').hide();" 
                                          update="signin,signinResult"/>
+                        <p:commandButton value="Sign in" icon="fa fa-check" 
+                                         oncomplete="JS.handleLoginRequest('signinDlg', xhr, status, args)" 
+                                         update="signin" action="#{mgr.submit}" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
@@ -355,7 +356,7 @@
             </h:form>
         </p:dialog><!-- /Role dialog -->
         <!-- Reset Wizard -->
-        <p:dialog widgetVar="resetWzd" header="Reset password" modal="true" styleClass="disable-scroll" width="600px">
+        <p:dialog widgetVar="resetWzd" closable="false" header="Reset password" modal="true" styleClass="disable-scroll" width="600px">
             <h:form id="resetForm">
                 <p:growl id="resetFormGrowl" sticky="true" showDetail="true"/>
                 <p:wizard widgetVar="resetWzdWizard" flowListener="#{passwordView.onFlowProcess}" backLabel="Cancel" nextLabel="OK" showNavBar="true">
@@ -371,9 +372,9 @@
                                 <p:inputText value="#{passwordView.mobile}" required="true" />
 
                                 <h:outputText value="I am human:" /><!-- Waiting for new Re-captcha integration from Primefaces -->
-                                <p:selectBooleanCheckbox value="#{passwordView.iamhuman}" />
+                                <p:selectBooleanCheckbox value="#{passwordView.iamhuman}" required="true"/>
                                 
-                                <h:inputHidden id="hidden1" value="#{passwordView.actionsecret}" />
+                                <!-- hidden value generated -->
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
@@ -389,9 +390,10 @@
                                 <p:password id="resetFormPwRetyped" label="ret pw" value="#{passwordView.password}" required="true" feedback="false"/>
 
                                 <h:outputText value="Reset Code:" />
-                                <p:inputText value="#{passwordView.resettoken}" required="true" />
+                                <p:inputText value="#{passwordView.emailedsecret}" required="true" />
                                 
-                                <h:inputHidden id="hidden2" value="#{passwordView.actionsecret}" />
+                                <h:inputHidden id="resetWzdHidden" value="#{passwordView.actionsecret}" />
+                                
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
@@ -400,7 +402,7 @@
                         <p:panel header="Password now changed">
                             <p:messages />
                             <h:panelGrid columns="2" columnClasses="label, value">
-                                <h:outputText value="Password changed!" />
+                                <h:outputText value="Password reset..." />
                                 <p:outputLabel value="Close by choosing next!"/>
                             </h:panelGrid>
                         </p:panel>

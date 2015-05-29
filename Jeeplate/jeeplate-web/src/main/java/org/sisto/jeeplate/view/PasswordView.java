@@ -19,6 +19,7 @@
 package org.sisto.jeeplate.view;
 
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.annotation.PostConstruct;
@@ -54,8 +55,8 @@ public class PasswordView implements Serializable {
     private String mobile;
     private String username;
     private String password;
-    private String resettoken; // emailed to user (basically temporary password)
     private String actionsecret; // hidden from user (alternative to reset URL)
+    private String emailedsecret;
     private Boolean iamhuman;
     
     @PostConstruct
@@ -65,7 +66,7 @@ public class PasswordView implements Serializable {
         this.mobile = "";
         this.username = "";
         this.password = "";
-        this.resettoken = "";
+        this.emailedsecret = "";
         this.actionsecret = "";
         this.iamhuman = Boolean.FALSE;
     }
@@ -102,27 +103,12 @@ public class PasswordView implements Serializable {
         this.password = password;
     }
 
-    public String getResettoken() {
-        return resettoken;
-    }
-
-    public void setResettoken(String resettoken) {
-        this.resettoken = resettoken;
-    }
-
     public String getActionsecret() {
         return actionsecret;
     }
 
     public void setActionsecret(String actionsecret) {
-        if (! this.flowing) {
-            if (actionsecret.isEmpty()) {
-                this.actionsecret = this.generateRandomString(8);
-            } else {
-                this.actionsecret = actionsecret;
-            }
-            
-        }
+        this.actionsecret = actionsecret;
     }
     
     public Boolean getIamhuman() {
@@ -130,7 +116,29 @@ public class PasswordView implements Serializable {
     }
 
     public void setIamhuman(Boolean iamhuman) {
+        if(iamhuman) {
+            this.newActionsecret();
+        }
         this.iamhuman = iamhuman;
+    }
+
+    public String getEmailedsecret() {
+        return emailedsecret;
+    }
+
+    public void setEmailedsecret(String emailedsecret) {
+        this.emailedsecret = emailedsecret;
+    }
+    
+    public void newActionsecret() {
+        if (! this.flowing) {
+            if (actionsecret.isEmpty()) {
+                this.actionsecret = this.generateRandomString(8);
+            }
+            this.flowing = true;
+        } else {
+            this.flowing = false;
+        }
     }
     
     private String generateRandomString(int length) {
@@ -153,20 +161,12 @@ public class PasswordView implements Serializable {
     }
     
     private String getResourceBundleValue(String key) {
-        FacesContext context = FacesContext.getCurrentInstance();
-        Application app = context.getApplication();
-        ResourceBundle backendText = app.getResourceBundle(context, "msg");
+        FacesContext fc = FacesContext.getCurrentInstance();
+        String msgBundleName = fc.getApplication().getMessageBundle();
+        Locale loc = fc.getViewRoot().getLocale();
+        ResourceBundle bundle = ResourceBundle.getBundle(msgBundleName, loc);
         
-        return backendText.getString(key);
-}
-    
-    public void requestPasswordResetPhase() {
-        EmailMessage newUser = new EmailMessage("Requested pw reset NEW", "secret is ${secret}", "Jari K.", "Jeeplate corp.");
-        EmailMessage oldUser = new EmailMessage("Requested pw reset OLD", "did you do this", "Jari K.", "Jeeplate corp.");
-        
-        this.flowing = true;
-        this.user = user.findOneUser(this.email);
-        this.resettoken = this.user.initializePasswordReset(oldUser, newUser);
+        return bundle.getString(key);
     }
     
     private String findRequestStringParamValue(String key) {
@@ -177,22 +177,34 @@ public class PasswordView implements Serializable {
         return val;
     }
     
+    private void findUserAccount() {
+        this.user = user.findOneUser(this.email);
+        log.info("Lost password recovery for user %s (%s)", this.email.toString(), String.valueOf(this.user.getEntity().getId()));
+    }
+    
+    public void requestPasswordResetPhase() {
+        EmailMessage newUserMsg = new EmailMessage("Requested pw reset NEW", "secret is ", "Jari K.", "Jeeplate corp.");
+        EmailMessage oldUserMsg = new EmailMessage("Requested pw reset OLD", "did you do this, if yes ${secret}", "Jari K.", "Jeeplate corp."); 
+        log.info("rpp -> "+this.user.getEntity().getId());
+        this.user.initializePasswordReset(oldUserMsg, newUserMsg);
+    }
+    
     private boolean passwordResetCanBeCompleted(String hiddenActionSecretGenerated) {
-        String hiddenActionSecretCarried = findRequestStringParamValue("signupWzdHidden");
-        boolean secretAreSame = hiddenActionSecretGenerated.equals(hiddenActionSecretCarried);
+        String hiddenActionSecretCarried = findRequestStringParamValue("resetForm:resetWzdHidden");
+        boolean secretsAreSame = hiddenActionSecretGenerated.equals(hiddenActionSecretCarried);
         boolean resetInitialized = this.flowing;
         
-        return (secretAreSame && resetInitialized);
+        return (secretsAreSame && resetInitialized);
     }
     
     public void completePasswordResetPhase() {
         String typedPassword = this.getPassword();
-        String emailedResetToken = this.getResettoken();
+        String emailedResetToken = this.getEmailedsecret();
         String hiddenActionSecretGenerated = this.getActionsecret();
         Boolean completed = Boolean.FALSE;
-        
+        log.info("cpr -> "+this.user.getEntity().getId());
         if (passwordResetCanBeCompleted(hiddenActionSecretGenerated)) {       
-            completed = user.completePasswordReset(typedPassword, emailedResetToken, hiddenActionSecretGenerated);
+            completed = this.user.completePasswordReset(typedPassword, emailedResetToken, hiddenActionSecretGenerated);
         }
         if (completed) {
             this.showFacesMessage(FacesMessage.SEVERITY_INFO, "OK, changed password");
@@ -222,7 +234,8 @@ public class PasswordView implements Serializable {
                 next = step;
             } else if (last) {
                 this.resetAllFieldValues();
-                ctx.execute("PF('resetWzd').hide()");
+                ctx.update("@form");
+                ctx.execute("PF('resetWzd').hide()");              
                 next = start;
             } else {
                 switch (phase) {
@@ -235,7 +248,7 @@ public class PasswordView implements Serializable {
                         //         action secret is also needed in a
                         // Server: Sends email 1) No account or 2) Reset request with temp password
                         //         Creates reset token and timestamp
-                        
+                        this.findUserAccount();
                         this.requestPasswordResetPhase();
                         break;
                     case 2:

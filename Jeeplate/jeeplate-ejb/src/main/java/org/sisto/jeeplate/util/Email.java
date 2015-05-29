@@ -19,6 +19,7 @@
 package org.sisto.jeeplate.util;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
@@ -58,12 +59,18 @@ public class Email {
     }
     
     private static class MockTransport {
-        public static void send(MimeMessage m) throws MessagingException {       
+        public static void send(MimeMessage m) throws MessagingException {
+            
             try {
-                System.out.println("MOCK EMAIL");
-                //System.out.println("TO:       "+m.getAllRecipients()[0]);
-                System.out.println("SUBJECT:  "+m.getSubject());
-                System.out.println("CONTENT:  "+m.getContent());
+                StringBuilder sb = new StringBuilder("");
+                Address[] tos = m.getAllRecipients();
+                sb.append("\n========= ");
+                sb.append("\n   EMAIL: ");
+                sb.append("\n      TO: ").append(Arrays.toString(tos));
+                sb.append("\n SUBJECT: ").append(String.valueOf(m.getSubject()));
+                sb.append("\n CONTENT: ").append(String.valueOf(m.getContent()));
+                sb.append("\n========= ");
+                System.out.println(sb.toString());
                 System.out.flush();
             } catch (IOException | NullPointerException e) {
                 throw new MessagingException(e.getMessage());

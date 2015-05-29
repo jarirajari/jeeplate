@@ -21,7 +21,7 @@
       <property name="javax.persistence.sql-load-script-source" value="db/scripts/ddl/populate-db.sql"/>
       <!-- Hibernate -->
       <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
-      <property name="hibernate.show_sql" value="false"/>
+      <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.format_sql" value="false"/>
       <property name="hibernate.hbm2ddl.auto" value="none"/>
       <!-- Wildfly -->
