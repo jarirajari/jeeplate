@@ -26,7 +26,16 @@ import java.time.ZoneId;
 import java.util.Date;
 
 public class DateAndTimeConverter {
-    
+    public static Instant convertToInstant(Date ts) {
+        Instant i = Instant.ofEpochMilli(ts.getTime());
+        
+        return i;
+    }
+    public static Date convertToDate(Instant i) {
+        Date d = Date.from(i);
+        
+        return d;
+    }
     /*
      * Convert java.util.Date to java.time.LocalDateTime that is a
      * date-time without a time-zone in the ISO-8601 calendar system,

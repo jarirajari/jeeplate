@@ -25,7 +25,9 @@ import java.util.ResourceBundle;
 import javax.annotation.PostConstruct;
 import javax.faces.application.Application;
 import javax.faces.application.FacesMessage;
+import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -123,11 +125,16 @@ public class PasswordView implements Serializable {
     }
 
     public String getEmailedsecret() {
-        return emailedsecret;
+        return (this.emailedsecret);
     }
 
-    public void setEmailedsecret(String emailedsecret) {
-        this.emailedsecret = emailedsecret;
+    public void setEmailedsecret(String emailed) {
+        this.emailedsecret = emailed;
+    }
+    
+    // example of how to use ajax listener
+    public void emailedsecretChanged(AjaxBehaviorEvent event) {
+        String emailed = (String) ((UIOutput)event.getSource()).getValue();
     }
     
     public void newActionsecret() {
@@ -146,11 +153,7 @@ public class PasswordView implements Serializable {
                 
         return rnd;
     }
-    
-    public void save() {        
-        
-    }
-    
+
     private void resetAllFieldValues() {
         this.init();
     }
@@ -185,7 +188,7 @@ public class PasswordView implements Serializable {
     public void requestPasswordResetPhase() {
         EmailMessage newUserMsg = new EmailMessage("Requested pw reset NEW", "secret is ", "Jari K.", "Jeeplate corp.");
         EmailMessage oldUserMsg = new EmailMessage("Requested pw reset OLD", "did you do this, if yes ${secret}", "Jari K.", "Jeeplate corp."); 
-        log.info("rpp -> "+this.user.getEntity().getId());
+        
         this.user.initializePasswordReset(oldUserMsg, newUserMsg);
     }
     
@@ -202,7 +205,7 @@ public class PasswordView implements Serializable {
         String emailedResetToken = this.getEmailedsecret();
         String hiddenActionSecretGenerated = this.getActionsecret();
         Boolean completed = Boolean.FALSE;
-        log.info("cpr -> "+this.user.getEntity().getId());
+        
         if (passwordResetCanBeCompleted(hiddenActionSecretGenerated)) {       
             completed = this.user.completePasswordReset(typedPassword, emailedResetToken, hiddenActionSecretGenerated);
         }
@@ -230,14 +233,13 @@ public class PasswordView implements Serializable {
         log.info("step=%s, phase=%s", step, ""+phase);
         if (forward) {
             if (first) {
-                log.info("do some reset inits here");
                 next = step;
             } else if (last) {
                 this.resetAllFieldValues();
-                ctx.update("@form");
-                ctx.execute("PF('resetWzd').hide()");              
+                ctx.execute("PF('resetWzd').hide()");
                 next = start;
             } else {
+                
                 switch (phase) {
                     case 0:
                         // Client: User enters email, number, and checks Captcha

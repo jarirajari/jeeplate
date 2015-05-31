@@ -387,10 +387,10 @@
                                 <p:password id="resetFormPwNew" label="new pw" value="#{passwordView.password}" required="true" feedback="false" match="resetFormPwRetyped"/>
 
                                 <h:outputText value="Retype Password:" />
-                                <p:password id="resetFormPwRetyped" label="ret pw" value="#{passwordView.password}" required="true" feedback="false"/>
+                                <p:password id="resetFormPwRetyped" label="ret pw"  required="true" feedback="false"/>
 
                                 <h:outputText value="Reset Code:" />
-                                <p:inputText value="#{passwordView.emailedsecret}" required="true" />
+                                <h:inputText id="resetWzdEmailed" value="#{passwordView.emailedsecret}" required="true" />
                                 
                                 <h:inputHidden id="resetWzdHidden" value="#{passwordView.actionsecret}" />
                                 

@@ -142,14 +142,15 @@ public class UserData implements Serializable {
     @Transactional
     public String initializePasswordReset(EmailMessage messageForOldUser, EmailMessage messageForNewUser) {
         assert this.entity != null;
-        boolean userExists =! this.entity.isDefault();
+        boolean userExists =! this.getEntity().isDefault();
         String resetToken;
         EmailMessage message;
-        UserCredential uc  = this.entity.getCredential();
+        UserCredential uc  = this.getEntity().getCredential();
         
         if (userExists) {
-            uc.resetToken();
-            uc.resetTimestamp();  
+            uc.activateResetProtocol();
+            this.update();
+            log.info("==>> %s %s", uc.getPasswordResetToken(), uc.getPasswordResetTimestamp().toString());
         }
         if (userExists) {
             message = messageForOldUser;
@@ -168,15 +169,21 @@ public class UserData implements Serializable {
     @Transactional
     public Boolean completePasswordReset(String typedPassword, String emailedResetToken, String hiddenActionSecret) {
         assert this.entity != null;
-        UserCredential uc = this.entity.getCredential();
+        UserCredential uc = this.getEntity().getCredential();
         Boolean changed = Boolean.FALSE;
+        Boolean resetRequestValid = uc.resetIsValid();
+        log.info("+++ id=%s, em=%s, db=%s",String.valueOf(this.entity.getId()), emailedResetToken, uc.getPasswordResetToken());
         
-        if (uc.resetIsValid()) {
-            if (uc.getPasswordResetToken().equals(emailedResetToken)) {
+        if (resetRequestValid) {
+            final boolean resetTokenValid = uc.getPasswordResetToken().equals(emailedResetToken);
+            if (resetTokenValid) {
+                uc.deactivateResetProtocol();
                 uc.refresh(typedPassword);
-                uc.resetToken();
-                uc.resetTimestamp();
-                changed = Boolean.TRUE;
+                changed = Boolean.TRUE; 
+            }
+            System.out.println("******** "+resetTokenValid);
+            if (changed) {
+                this.update();
             }
         }
         
@@ -214,28 +221,6 @@ public class UserData implements Serializable {
             return Boolean.FALSE;
         }
     }
-    
-    @Transactional
-    public void switchPassword() {
-        
-        // Many phases.
-        
-        // resetToken (delete old + create new)
-        // resetRequestTimestamp (this time)
-        // client generates and keeps local secret
-        // email is sent to the user with email-secret
-        // type new pw along with email-secret and secret
-        // valid token and valid ie. not expired
-        // send email to user about end result
-        // finished
-    }
-    
-    public void existingToken() {
-        UserEntity ue = this.getEntity();
-        ue.getCredential().resetToken();
-    }
-    
-
     
     @Transactional
     public Boolean testHashing() {

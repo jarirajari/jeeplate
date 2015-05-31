@@ -12,8 +12,8 @@
 // Modal opacity
 .ui-widget-overlay {
     background-color: white;
-    filter:alpha(opacity=80) !important;  /* works in IE 7 */
-    opacity: 0.5 !important;  /* works in Firefox */
+    filter:alpha(opacity=60) !important;  /* works in IE 7 */
+    opacity: 0.6 !important;  /* works in Firefox */
 }
 
 .signupEmail input {

@@ -19,6 +19,7 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
@@ -29,13 +30,14 @@ import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.util.ByteSource;
 import org.sisto.jeeplate.security.shiro.Salt;
+import org.sisto.jeeplate.util.DateAndTimeConverter;
 
 @Embeddable
 public class UserCredential implements Serializable {
     @Transient
     protected static final String RESET = "";
     @Transient
-    protected static final int EXPIRATION_PERIOD = 24 * 60 * 60 * 1000; //ms
+    protected static final int EXPIRATION_PERIOD = 5 * 60; //5 min in seconds
     protected String salt;
     protected String password; // hashed with salt
     protected String passwordResetToken;
@@ -46,11 +48,11 @@ public class UserCredential implements Serializable {
         this.salt = RESET;
         this.password = RESET;
         this.passwordResetToken = RESET;
-        this.passwordResetTimestamp = UserCredential.now();
+        this.passwordResetTimestamp = Date.from(Instant.EPOCH);
     }
     
     private static Date now() {
-        return (new Date());
+        return (Date.from(Instant.now()));
     }
     
     public void refresh(String newPassword) {
@@ -98,16 +100,24 @@ public class UserCredential implements Serializable {
         return (hasher.toHex());
     }
     
-    public void resetToken() {
+    public void activateResetProtocol() {
         this.passwordResetToken = UserCredential.generateRandomNumberToken();
-    }
-    
-    public void resetTimestamp () {
         this.passwordResetTimestamp = UserCredential.now();
     }
     
+    public void deactivateResetProtocol() {
+        this.passwordResetToken = RESET;
+        this.passwordResetTimestamp = Date.from(Instant.EPOCH);
+    }
+    
     public Boolean resetIsValid() {
-        return true;
+        final Date databaseTime = this.getPasswordResetTimestamp();
+        Instant epochTime = DateAndTimeConverter.convertToInstant(databaseTime);
+        Instant expireTime = epochTime.plusSeconds(EXPIRATION_PERIOD);
+        Instant currentTime = Instant.now();
+        Boolean invalid = currentTime.isAfter(expireTime);
+        
+        return (! invalid);
     }
 
     private static String generateRandomNumberToken() {
