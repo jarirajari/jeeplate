@@ -150,7 +150,6 @@ public class UserData implements Serializable {
         if (userExists) {
             uc.activateResetProtocol();
             this.update();
-            log.info("==>> %s %s", uc.getPasswordResetToken(), uc.getPasswordResetTimestamp().toString());
         }
         if (userExists) {
             message = messageForOldUser;
@@ -172,7 +171,6 @@ public class UserData implements Serializable {
         UserCredential uc = this.getEntity().getCredential();
         Boolean changed = Boolean.FALSE;
         Boolean resetRequestValid = uc.resetIsValid();
-        log.info("+++ id=%s, em=%s, db=%s",String.valueOf(this.entity.getId()), emailedResetToken, uc.getPasswordResetToken());
         
         if (resetRequestValid) {
             final boolean resetTokenValid = uc.getPasswordResetToken().equals(emailedResetToken);
@@ -181,9 +179,10 @@ public class UserData implements Serializable {
                 uc.refresh(typedPassword);
                 changed = Boolean.TRUE; 
             }
-            System.out.println("******** "+resetTokenValid);
             if (changed) {
                 this.update();
+            } else {
+                log.info("Did not change password for user '%s'...", this.getEntity().username);
             }
         }
         
@@ -229,7 +228,9 @@ public class UserData implements Serializable {
         this.store.create(this.hashed3);
         return Boolean.TRUE;
     }
-    
+    /*
+     * Methods find() and bind(id) must be public
+     */
     @Transactional
     public UserData find() {
         return (this);
@@ -243,9 +244,11 @@ public class UserData implements Serializable {
         
         return (this);
     }
-    
+    /*
+     * Methods create(), read(), update(), and delete() must be package private!
+     */
     @Transactional
-    public Boolean create() {
+    Boolean create() {
         log.info("UserData.create()");
         this.entity = this.store.create(entity);
         
@@ -253,7 +256,7 @@ public class UserData implements Serializable {
     }
     
     @Transactional
-    public Boolean read() {
+    Boolean read() {
         log.info("UserData.read() discards changes");
         this.entity = this.store.read(entity);
         
@@ -261,7 +264,7 @@ public class UserData implements Serializable {
     }
     
     @Transactional
-    public Boolean update() {
+    Boolean update() {
         log.info("UserData.update() overwrites");
         this.entity = this.store.update(entity);
         log.info("Updated"+this.entity.hashCode()+", "+this.entity.toString());
@@ -269,10 +272,11 @@ public class UserData implements Serializable {
     }
     
     @Transactional
-    public Boolean delete() {
+    Boolean delete() {
         log.info("UserData.delete()");
         this.entity = this.store.delete(entity);
         
         return Boolean.TRUE;
     }
+    void whatever() {}
 }

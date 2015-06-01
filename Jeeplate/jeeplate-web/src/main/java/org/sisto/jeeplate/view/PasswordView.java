@@ -185,19 +185,20 @@ public class PasswordView implements Serializable {
         log.info("Lost password recovery for user %s (%s)", this.email.toString(), String.valueOf(this.user.getEntity().getId()));
     }
     
-    public void requestPasswordResetPhase() {
-        EmailMessage newUserMsg = new EmailMessage("Requested pw reset NEW", "secret is ", "Jari K.", "Jeeplate corp.");
-        EmailMessage oldUserMsg = new EmailMessage("Requested pw reset OLD", "did you do this, if yes ${secret}", "Jari K.", "Jeeplate corp."); 
-        
-        this.user.initializePasswordReset(oldUserMsg, newUserMsg);
-    }
-    
     private boolean passwordResetCanBeCompleted(String hiddenActionSecretGenerated) {
         String hiddenActionSecretCarried = findRequestStringParamValue("resetForm:resetWzdHidden");
         boolean secretsAreSame = hiddenActionSecretGenerated.equals(hiddenActionSecretCarried);
         boolean resetInitialized = this.flowing;
         
         return (secretsAreSame && resetInitialized);
+    }
+    
+    public void requestPasswordResetPhase() {
+        EmailMessage newUserMsg = new EmailMessage("Requested pw reset NEW", "secret is ", "Jari K.", "Jeeplate corp.");
+        EmailMessage oldUserMsg = new EmailMessage("Requested pw reset OLD", "did you do this, if yes ${secret}", "Jari K.", "Jeeplate corp."); 
+        
+        this.findUserAccount();
+        this.user.initializePasswordReset(oldUserMsg, newUserMsg);
     }
     
     public void completePasswordResetPhase() {
@@ -250,7 +251,6 @@ public class PasswordView implements Serializable {
                         //         action secret is also needed in a
                         // Server: Sends email 1) No account or 2) Reset request with temp password
                         //         Creates reset token and timestamp
-                        this.findUserAccount();
                         this.requestPasswordResetPhase();
                         break;
                     case 2:
