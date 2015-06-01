@@ -357,7 +357,7 @@
         </p:dialog><!-- /Role dialog -->
         <!-- Reset Wizard -->
         <p:dialog widgetVar="resetWzd" closable="false" header="Reset password" modal="true" styleClass="disable-scroll" width="600px">
-            <h:form id="resetForm">
+            <h:form id="resetForm" target="" >
                 <p:growl id="resetFormGrowl" sticky="true" showDetail="true"/>
                 <p:wizard widgetVar="resetWzdWizard" flowListener="#{passwordView.onFlowProcess}" backLabel="Cancel" nextLabel="OK" showNavBar="true">
                     <!-- Send email if information is correct -->

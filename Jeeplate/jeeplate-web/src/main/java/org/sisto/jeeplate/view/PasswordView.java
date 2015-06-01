@@ -233,41 +233,38 @@ public class PasswordView implements Serializable {
         
         log.info("step=%s, phase=%s", step, ""+phase);
         if (forward) {
-            if (first) {
-                next = step;
-            } else if (last) {
-                this.resetAllFieldValues();
-                ctx.execute("PF('resetWzd').hide()");
-                next = start;
-            } else {
-                
-                switch (phase) {
-                    case 0:
-                        // Client: User enters email, number, and checks Captcha
-                        // Server: Creates action secret
-                        break;
-                    case 1:
-                        // Client: User enters new password, retypes it, and inputs emailed reset secret;
-                        //         action secret is also needed in a
-                        // Server: Sends email 1) No account or 2) Reset request with temp password
-                        //         Creates reset token and timestamp
-                        this.requestPasswordResetPhase();
-                        break;
-                    case 2:
-                        // Client: Valid reset token together with emailed reset secret (i.e. temp password)
-                        //         changes the password if the action secret matches too, otherwise no change
-                        // Server: 
-                        this.completePasswordResetPhase();
-                        break;
-                    case 3:
-                        // Client: Two factor authentication (2FA) would be here...
-                        //         This would meaning issuing Request-Response challenge vie mobile channel
-                        // Server:
-                        break;
-                    default:
-                        break;
-                }
-                next = step;
+            switch (phase) {
+                case 0:
+                    // Client: User enters email, number, and checks Captcha
+                    // Server: Creates action secret
+                    next = step;
+                    break;
+                case 1:
+                    // Client: User enters new password, retypes it, and inputs emailed reset secret;
+                    //         action secret is also needed in a
+                    // Server: Sends email 1) No account or 2) Reset request with temp password
+                    //         Creates reset token and timestamp
+                    this.resetAllFieldValues();
+                    this.requestPasswordResetPhase();
+                    next = step;
+                    break;
+                case 2:
+                    // Client: Valid reset token together with emailed reset secret (i.e. temp password)
+                    //         changes the password if the action secret matches too, otherwise no change
+                    // Server: 
+                    this.completePasswordResetPhase();
+                    next = step;
+                    break;
+                case 3:
+                    // Client: Two factor authentication (2FA) would be here...
+                    //         This would meaning issuing Request-Response challenge vie mobile channel
+                    // Server:
+                    next = step;
+                    break;
+                default:
+                    ctx.execute("PF('resetWzd').hide()");
+                    next = start;
+                    break;
             }
         } else {
             next = step;
