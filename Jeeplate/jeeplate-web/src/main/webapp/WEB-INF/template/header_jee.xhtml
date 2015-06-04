@@ -356,23 +356,23 @@
             </h:form>
         </p:dialog><!-- /Role dialog -->
         <!-- Reset Wizard -->
-        <p:dialog widgetVar="resetWzd" closable="false" header="Reset password" modal="true" styleClass="disable-scroll" width="600px">
-            <h:form id="resetForm" target="" >
+        <p:dialog widgetVar="resetWzd" closable="true" header="Reset password" modal="true" styleClass="disable-scroll" width="600px">
+            <h:form id="resetForm" >
                 <p:growl id="resetFormGrowl" sticky="true" showDetail="true"/>
                 <p:wizard widgetVar="resetWzdWizard" flowListener="#{passwordView.onFlowProcess}" backLabel="Cancel" nextLabel="OK" showNavBar="true">
                     <!-- Send email if information is correct -->
                     <p:tab id="resetWzd0" title="Account Details">
                         <p:panel header="Account Details2">
-                            <p:messages />
+                            <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="Email:" />
-                                <p:inputText value="#{passwordView.email}" required="true" />
+                                <p:inputText label="Email" value="#{passwordView.email}" required="true" />
 
                                 <h:outputText value="Mobile:" />
-                                <p:inputText value="#{passwordView.mobile}" required="true" />
+                                <p:inputText label="Mobile" value="#{passwordView.mobile}" required="true" />
 
                                 <h:outputText value="I am human:" /><!-- Waiting for new Re-captcha integration from Primefaces -->
-                                <p:selectBooleanCheckbox value="#{passwordView.iamhuman}" required="true"/>
+                                <p:selectBooleanCheckbox  label="Captcha" value="#{passwordView.iamhuman}" required="true"/>
                                 
                                 <!-- hidden value generated -->
                             </h:panelGrid>
@@ -398,18 +398,22 @@
                         </p:panel>
                     </p:tab>
                     <!--  -->
-                    <p:tab id="resetWzd2" title="Password changed" >
+                    <p:tab id="resetWzd2" title="Password reseted" >
                         <p:panel header="Password now changed">
-                            <p:messages />
-                            <h:panelGrid columns="2" columnClasses="label, value">
-                                <h:outputText value="Password reset..." />
-                                <p:outputLabel value="Close by choosing next!"/>
+                            <p:messages showDetail="true" showIcon="false"/>
+                            <h:panelGrid rendered="true" columns="2" columnClasses="label, value">
+                                <h:outputText rendered="#{not passwordView.reseted}" value="Password not reseted..." />
+                                <h:outputText rendered="#{passwordView.reseted}" value="Password succesfully reseted..." />
+                                <p:outputLabel rendered="#{not passwordView.reseted}" value="Please register or try reset again."/>
+                                <p:outputLabel rendered="#{passwordView.reseted}" value="Close by choosing next and sign in!"/>
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
                     <p:tab id="resetWzd9"  title="" titleStyleClass="ui-wizard-step-title-custom fa fa-lock fa-2x">
+                        <span onloadstart="document.getElementById('resetForm').submit();">One ugly PrimeFaces hack</span>
                     </p:tab>
                 </p:wizard>
+                
             </h:form>
         </p:dialog><!-- /Reset Wizard -->
         <!-- Terms and conditions dialog -->

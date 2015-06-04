@@ -25,7 +25,9 @@ import java.util.ResourceBundle;
 import javax.annotation.PostConstruct;
 import javax.faces.application.Application;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.ViewHandler;
 import javax.faces.component.UIOutput;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.ViewScoped;
@@ -60,6 +62,7 @@ public class PasswordView implements Serializable {
     private String actionsecret; // hidden from user (alternative to reset URL)
     private String emailedsecret;
     private Boolean iamhuman;
+    private Boolean reseted = Boolean.FALSE;
     
     @PostConstruct
     public void init() {
@@ -71,6 +74,7 @@ public class PasswordView implements Serializable {
         this.emailedsecret = "";
         this.actionsecret = "";
         this.iamhuman = Boolean.FALSE;
+        this.reseted = Boolean.FALSE;
     }
     
     public String getEmail() {
@@ -78,6 +82,7 @@ public class PasswordView implements Serializable {
     }
 
     public void setEmail(String email) {
+        log.info("********************** Setting user email=%s",email);
         this.email = email;
     }
 
@@ -122,6 +127,14 @@ public class PasswordView implements Serializable {
             this.newActionsecret();
         }
         this.iamhuman = iamhuman;
+    }
+
+    public Boolean getReseted() {
+        return reseted;
+    }
+
+    public void setReseted(Boolean reseted) {
+        this.reseted = reseted;
     }
 
     public String getEmailedsecret() {
@@ -181,8 +194,10 @@ public class PasswordView implements Serializable {
     }
     
     private void findUserAccount() {
-        this.user = user.findOneUser(this.email);
-        log.info("Lost password recovery for user %s (%s)", this.email.toString(), String.valueOf(this.user.getEntity().getId()));
+        String em = this.getEmail();
+        
+        this.user = user.findOneUser(em);
+        log.info("Lost password recovery for user '%s' (%s)", em, String.valueOf(this.user.getEntity().getId()));
     }
     
     private boolean passwordResetCanBeCompleted(String hiddenActionSecretGenerated) {
@@ -207,7 +222,8 @@ public class PasswordView implements Serializable {
         String hiddenActionSecretGenerated = this.getActionsecret();
         Boolean completed = Boolean.FALSE;
         
-        if (passwordResetCanBeCompleted(hiddenActionSecretGenerated)) {       
+        if (passwordResetCanBeCompleted(hiddenActionSecretGenerated)) {
+            this.findUserAccount();
             completed = this.user.completePasswordReset(typedPassword, emailedResetToken, hiddenActionSecretGenerated);
         }
         if (completed) {
@@ -215,6 +231,7 @@ public class PasswordView implements Serializable {
         } else {
             this.showFacesMessage(FacesMessage.SEVERITY_ERROR, "Failed, not changing password");
         }
+        this.reseted = completed;
     }
     
     // PrimeFaces use inherently wrong design for Wizards
@@ -244,7 +261,6 @@ public class PasswordView implements Serializable {
                     //         action secret is also needed in a
                     // Server: Sends email 1) No account or 2) Reset request with temp password
                     //         Creates reset token and timestamp
-                    this.resetAllFieldValues();
                     this.requestPasswordResetPhase();
                     next = step;
                     break;
@@ -263,6 +279,7 @@ public class PasswordView implements Serializable {
                     break;
                 default:
                     ctx.execute("PF('resetWzd').hide()");
+                    this.resetAllFieldValues();
                     next = start;
                     break;
             }
@@ -271,5 +288,14 @@ public class PasswordView implements Serializable {
         }
         
         return next;
+    }
+    
+    protected void refreshPage() {
+        FacesContext fc = FacesContext.getCurrentInstance();
+        String refreshpage = fc.getViewRoot().getViewId();
+        ViewHandler ViewH = fc.getApplication().getViewHandler();
+        UIViewRoot UIV = ViewH.createView(fc, refreshpage);
+        UIV.setViewId(refreshpage);
+        fc.setViewRoot(UIV);
     }
 }
