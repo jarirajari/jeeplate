@@ -374,11 +374,10 @@
                                 <p:inputText id="resetFormMobile" label="Mobile" value="#{passwordView.mobile}" required="true">
                                     <f:validator validatorId="mobileValidator" />
                                 </p:inputText>
-
-                                <h:outputText value="I am human:" /><!-- Waiting for new Re-captcha integration from Primefaces -->
-                                <p:selectBooleanCheckbox  label="Captcha" value="#{passwordView.iamhuman}" required="true"/>
                                 
-                                <!-- hidden value generated -->
+                                <h:outputText value="I am human:" />
+                                <p:selectBooleanCheckbox value="#{passwordView.iamhuman}" required="true"/>
+                                <!-- Waiting for new Re-captcha integration from Primefaces -->
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
