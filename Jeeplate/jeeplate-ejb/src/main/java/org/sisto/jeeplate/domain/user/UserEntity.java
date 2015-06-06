@@ -32,9 +32,8 @@ import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import org.apache.shiro.crypto.hash.Sha256Hash;
+import javax.validation.constraints.Digits;
 import org.sisto.jeeplate.domain.BusinessEntity;
-import org.sisto.jeeplate.security.shiro.Salt;
 
 /**
  * Business object model for an actual business object
@@ -50,7 +49,8 @@ public class UserEntity extends BusinessEntity implements Serializable {
     @GeneratedValue(generator = "user_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
     protected String username; // email address
-    protected String mobile; // mobile msisdn
+    @Digits(integer = 15, fraction = 0)
+    protected Long mobile; // mobile msisdn
     // requires later a reference to a person or organsation individual
     @Embedded
     protected UserCredential credential;
@@ -69,16 +69,33 @@ public class UserEntity extends BusinessEntity implements Serializable {
         this.username = setUsername;
     }
 
-    public String getMobile() {
+    public Long getMobile() {
         return mobile;
     }
 
-    public void setMobile(String mobile) {
+    public void setMobile(Long mobile) {
         this.mobile = mobile;
     }
 
     public UserCredential getCredential() {
         return credential;
+    }
+    
+    public Boolean mobileNumberIsSame(String msisdn) {
+        Boolean same;
+        
+        try {
+            Long temp = Long.valueOf(msisdn);
+            if (this.mobile.equals(temp)) {
+                same = Boolean.TRUE;
+            } else {
+                same = Boolean.FALSE;
+            }
+        } catch (NumberFormatException nfe) {
+            same = Boolean.FALSE;
+        }
+        
+        return same;
     }
     
     /*
@@ -106,12 +123,18 @@ public class UserEntity extends BusinessEntity implements Serializable {
 
         private void defaults() {
             this.object.username = "";
-            this.object.mobile = "";
+            this.object.mobile = 0L;
             this.object.credential = new UserCredential();
         }
         
         public UserEntityBuilder withUsername(String name) {
             this.object.username = name;
+            
+            return (this);
+        }
+        
+        public UserEntityBuilder withMobile(Long mobile) {
+            this.object.mobile = mobile;
             
             return (this);
         }

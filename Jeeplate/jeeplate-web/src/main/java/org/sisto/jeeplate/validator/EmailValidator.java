@@ -34,23 +34,23 @@ public class EmailValidator implements Validator {
     private final static Pattern COMPILED_EMAIL_PATTERN = Pattern.compile(VALID_EMAIL_PATTERN);
     
     @Override
-    public void validate(FacesContext fc, UIComponent c, Object o) throws ValidatorException {
+    public void validate(FacesContext fc, UIComponent c, 
+                         Object value) throws ValidatorException {
         Matcher matcher = null;
-        String email = null;
-        boolean validEmailAddress = false;
+        String email = (value == null) ? "" : (String) value;
         
         // No value is not ok
-        if (o == null || "".equals((String) o)) {
-            FacesMessage msg = new FacesMessage("No email value!", "Email Validation Error");
+        if (email.isEmpty()) {
+            FacesMessage msg = new FacesMessage("Email Validation Error");
             msg.setSeverity(FacesMessage.SEVERITY_ERROR);
             throw new ValidatorException(msg);
         }
 
         // The email matcher
-        matcher = COMPILED_EMAIL_PATTERN.matcher((String) o);
+        matcher = COMPILED_EMAIL_PATTERN.matcher(email);
 
-        if (!matcher.matches()) {   // Email doesn't match
-            FacesMessage msg = new FacesMessage("Invalid email value!", "Email Validation Error");
+        if (!matcher.matches()) {
+            FacesMessage msg = new FacesMessage("Email Validation Error");
             msg.setSeverity(FacesMessage.SEVERITY_ERROR);
             throw new ValidatorException(msg);
         }

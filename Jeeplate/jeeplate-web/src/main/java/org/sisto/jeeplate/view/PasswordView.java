@@ -82,7 +82,6 @@ public class PasswordView implements Serializable {
     }
 
     public void setEmail(String email) {
-        log.info("********************** Setting user email=%s",email);
         this.email = email;
     }
 
@@ -91,7 +90,7 @@ public class PasswordView implements Serializable {
     }
 
     public void setMobile(String mobile) {
-        this.mobile = mobile;
+        this.mobile = String.format("+%s", mobile.replaceAll("\\D+",""));
     }
     
     public String getUsername() {
@@ -147,7 +146,7 @@ public class PasswordView implements Serializable {
     
     // example of how to use ajax listener
     public void emailedsecretChanged(AjaxBehaviorEvent event) {
-        String emailed = (String) ((UIOutput)event.getSource()).getValue();
+        String example = (String) ((UIOutput)event.getSource()).getValue();
     }
     
     public void newActionsecret() {
@@ -172,8 +171,11 @@ public class PasswordView implements Serializable {
     }
     
     private void showFacesMessage(FacesMessage.Severity type, String text) {
-        FacesMessage msg = new FacesMessage(type.toString(), text);
-        FacesContext.getCurrentInstance().addMessage(null, msg);
+        FacesMessage msg = new FacesMessage(text);
+        FacesContext ctx = FacesContext.getCurrentInstance();
+        
+        msg.setSeverity(type);
+        ctx.addMessage(null, msg);
     }
     
     private String getResourceBundleValue(String key) {
@@ -217,6 +219,7 @@ public class PasswordView implements Serializable {
     }
     
     public void completePasswordResetPhase() {
+        String typedMobile = this.getMobile();
         String typedPassword = this.getPassword();
         String emailedResetToken = this.getEmailedsecret();
         String hiddenActionSecretGenerated = this.getActionsecret();
@@ -224,7 +227,7 @@ public class PasswordView implements Serializable {
         
         if (passwordResetCanBeCompleted(hiddenActionSecretGenerated)) {
             this.findUserAccount();
-            completed = this.user.completePasswordReset(typedPassword, emailedResetToken, hiddenActionSecretGenerated);
+            completed = this.user.completePasswordReset(typedMobile, typedPassword, emailedResetToken, hiddenActionSecretGenerated);
         }
         if (completed) {
             this.showFacesMessage(FacesMessage.SEVERITY_INFO, "OK, changed password");

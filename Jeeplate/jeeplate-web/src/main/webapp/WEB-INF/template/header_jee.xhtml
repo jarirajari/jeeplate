@@ -366,10 +366,14 @@
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="Email:" />
-                                <p:inputText label="Email" value="#{passwordView.email}" required="true" />
+                                <p:inputText id="resetFormEmail" label="Email" value="#{passwordView.email}" required="true">
+                                    <f:validator validatorId="emailValidator" />
+                                </p:inputText>
 
                                 <h:outputText value="Mobile:" />
-                                <p:inputText label="Mobile" value="#{passwordView.mobile}" required="true" />
+                                <p:inputText id="resetFormMobile" label="Mobile" value="#{passwordView.mobile}" required="true">
+                                    <f:validator validatorId="mobileValidator" />
+                                </p:inputText>
 
                                 <h:outputText value="I am human:" /><!-- Waiting for new Re-captcha integration from Primefaces -->
                                 <p:selectBooleanCheckbox  label="Captcha" value="#{passwordView.iamhuman}" required="true"/>
@@ -381,13 +385,17 @@
                     <!-- Input security code from email -->
                     <p:tab id="resetWzd1" title="Change Password">
                         <p:panel header="Change Password2">
-                            <p:messages showDetail="true" showIcon="false"/>
+                            <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="New Password:" />
-                                <p:password id="resetFormPwNew" label="new pw" value="#{passwordView.password}" required="true" feedback="false" match="resetFormPwRetyped"/>
+                                <p:password id="resetFormPwNew" label="new pw" value="#{passwordView.password}" required="true" 
+                                            match="resetFormPwRetyped" feedback="true" inline="true" promptLabel="Pw strength" 
+                                            weakLabel="weak" goodLabel="good" strongLabel="Strong" maxlength="32" >
+                                    <f:validator validatorId="passwordValidator" />
+                                </p:password>
 
                                 <h:outputText value="Retype Password:" />
-                                <p:password id="resetFormPwRetyped" label="ret pw"  required="true" feedback="false"/>
+                                <p:password id="resetFormPwRetyped" label="ret pw" required="true" feedback="false"/>
 
                                 <h:outputText value="Reset Code:" />
                                 <h:inputText id="resetWzdEmailed" value="#{passwordView.emailedsecret}" required="true" />
@@ -400,7 +408,7 @@
                     <!--  -->
                     <p:tab id="resetWzd2" title="Password reseted" >
                         <p:panel header="Password now changed">
-                            <p:messages showDetail="true" showIcon="false"/>
+                            <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid rendered="true" columns="2" columnClasses="label, value">
                                 <h:outputText rendered="#{not passwordView.reseted}" value="Password not reseted..." />
                                 <h:outputText rendered="#{passwordView.reseted}" value="Password succesfully reseted..." />

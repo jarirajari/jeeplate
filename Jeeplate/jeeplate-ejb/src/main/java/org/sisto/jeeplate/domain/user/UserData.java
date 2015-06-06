@@ -166,13 +166,14 @@ public class UserData implements Serializable {
     }
     
     @Transactional
-    public Boolean completePasswordReset(String typedPassword, String emailedResetToken, String hiddenActionSecret) {
+    public Boolean completePasswordReset(String typedMobile, String typedPassword, String emailedResetToken, String hiddenActionSecret) {
         assert this.entity != null;
         UserCredential uc = this.getEntity().getCredential();
         Boolean changed = Boolean.FALSE;
         Boolean resetRequestValid = uc.resetIsValid();
+        Boolean securityQuestionMobileNumberMatches = this.getEntity().mobileNumberIsSame(typedMobile);
         
-        if (resetRequestValid) {
+        if (resetRequestValid && securityQuestionMobileNumberMatches) {
             final boolean resetTokenValid = uc.getPasswordResetToken().equals(emailedResetToken);
             if (resetTokenValid) {
                 uc.deactivateResetProtocol();
@@ -182,8 +183,11 @@ public class UserData implements Serializable {
             if (changed) {
                 this.update();
             } else {
-                log.info("Did not change password for user '%s'...", this.getEntity().username);
+                log.info("Did not change password for user '%s'...", this.getEntity().getUsername());
             }
+        } else {
+            log.error("Changing password for user '%s' failed: %s %s", this.getEntity().getUsername(),
+                      resetRequestValid.toString(), securityQuestionMobileNumberMatches.toString());
         }
         
         return changed;
