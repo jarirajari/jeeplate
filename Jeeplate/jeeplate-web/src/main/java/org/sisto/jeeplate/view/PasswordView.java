@@ -19,17 +19,10 @@
 package org.sisto.jeeplate.view;
 
 import java.io.Serializable;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import javax.annotation.PostConstruct;
-import javax.faces.application.Application;
 import javax.faces.application.FacesMessage;
-import javax.faces.application.ViewHandler;
-import javax.faces.component.UIOutput;
-import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,7 +36,7 @@ import org.sisto.jeeplate.util.Randomness;
 
 @Named
 @ViewScoped
-public class PasswordView implements Serializable {
+public class PasswordView extends AbstractView implements Serializable {
     
     @Inject
     transient private StringLogger log;
@@ -54,19 +47,18 @@ public class PasswordView implements Serializable {
     @Inject
     transient private Randomness random;
     
-    private boolean flowing = false;
     private String email;
     private String mobile;
     private String username;
     private String password;
-    private String actionsecret; // hidden from user (alternative to reset URL)
     private String emailedsecret;
+    private String actionsecret; // hidden from user (alternative to reset URL)
     private Boolean iamhuman;
-    private Boolean reseted = Boolean.FALSE;
+    private Boolean reseted;
+    private Boolean flowing;
     
     @PostConstruct
     public void init() {
-        this.flowing = false;
         this.email = "";
         this.mobile = "";
         this.username = "";
@@ -75,6 +67,11 @@ public class PasswordView implements Serializable {
         this.actionsecret = "";
         this.iamhuman = Boolean.FALSE;
         this.reseted = Boolean.FALSE;
+        this.flowing = Boolean.FALSE;
+    }
+    
+    private void resetAllFieldValues() {
+        this.init();
     }
     
     public String getEmail() {
@@ -121,11 +118,11 @@ public class PasswordView implements Serializable {
         return iamhuman;
     }
 
-    public void setIamhuman(Boolean iamhuman) {
-        if(iamhuman) {
+    public void setIamhuman(Boolean human) {
+        if(human) {
             this.newActionsecret();
         }
-        this.iamhuman = iamhuman;
+        this.iamhuman = human;
     }
 
     public Boolean getReseted() {
@@ -144,55 +141,15 @@ public class PasswordView implements Serializable {
         this.emailedsecret = emailed;
     }
     
-    // example of how to use ajax listener
-    public void emailedsecretChanged(AjaxBehaviorEvent event) {
-        String example = (String) ((UIOutput)event.getSource()).getValue();
-    }
-    
     public void newActionsecret() {
         if (! this.flowing) {
             if (actionsecret.isEmpty()) {
-                this.actionsecret = this.generateRandomString(8);
+                this.actionsecret = this.random.generateRandomString(8);
             }
             this.flowing = true;
         } else {
             this.flowing = false;
         }
-    }
-    
-    private String generateRandomString(int length) {
-        String rnd = this.random.generateRandomString(length);
-                
-        return rnd;
-    }
-
-    private void resetAllFieldValues() {
-        this.init();
-    }
-    
-    private void showFacesMessage(FacesMessage.Severity type, String text) {
-        FacesMessage msg = new FacesMessage(text);
-        FacesContext ctx = FacesContext.getCurrentInstance();
-        
-        msg.setSeverity(type);
-        ctx.addMessage(null, msg);
-    }
-    
-    private String getResourceBundleValue(String key) {
-        FacesContext fc = FacesContext.getCurrentInstance();
-        String msgBundleName = fc.getApplication().getMessageBundle();
-        Locale loc = fc.getViewRoot().getLocale();
-        ResourceBundle bundle = ResourceBundle.getBundle(msgBundleName, loc);
-        
-        return bundle.getString(key);
-    }
-    
-    private String findRequestStringParamValue(String key) {
-        Map<String,String> params = FacesContext.getCurrentInstance()
-                                    .getExternalContext().getRequestParameterMap();
-	String val = params.get(key);
-        
-        return val;
     }
     
     private void findUserAccount() {
@@ -251,7 +208,7 @@ public class PasswordView implements Serializable {
         int phase = WizardHelper.extractPhase(step);
         RequestContext ctx = RequestContext.getCurrentInstance();
         
-        log.info("step=%s, phase=%s", step, ""+phase);
+        log.info("Account reset: step=%s, phase=%s", step, ""+phase);
         if (forward) {
             switch (phase) {
                 case 0:
@@ -291,14 +248,5 @@ public class PasswordView implements Serializable {
         }
         
         return next;
-    }
-    
-    protected void refreshPage() {
-        FacesContext fc = FacesContext.getCurrentInstance();
-        String refreshpage = fc.getViewRoot().getViewId();
-        ViewHandler ViewH = fc.getApplication().getViewHandler();
-        UIViewRoot UIV = ViewH.createView(fc, refreshpage);
-        UIV.setViewId(refreshpage);
-        fc.setViewRoot(UIV);
     }
 }

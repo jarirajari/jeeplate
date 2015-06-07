@@ -73,57 +73,68 @@
         </h:form>
         <!-- /Menubar -->
         <!-- Signup dialog -->
-        <p:dialog closable="false" rendered="true" widgetVar="signupWzd" header="Sign up" modal="true" styleClass="disable-scroll" width="600px">
+        <p:dialog widgetVar="signupWzd" header="Sign up" modal="true" styleClass="disable-scroll" width="600px">
             <h:form id="signupForm">
                 <p:growl id="signupFormGrowl" sticky="true" showDetail="true"/>
                 <p:wizard widgetVar="signupWzdWizard" flowListener="#{registrationView.onFlowProcess}" backLabel="Cancel" nextLabel="OK" showNavBar="true">
                     <!-- Send email if information is correct -->
-                    <p:tab id="signupWzdStart" title="Register Account">
+                    <p:tab id="signupWzd0" title="Register Account">
                         <p:panel header="Register Account2">
-                            <p:messages showDetail="true" showIcon="false"/>
+                            <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="Email:" />
-                                <p:inputText value="#{registrationView.email}" required="true" />
+                                <p:inputText label="Email" value="#{registrationView.email}" required="true">
+                                    <f:validator validatorId="emailValidator" />
+                                </p:inputText>
 
                                 <h:outputText value="Mobile:" />
-                                <p:inputText value="#{registrationView.mobile}" required="true" />
+                                <p:inputText label="Mobile" value="#{registrationView.mobile}" required="true">
+                                    <f:validator validatorId="mobileValidator" />
+                                </p:inputText>
 
-                                <h:outputText value="I Accept Terms and Conditions:" />
+                                <h:outputLabel for="signupWzdAccept" value="">
+                                    <p:commandLink id="signupWzdAccept" value="Terms and Conditions" onclick="PF('termsCondsDialog').show();" oncomplete="PF('signinDlg').hide()"/>
+                                </h:outputLabel>
                                 <p:selectBooleanCheckbox value="#{registrationView.iacceptTermsAndConditions}" required="true"/>
                                 
-                                <h:inputHidden id="signupWzdHidden" value="#{registrationView.hidden}" />
+                                <h:inputHidden id="signupWzdHidden" value="#{registrationView.actionsecret}" />
                             </h:panelGrid>                            
                         </p:panel>
                     </p:tab>
                     <!-- Input security code from email -->
-                    <p:tab id="signupWzdAccount" title="Account Password">
+                    <p:tab id="signupWzd1" title="Account Password">
                         <p:panel header="Account Password2">
-                            <p:messages showDetail="true" showIcon="false"/>
+                            <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="New Password:" />
-                                <p:password id="resetFormPwNew" label="new pw" value="#{registrationView.password}" required="true" feedback="false" match="resetFormPwRetyped"/>
+                                <p:password id="signupFormPwNew" label="new pw" value="#{registrationView.password}" required="true" 
+                                            match="resetFormPwRetyped" feedback="true" inline="true" promptLabel="Pw strength" 
+                                            weakLabel="weak" goodLabel="good" strongLabel="Strong" maxlength="32" >
+                                    <f:validator validatorId="passwordValidator" />
+                                </p:password>
 
                                 <h:outputText value="Retype Password:" />
-                                <p:password id="resetFormPwRetyped" label="ret pw" value="#{registrationView.password}" required="true" feedback="false"/>
-
-                                <h:outputText value="Domain Code: " />
-                                <p:inputText value="#{registrationView.securitycode}" required="true" >
-                                    <f:param name="signupWzdHidden" value="#{registrationView.hidden}" />
-                                </p:inputText>
+                                <p:password id="signupFormPwRetyped" label="ret pw" required="true" feedback="false"/>
+                                
+                                <h:outputText value="Domain Code:" />
+                                <p:inputText value="#{registrationView.domaincode}" required="true" />
+                                
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
                     <!--  -->
-                    <p:tab id="signupWzdInfo" title="Account registerd" >
+                    <p:tab id="signupWzd9" title="Account registerd" >
                         <p:panel header="Account Registered2">
-                            <p:messages />
-                            <h:panelGrid columns="2" columnClasses="label, value">
-                                <p:outputLabel value="Close by choosing next!"/>
+                            <p:messages showDetail="false" showIcon="false" closable="true"/>
+                            <h:panelGrid rendered="true" columns="2" columnClasses="label, value">
+                                <h:outputText rendered="#{not registrationView.registered}" value="Account not created..." />
+                                <h:outputText rendered="#{registrationView.registered}" value="Account succesfully created..." />
+                                <p:outputLabel rendered="#{not registrationView.registered}" value="Please register or try reset again."/>
+                                <p:outputLabel rendered="#{registrationView.registered}" value="Close by choosing next and sign in!"/>
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
                     <p:tab id="signupWzdStop"  title="" titleStyleClass="ui-wizard-step-title-custom fa fa-check fa-2x">
-
                     </p:tab>
                 </p:wizard>
                 
@@ -205,8 +216,7 @@
                     <p:row>
                         <p:column colspan="2">
                             <i class="fa fa-unlock-alt" style="margin-right: 10px;"/>
-                            <p:commandLink id="cmdReset" value="Reset password?" onclick="PF('resetWzd').show();" oncomplete="PF('signinDlg').hide()">
-                            </p:commandLink>
+                            <p:commandLink id="cmdReset" value="Reset password?" onclick="PF('resetWzd').show();" oncomplete="PF('signinDlg').hide()"/>
                         </p:column>
                     </p:row>
 
@@ -417,7 +427,6 @@
                         </p:panel>
                     </p:tab>
                     <p:tab id="resetWzd9"  title="" titleStyleClass="ui-wizard-step-title-custom fa fa-lock fa-2x">
-                        <span onloadstart="document.getElementById('resetForm').submit();">One ugly PrimeFaces hack</span>
                     </p:tab>
                 </p:wizard>
                 

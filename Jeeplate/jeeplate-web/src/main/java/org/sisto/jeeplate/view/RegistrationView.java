@@ -18,26 +18,22 @@
  */
 package org.sisto.jeeplate.view;
 
-import java.beans.Transient;
 import java.io.Serializable;
-import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.internet.MimeMessage;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
-import org.sisto.jeeplate.domain.user.User;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.Email;
+import org.sisto.jeeplate.util.Randomness;
 
 @Named
 @ViewScoped
-public class RegistrationView implements Serializable {
+public class RegistrationView extends AbstractView implements Serializable {
     
     @Inject
     transient private StringLogger log;
@@ -45,15 +41,36 @@ public class RegistrationView implements Serializable {
     transient private Email emailSender;
     @Inject
     transient private UserData user;
+    @Inject
+    transient private Randomness random;
     
     private String email;
     private String mobile;
     private String username;
     private String password;
-    private String securitycode;
+    private String domaincode; // used also for emaild address validation
+    private String actionsecret;
     private Boolean iacceptTermsAndConditions;
-    private String hidden;
-
+    private Boolean registered;
+    private Boolean flowing;
+    
+    @PostConstruct
+    public void init() {
+        this.email = "";
+        this.mobile = "";
+        this.username = "";
+        this.password = "";
+        this.domaincode = "";
+        this.actionsecret = "";
+        this.iacceptTermsAndConditions = Boolean.FALSE;
+        this.registered = Boolean.FALSE;
+        this.flowing = Boolean.FALSE;
+    }
+    
+    private void resetAllFieldValues() {
+        this.init();
+    }
+    
     public String getEmail() {
         return email;
     }
@@ -67,7 +84,7 @@ public class RegistrationView implements Serializable {
     }
 
     public void setMobile(String mobile) {
-        this.mobile = mobile;
+        this.mobile = String.format("+%s", mobile.replaceAll("\\D+",""));
     }
 
     public String getUsername() {
@@ -78,6 +95,14 @@ public class RegistrationView implements Serializable {
         this.username = username;
     }
 
+    public String getDomaincode() {
+        return domaincode;
+    }
+
+    public void setDomaincode(String domaincode) {
+        this.domaincode = domaincode;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -86,37 +111,42 @@ public class RegistrationView implements Serializable {
         this.password = password;
     }
 
-    public String getSecuritycode() {
-        return securitycode;
+    public String getActionsecret() {
+        return actionsecret;
     }
 
-    public void setSecuritycode(String securitycode) {
-        this.securitycode = securitycode;
+    public void setActionsecret(String actionsecret) {
+        this.actionsecret = actionsecret;
     }
 
-    public String getHidden() {
-        return hidden;
+    public Boolean getRegistered() {
+        return registered;
     }
 
-    public void setHidden(String hidden) {
-        this.hidden = hidden;
+    public void setRegistered(Boolean registered) {
+        this.registered = registered;
     }
     
     public Boolean getIacceptTermsAndConditions() {
         return iacceptTermsAndConditions;
     }
 
-    public void setIacceptTermsAndConditions(Boolean iacceptTermsAndConditions) {
-        this.iacceptTermsAndConditions = iacceptTermsAndConditions;
+    public void setIacceptTermsAndConditions(Boolean accept) {
+        if(accept) {
+            this.newActionsecret();
+        }
+        this.iacceptTermsAndConditions = accept;
     }
     
-    @PostConstruct
-    public void init() {
-        this.iacceptTermsAndConditions = Boolean.FALSE;
-    }
-    
-    private void resetAllFieldValues() {
-        
+    public void newActionsecret() {
+        if (! this.flowing) {
+            if (actionsecret.isEmpty()) {
+                this.actionsecret = this.random.generateRandomString(8);
+            }
+            this.flowing = true;
+        } else {
+            this.flowing = false;
+        }
     }
     
     public boolean accountForEmailExists(String enteredUserEmailAddress) {
@@ -126,30 +156,74 @@ public class RegistrationView implements Serializable {
         
         if (exists) {
             MimeMessage m = emailSender.constructEmail("Greeting from Jeeplate!", "Account already exists!", 
-                                    "jee@pla.te", enteredUserEmailAddress);
+                                                       "jee@pla.te", enteredUserEmailAddress);
             emailSender.sendMessage(m);
         }
         
         return exists;
     }
     
+    public void requestAccountCreatePhase() {
+        
+    }
+    
+    public void completeAccountCreatePhase() {
+        
+    }
+    
+    // PrimeFaces use inherently wrong design for Wizards
     public String onFlowProcess(FlowEvent event) {
-        final String START = "signupWzdStart";
-        final String ACCOUNT = "signupWzdAccount";
-        final String STOP = "signupWzdStop";
-        
-        if (event == null) return null;
-        
+        final String flowName = "signupWzd";
+        String next = null;
         String step = event.getNewStep();
+        String pets = event.getOldStep();
+        boolean forward = WizardHelper.isForward(pets, step);
+        boolean first = WizardHelper.isFirstPhase(step);
+        boolean last = WizardHelper.isLastPhase(step);
+        String start = WizardHelper.firstPhase(flowName);
+        String end = WizardHelper.lastPhase(flowName);
+        int phase = WizardHelper.extractPhase(step);
         RequestContext ctx = RequestContext.getCurrentInstance();
         
-        if (step.equals(STOP)) {
-            resetAllFieldValues();
-            ctx.execute("PF('signupWzd').hide()");
-            return START;
+        log.info("Sign up: step=%s, phase=%s", step, ""+phase);
+        if (forward) {
+            switch (phase) {
+                case 0:
+                    // Client: User enters email, number, and checks Captcha
+                    // Server: Creates action secret
+                    next = step;
+                    break;
+                case 1:
+                    // Client: User enters new password, retypes it, and inputs emailed reset secret;
+                    //         action secret is also needed in a
+                    // Server: Sends email 1) No account or 2) Reset request with temp password
+                    //         Creates reset token and timestamp
+                    this.requestAccountCreatePhase();
+                    next = step;
+                    break;
+                case 2:
+                    // Client: Valid reset token together with emailed reset secret (i.e. temp password)
+                    //         changes the password if the action secret matches too, otherwise no change
+                    // Server: 
+                    this.completeAccountCreatePhase();
+                    next = step;
+                    break;
+                case 3:
+                    // Client: Two factor authentication (2FA) would be here...
+                    //         This would meaning issuing Request-Response challenge vie mobile channel
+                    // Server:
+                    next = step;
+                    break;
+                default:
+                    ctx.execute("PF('signupWzd').hide()");
+                    this.resetAllFieldValues();
+                    next = start;
+                    break;
+            }
         } else {
-            
+            next = step;
         }
-        return event.getNewStep();
+        
+        return next;
     }
 }
