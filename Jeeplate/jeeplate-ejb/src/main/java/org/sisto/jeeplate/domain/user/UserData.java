@@ -166,7 +166,7 @@ public class UserData implements Serializable {
     }
     
     @Transactional
-    public Boolean completePasswordReset(String typedMobile, String typedPassword, String emailedResetToken, String hiddenActionSecret) {
+    public Boolean finalizePasswordReset(String typedMobile, String typedPassword, String emailedResetToken, String hiddenActionSecret) {
         assert this.entity != null;
         UserCredential uc = this.getEntity().getCredential();
         Boolean changed = Boolean.FALSE;

@@ -144,7 +144,7 @@ public class PasswordView extends AbstractView implements Serializable {
     public void newActionsecret() {
         if (! this.flowing) {
             if (actionsecret.isEmpty()) {
-                this.actionsecret = this.random.generateRandomString(8);
+                this.actionsecret = this.random.generateRandomString(8); // 2x
             }
             this.flowing = true;
         } else {
@@ -167,7 +167,7 @@ public class PasswordView extends AbstractView implements Serializable {
         return (secretsAreSame && resetInitialized);
     }
     
-    public void requestPasswordResetPhase() {
+    public void beginPasswordResetPhase() {
         EmailMessage newUserMsg = new EmailMessage("Requested pw reset NEW", "secret is ", "Jari K.", "Jeeplate corp.");
         EmailMessage oldUserMsg = new EmailMessage("Requested pw reset OLD", "did you do this, if yes ${secret}", "Jari K.", "Jeeplate corp."); 
         
@@ -175,7 +175,7 @@ public class PasswordView extends AbstractView implements Serializable {
         this.user.initializePasswordReset(oldUserMsg, newUserMsg);
     }
     
-    public void completePasswordResetPhase() {
+    public void endPasswordResetPhase() {
         String typedMobile = this.getMobile();
         String typedPassword = this.getPassword();
         String emailedResetToken = this.getEmailedsecret();
@@ -184,7 +184,7 @@ public class PasswordView extends AbstractView implements Serializable {
         
         if (passwordResetCanBeCompleted(hiddenActionSecretGenerated)) {
             this.findUserAccount();
-            completed = this.user.completePasswordReset(typedMobile, typedPassword, emailedResetToken, hiddenActionSecretGenerated);
+            completed = this.user.finalizePasswordReset(typedMobile, typedPassword, emailedResetToken, hiddenActionSecretGenerated);
         }
         if (completed) {
             this.showFacesMessage(FacesMessage.SEVERITY_INFO, "OK, changed password");
@@ -221,14 +221,14 @@ public class PasswordView extends AbstractView implements Serializable {
                     //         action secret is also needed in a
                     // Server: Sends email 1) No account or 2) Reset request with temp password
                     //         Creates reset token and timestamp
-                    this.requestPasswordResetPhase();
+                    this.beginPasswordResetPhase();
                     next = step;
                     break;
                 case 2:
                     // Client: Valid reset token together with emailed reset secret (i.e. temp password)
                     //         changes the password if the action secret matches too, otherwise no change
                     // Server: 
-                    this.completePasswordResetPhase();
+                    this.endPasswordResetPhase();
                     next = step;
                     break;
                 case 3:

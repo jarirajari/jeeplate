@@ -163,11 +163,11 @@ public class RegistrationView extends AbstractView implements Serializable {
         return exists;
     }
     
-    public void requestAccountCreatePhase() {
+    public void beginUserRegistrationPhase() {
         
     }
     
-    public void completeAccountCreatePhase() {
+    public void endUserRegistrationPhase() {
         
     }
     
@@ -186,6 +186,31 @@ public class RegistrationView extends AbstractView implements Serializable {
         RequestContext ctx = RequestContext.getCurrentInstance();
         
         log.info("Sign up: step=%s, phase=%s", step, ""+phase);
+        /* 
+         * Note that email will be sent always to validate the address!
+         * Also password reset must be possible! And guessing domain impossible!
+         * Domain code is 16 digits long string: 1234-5566-7788-9900
+         *
+         * 1.user regs as app user, 1 domains => domain code is sent to user via email 
+         *   and the code is same for all. Users do not know code beforehand, and email 
+         *   delivery is enough since only same domain code! "default domain"
+         * 2.user regs as app user, N domains => domain code is sent to user via email 
+         *   and the code is unique for each (app) domain. 
+         *   Special case so that 1+(N-1) domains => N domains meaning that first domain 
+         *   is "default" which in turn means that in email "user is asked to input alt-
+         *   ernative domain code" that is common and distributed via other channels. 
+         *   For example, company might put this info to their Intranet site!
+         * 3.user regs as sys user, 1 domains => domain code is sent to user via email. 
+         *   However, this is not entered to "domain code" field but rather the user 
+         *   is put to the "sys users" group if side-channel step is ok: basically 
+         *   this means that the emailed domain code is the Challenge in Request-
+         *   Response challenge. User puts the domain code into his/hers mobile device 
+         *   (number from the 'mobile' field) and gets "translated" security code. 
+         *   If this security code is same as one of the system codes the user is added 
+         *   to a group. Note that "system" code is similar but not same as "domain"!
+         * 4.user regs as sys user, M domains => same instructions as in the prev 
+         *   since there is _always_exactly_one_ system group that holds admins...
+         */
         if (forward) {
             switch (phase) {
                 case 0:
@@ -198,14 +223,14 @@ public class RegistrationView extends AbstractView implements Serializable {
                     //         action secret is also needed in a
                     // Server: Sends email 1) No account or 2) Reset request with temp password
                     //         Creates reset token and timestamp
-                    this.requestAccountCreatePhase();
+                    this.beginUserRegistrationPhase();
                     next = step;
                     break;
                 case 2:
                     // Client: Valid reset token together with emailed reset secret (i.e. temp password)
                     //         changes the password if the action secret matches too, otherwise no change
                     // Server: 
-                    this.completeAccountCreatePhase();
+                    this.endUserRegistrationPhase();
                     next = step;
                     break;
                 case 3:
