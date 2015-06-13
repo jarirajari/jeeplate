@@ -23,6 +23,8 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,19 +43,27 @@ import org.sisto.jeeplate.domain.BusinessEntity;
 @Entity
 @Access(AccessType.FIELD)
 @Table(name = "system_users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "username")})
+       @UniqueConstraint(columnNames = "username")})
 public class UserEntity extends BusinessEntity implements Serializable {
     
-    @Id
-    @SequenceGenerator(name = "user_seq", allocationSize = 1)
+    @Id @SequenceGenerator(name = "user_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
     protected String username; // email address
     @Digits(integer = 15, fraction = 0)
-    protected Long mobile; // mobile msisdn
-    // requires later a reference to a person or organsation individual
+    protected Long mobile; // phone msisdn
     @Embedded
     protected UserCredential credential;
+    @Enumerated(EnumType.STRING)
+    protected UserType.Type type;
+    
+    protected UserEntity() {
+        this.id = DEFAULT_ID;
+        this.username = "";
+        this.mobile = 0L;
+        this.credential = new UserCredential();
+        this.type = UserType.Type.UNKNOWN;
+    }
     
     @PostLoad @PostPersist @PostUpdate
     @Override
@@ -79,6 +89,14 @@ public class UserEntity extends BusinessEntity implements Serializable {
 
     public UserCredential getCredential() {
         return credential;
+    }
+
+    public UserType.Type getType() {
+        return type;
+    }
+
+    public void setType(UserType.Type type) {
+        this.type = type;
     }
     
     public Boolean mobileNumberIsSame(String msisdn) {

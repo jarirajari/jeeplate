@@ -24,16 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.Init;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.jboss.logging.Logger;
 import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
-import org.sisto.jeeplate.domain.user.group.UserGroupEntity;
 
 @SessionScoped
 public class UserGroupData implements Serializable {
@@ -113,8 +109,8 @@ public class UserGroupData implements Serializable {
     
     @Transactional
     public UserGroupData bind(Long id) {
-        UserGroupEntity entity = UserGroupEntity.newUserGroupEntityBuilder().renovate(id);
-        UserGroupEntity group = this.store.bind(entity);
+        UserGroupEntity ugd = UserGroupEntity.newUserGroupEntityBuilder().renovate(id);
+        UserGroupEntity group = this.store.bind(ugd);
         Optional<UserGroupEntity> bound = Optional.ofNullable(group);
         
         if(bound.isPresent()) {
@@ -125,7 +121,7 @@ public class UserGroupData implements Serializable {
     }
     
     @Transactional
-    public Boolean create() {
+    Boolean create() {
         log.info("UserGroupData.create()");
         this.entity = this.store.create(entity);
         
@@ -133,7 +129,7 @@ public class UserGroupData implements Serializable {
     }
     
     @Transactional
-    public Boolean read() {
+    Boolean read() {
         log.info("UserGroupData.read() discards changes");
         this.entity = this.store.read(entity);
         
@@ -141,15 +137,16 @@ public class UserGroupData implements Serializable {
     }
     
     @Transactional
-    public Boolean update() {
+    Boolean update() {
         log.info("UserGroupData.update() overwrites");
         this.entity = this.store.update(entity);
         log.info("Updated"+this.entity.hashCode()+", "+this.entity.toString());
+        
         return Boolean.TRUE;
     }
     
     @Transactional
-    public Boolean delete() {
+    Boolean delete() {
         log.info("UserGroupData.delete()");
         this.entity = this.store.delete(entity);
         

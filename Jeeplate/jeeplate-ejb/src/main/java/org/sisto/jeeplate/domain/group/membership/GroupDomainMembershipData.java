@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.user.group.membership;
+package org.sisto.jeeplate.domain.group.membership;
 
 import java.io.Serializable;
 import javax.enterprise.context.SessionScoped;
@@ -26,40 +26,40 @@ import org.sisto.jeeplate.domain.BusinessEntityStore;
 import org.sisto.jeeplate.logging.StringLogger;
 
 @SessionScoped
-public class UserGroupMembershipData implements Serializable {
+public class GroupDomainMembershipData implements Serializable {
     
     @Inject
     private transient StringLogger log;
     
     @Inject
-    private transient BusinessEntityStore<UserGroupMembershipEntity> store;
+    private transient BusinessEntityStore<GroupDomainMembershipEntity> store;
     
-    private transient UserGroupMembershipEntity entity;
+    private transient GroupDomainMembershipEntity entity;
     
-    public UserGroupMembershipData() {
-        this.entity = UserGroupMembershipEntity.defaultUserGroupMembershipEntity();
+    public GroupDomainMembershipData() {
+        this.entity = GroupDomainMembershipEntity.defaultApplicationDomainMembershipEntity();
     }
     
-    protected UserGroupMembershipData(UserGroupMembershipEntity uge) {
-        this.entity = uge;
+    protected GroupDomainMembershipData(GroupDomainMembershipEntity adme) {
+        this.entity = adme;
     }
     
-    public void setEntity(UserGroupMembershipEntity uge) {
-        this.entity = uge;
+    public void setEntity(GroupDomainMembershipEntity adme) {
+        this.entity = adme;
     }
     
-    public UserGroupMembershipEntity getEntity() {
+    public GroupDomainMembershipEntity getEntity() {
         return (this.entity);
     }
     
     @Transactional
-    public Boolean addNewMember(Long user, Long toGroup) {
-        UserGroupMembershipEntity member = UserGroupMembershipEntity
-                .newUserGroupMembershipEntityBuilder()
-                .group(toGroup)
-                .member(user)
+    public Boolean addNewMember(Long domain, Long group) {
+        GroupDomainMembershipEntity member = GroupDomainMembershipEntity
+                .newApplicationDomainMembershipEntity()
+                .domain(domain)
+                .member(group)
                 .build();
-        this.setEntity(this.store.create(member)); // entity is kind of proxied!
+        this.setEntity(this.store.create(member));
         
         return Boolean.TRUE;
     }

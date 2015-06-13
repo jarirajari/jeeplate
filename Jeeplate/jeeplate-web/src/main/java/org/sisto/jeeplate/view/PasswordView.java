@@ -21,6 +21,7 @@ package org.sisto.jeeplate.view;
 import java.io.Serializable;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.New;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -42,12 +43,11 @@ public class PasswordView extends AbstractView implements Serializable {
     transient private StringLogger log;
     @Inject
     transient private Email emailSender;
-    @Inject
+    @Inject @New
     transient private UserData user;
     @Inject
     transient private Randomness random;
     
-    private String email;
     private String mobile;
     private String username;
     private String password;
@@ -59,7 +59,6 @@ public class PasswordView extends AbstractView implements Serializable {
     
     @PostConstruct
     public void init() {
-        this.email = "";
         this.mobile = "";
         this.username = "";
         this.password = "";
@@ -73,13 +72,13 @@ public class PasswordView extends AbstractView implements Serializable {
     private void resetAllFieldValues() {
         this.init();
     }
-    
-    public String getEmail() {
-        return email;
+
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getMobile() {
@@ -88,14 +87,6 @@ public class PasswordView extends AbstractView implements Serializable {
 
     public void setMobile(String mobile) {
         this.mobile = String.format("+%s", mobile.replaceAll("\\D+",""));
-    }
-    
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {
@@ -153,7 +144,7 @@ public class PasswordView extends AbstractView implements Serializable {
     }
     
     private void findUserAccount() {
-        String em = this.getEmail();
+        String em = this.getUsername();
         
         this.user = user.findOneUser(em);
         log.info("Lost password recovery for user '%s' (%s)", em, String.valueOf(this.user.getEntity().getId()));
@@ -168,9 +159,11 @@ public class PasswordView extends AbstractView implements Serializable {
     }
     
     public void beginPasswordResetPhase() {
-        EmailMessage newUserMsg = new EmailMessage("Requested pw reset NEW", "secret is ", "Jari K.", "Jeeplate corp.");
-        EmailMessage oldUserMsg = new EmailMessage("Requested pw reset OLD", "did you do this, if yes ${secret}", "Jari K.", "Jeeplate corp."); 
-        
+        final String replace = "${secret}";
+        final String recipient = this.getUsername();
+        EmailMessage newUserMsg = new EmailMessage("Requested pw reset NEW", "secret is ", recipient, "Jeeplate corp.");
+        EmailMessage oldUserMsg = new EmailMessage("Requested pw reset OLD", String.format("did you do this, if yes %s",replace), recipient, "Jeeplate corp."); 
+        log.info("******************"+oldUserMsg.toString());
         this.findUserAccount();
         this.user.initializePasswordReset(oldUserMsg, newUserMsg);
     }

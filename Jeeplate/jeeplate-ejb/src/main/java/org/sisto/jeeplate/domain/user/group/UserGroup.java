@@ -20,7 +20,6 @@ package org.sisto.jeeplate.domain.user.group;
 
 import java.io.Serializable;
 import javax.enterprise.context.Dependent;
-import org.sisto.jeeplate.domain.BusinessObject;
 
 /**
  * User <---> UserGroup <---> Group per domain <---> PermissionGroup <---> Permission

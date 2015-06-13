@@ -52,12 +52,9 @@ public class UserData implements Serializable {
     private Email emailSender;
     
     @Inject
-    private UserGroupMembershipData usersGroups;
-    
-    @Inject @New
     private transient BusinessEntityStore<UserEntity> store;
     
-    private UserEntity entity;
+    private UserEntity entity; // this is basically sort of proxy object!
     
     private transient final UserEntity hashed = UserEntity.newUserEntityBuilder()
             .withUsername("hashis")
@@ -119,29 +116,56 @@ public class UserData implements Serializable {
     @Transactional
     public UserData findOneUser(final String emailAddress) {
         final List<UserEntity> result = this.findUserByEmail(emailAddress);
-                
+        
         if ((result != null) && (result.isEmpty() == false) && (result.size() == 1)) {
             UserEntity id = result.get(0);
             this.entity = id;
        } else {
+            this.entity = UserEntity.newUserEntityBuilder().build(); // dont use 'new' op!
             log.error("Finding one user by email address failed!");
         }
         
         return (this);
     }
     
-    private void sendPasswordResetEmailForUser(EmailMessage em, String secret) {
+    private void sendEmailToUser(EmailMessage em, String secretKey, String secretVal) {
         String subject = em.getSubject();
-        // Convention and loose contract that '${secret}' will be replaced
-        String content = em.getContent().replace("${secret}", secret);
-        MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress, this.entity.username);
+        // Convention and loose contract that secretKey will be replaced with secretVal
+        String content = em.getContent().replace(secretKey, secretVal);
+        MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress, em.getContentRecipient());
         
         emailSender.sendMessage(mm);
     }
     
     @Transactional
+    public void applyForUserAccount(EmailMessage messageForOldUser, EmailMessage messageForNewUser, String registrationToken) {
+        assert this.entity != null;
+        final String replace = "${domain}";
+        boolean userNotExist = this.getEntity().isDefault();
+        EmailMessage message;
+        UserCredential uc  = this.getEntity().getCredential();
+        
+        if (userNotExist) {
+            message = messageForNewUser;
+            log.debug("User registration requested for a user that has no account!");
+        } else {
+            message = messageForOldUser;
+            log.info("User registration requested for an existing user (id=%s).", String.valueOf(this.getEntity().getId()));
+        }
+        sendEmailToUser(message, replace, registrationToken);
+    }
+    
+    @Transactional
+    public Boolean grantUserAccount(String typedMobile, String typedPassword, String emailedResetToken, String hiddenActionSecret) {
+        
+        
+        return Boolean.FALSE;
+    }
+    
+    @Transactional
     public String initializePasswordReset(EmailMessage messageForOldUser, EmailMessage messageForNewUser) {
         assert this.entity != null;
+        final String replace = "${secret}";
         boolean userExists =! this.getEntity().isDefault();
         String resetToken;
         EmailMessage message;
@@ -160,7 +184,7 @@ public class UserData implements Serializable {
             resetToken = "";
             log.error("Password reset requested for a user that has no account!");
         }
-        sendPasswordResetEmailForUser(message, resetToken);
+        sendEmailToUser(message, replace, resetToken);
         
         return resetToken;
     }

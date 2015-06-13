@@ -67,4 +67,17 @@ public class EmailMessage {
     public void setContentSender(String contentSender) {
         this.contentSender = contentSender;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("Email:");
+        sb.append("  subject  = ").append(this.subject);
+        sb.append(", recipient= ").append(this.contentRecipient);
+        sb.append(", sender   = ").append(this.contentSender);
+        sb.append(", content  = ").append(this.content);
+        
+        return (sb.toString());
+    }
 }

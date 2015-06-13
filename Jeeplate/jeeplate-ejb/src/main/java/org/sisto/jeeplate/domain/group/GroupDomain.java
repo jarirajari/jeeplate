@@ -16,12 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.user;
+package org.sisto.jeeplate.domain.group;
 
-public class UserType {
-    public enum Type {
-        UNKNOWN,
-        APPLICATION,
-        SYSTEM;
-    }
+public class GroupDomain {
+    
 }

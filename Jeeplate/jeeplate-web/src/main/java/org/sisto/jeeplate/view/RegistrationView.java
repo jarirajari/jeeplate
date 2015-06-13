@@ -20,15 +20,19 @@ package org.sisto.jeeplate.view;
 
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.New;
+import javax.faces.application.FacesMessage;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.internet.MimeMessage;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
+import org.sisto.jeeplate.domain.group.GroupDomainData;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.Email;
+import org.sisto.jeeplate.util.EmailMessage;
 import org.sisto.jeeplate.util.Randomness;
 
 @Named
@@ -39,16 +43,17 @@ public class RegistrationView extends AbstractView implements Serializable {
     transient private StringLogger log;
     @Inject
     transient private Email emailSender;
-    @Inject
+    @Inject @New
+    transient private GroupDomainData domain;
+    @Inject @New
     transient private UserData user;
     @Inject
     transient private Randomness random;
     
-    private String email;
-    private String mobile;
     private String username;
+    private String mobile;
     private String password;
-    private String domaincode; // used also for emaild address validation
+    private String domaincode; // emailed = domain+user part, email address check
     private String actionsecret;
     private Boolean iacceptTermsAndConditions;
     private Boolean registered;
@@ -56,9 +61,8 @@ public class RegistrationView extends AbstractView implements Serializable {
     
     @PostConstruct
     public void init() {
-        this.email = "";
-        this.mobile = "";
         this.username = "";
+        this.mobile = "";
         this.password = "";
         this.domaincode = "";
         this.actionsecret = "";
@@ -70,21 +74,13 @@ public class RegistrationView extends AbstractView implements Serializable {
     private void resetAllFieldValues() {
         this.init();
     }
-    
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public String getMobile() {
         return mobile;
     }
 
-    public void setMobile(String mobile) {
-        this.mobile = String.format("+%s", mobile.replaceAll("\\D+",""));
+    public void setMobile(String phone) {
+        this.mobile = String.format("+%s", phone.replaceAll("\\D+",""));
     }
 
     public String getUsername() {
@@ -100,7 +96,7 @@ public class RegistrationView extends AbstractView implements Serializable {
     }
 
     public void setDomaincode(String domaincode) {
-        this.domaincode = domaincode;
+        this.domaincode = String.format("%s", domaincode.replaceAll("-",""));
     }
 
     public String getPassword() {
@@ -149,7 +145,7 @@ public class RegistrationView extends AbstractView implements Serializable {
         }
     }
     
-    public boolean accountForEmailExists(String enteredUserEmailAddress) {
+    public Boolean accountForEmailExists(String enteredUserEmailAddress) {
         log.info("accountForEmailExists="+enteredUserEmailAddress);
         
         boolean exists = user.noUserWithEmail(enteredUserEmailAddress);
@@ -163,7 +159,32 @@ public class RegistrationView extends AbstractView implements Serializable {
         return exists;
     }
     
+    public Boolean checkUserAgreement() {
+        Boolean userAgreement = getIacceptTermsAndConditions();
+        
+        if (! userAgreement) {
+            this.showFacesMessage(FacesMessage.SEVERITY_WARN, "Please accept terms and conds!");
+        }
+        
+        return userAgreement;
+    }
+    
+    private void findUserAccount() {
+        String em = this.getUsername();
+        
+        this.user = user.findOneUser(em);
+        log.info("User registration request for user '%s' (%s)", em, String.valueOf(this.user.getEntity().getId()));
+    }
+    
     public void beginUserRegistrationPhase() {
+        final String replace = "${domain}";
+        final String recipient = this.getUsername();
+        EmailMessage newUserMsg = new EmailMessage("Requested user-req NEW", String.format("did you do this, if yes %s",replace), recipient, "Jeeplate corp.");
+        EmailMessage oldUserMsg = new EmailMessage("Requested user-req OLD", "somebody tried to register this to our service", recipient, "Jeeplate corp."); 
+        String token = this.domain.applyForUserAccount();
+        
+        this.findUserAccount();
+        this.user.applyForUserAccount(oldUserMsg, newUserMsg, token);
         
     }
     
@@ -191,6 +212,11 @@ public class RegistrationView extends AbstractView implements Serializable {
          * Also password reset must be possible! And guessing domain impossible!
          * Domain code is 16 digits long string: 1234-5566-7788-9900
          *
+         * 0.default is no domains, users are separate group of all users and if
+         *   they are added to a domain it means that they are actually added a 
+         *   reference to a user group that is programmatically already added to
+         *   a domain. Default user group (i.e. if only one domain) is called 
+         *   "ALL" meaning a group of all users who are members in this _domain_!
          * 1.user regs as app user, 1 domains => domain code is sent to user via email 
          *   and the code is same for all. Users do not know code beforehand, and email 
          *   delivery is enough since only same domain code! "default domain"
@@ -210,6 +236,10 @@ public class RegistrationView extends AbstractView implements Serializable {
          *   to a group. Note that "system" code is similar but not same as "domain"!
          * 4.user regs as sys user, M domains => same instructions as in the prev 
          *   since there is _always_exactly_one_ system group that holds admins...
+         * 
+         * => actually this is TOO COMPLEX design, let's just assume that first we
+         *    define that there are always many domains and companys' domain codes 
+         *    are distributed separately (e.g. SMS)
          */
         if (forward) {
             switch (phase) {
@@ -223,8 +253,26 @@ public class RegistrationView extends AbstractView implements Serializable {
                     //         action secret is also needed in a
                     // Server: Sends email 1) No account or 2) Reset request with temp password
                     //         Creates reset token and timestamp
-                    this.beginUserRegistrationPhase();
-                    next = step;
+                    Boolean userAgreement = this.checkUserAgreement();
+                    if(userAgreement) {
+                        next = step;
+                    } else {
+                        next = pets;
+                    }
+                    if(userAgreement) {
+                        this.beginUserRegistrationPhase();
+                        /*
+                         * Two cases:
+                         * 1. Sys type domain => Request-response challenge for [domain-part]^[user-part]
+                         *    i.e. you kind of validate yourself as sys by producing signature of system
+                         * 2. App type domain => Emailed code  = [domain-part]^[user-part]
+                         * 
+                         * User is created and registered when flow is completed!
+                         * Email address gets validated
+                         */
+                        
+                    }
+                    
                     break;
                 case 2:
                     // Client: Valid reset token together with emailed reset secret (i.e. temp password)

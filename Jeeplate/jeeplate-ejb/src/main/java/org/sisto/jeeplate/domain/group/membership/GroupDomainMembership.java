@@ -16,12 +16,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.user;
+package org.sisto.jeeplate.domain.group.membership;
 
-public class UserType {
-    public enum Type {
-        UNKNOWN,
-        APPLICATION,
-        SYSTEM;
-    }
+public class GroupDomainMembership {
+    // Domain is defined as the subset of power set where all elements are present
+    // Basically this means that a domain is one specific group of groups. This 
+    // is to say that if there are N possible groups there are 2^N subgroups and 
+    // 1 super group, i.e {0, {a}, {b}, {a,b}} => domain is group {a,b}
 }

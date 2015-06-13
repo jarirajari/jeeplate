@@ -64,9 +64,10 @@ public class Email {
             try {
                 StringBuilder sb = new StringBuilder("");
                 Address[] tos = m.getAllRecipients();
+                String adrs = (tos == null || tos.length == 0) ? "No addresses!" : Arrays.toString(tos);
                 sb.append("\n========= ");
-                sb.append("\n   EMAIL: ");
-                sb.append("\n      TO: ").append(Arrays.toString(tos));
+                sb.append("\n    EMAIL ");
+                sb.append("\n      TO: ").append(adrs);
                 sb.append("\n SUBJECT: ").append(String.valueOf(m.getSubject()));
                 sb.append("\n CONTENT: ").append(String.valueOf(m.getContent()));
                 sb.append("\n========= ");

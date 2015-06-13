@@ -83,7 +83,7 @@
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="Email:" />
-                                <p:inputText label="Email" value="#{registrationView.email}" required="true">
+                                <p:inputText label="Email" value="#{registrationView.username}" required="true">
                                     <f:validator validatorId="emailValidator" />
                                 </p:inputText>
 
@@ -108,7 +108,7 @@
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="New Password:" />
                                 <p:password id="signupFormPwNew" label="new pw" value="#{registrationView.password}" required="true" 
-                                            match="resetFormPwRetyped" feedback="true" inline="true" promptLabel="Pw strength" 
+                                            match="signupFormPwRetyped" feedback="true" inline="true" promptLabel="Pw strength" 
                                             weakLabel="weak" goodLabel="good" strongLabel="Strong" maxlength="32" >
                                     <f:validator validatorId="passwordValidator" />
                                 </p:password>
@@ -117,8 +117,7 @@
                                 <p:password id="signupFormPwRetyped" label="ret pw" required="true" feedback="false"/>
                                 
                                 <h:outputText value="Domain Code:" />
-                                <p:inputText value="#{registrationView.domaincode}" required="true" />
-                                
+                                <p:inputMask value="#{registrationView.domaincode}" required="true" mask="****-*****-*****-****"/>
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
@@ -376,7 +375,7 @@
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="Email:" />
-                                <p:inputText id="resetFormEmail" label="Email" value="#{passwordView.email}" required="true">
+                                <p:inputText id="resetFormEmail" label="Email" value="#{passwordView.username}" required="true">
                                     <f:validator validatorId="emailValidator" />
                                 </p:inputText>
 
