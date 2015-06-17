@@ -27,7 +27,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import org.apache.shiro.crypto.RandomNumberGenerator;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.util.ByteSource;
 import org.sisto.jeeplate.util.DateAndTimeConverter;
 
@@ -37,9 +36,9 @@ public class GroupDomainRegistration implements Serializable {
     protected static final String RESET = "";
     @Transient
     protected static final int EXPIRATION_PERIOD = 5 * 60; //5 min in seconds
-    protected String partDomainDeliveredSeparately; // must be persisted, same for all
     @Transient 
     protected String partEmailExpiringRandom;
+    protected String partDomainDeliveredSeparately; // must be persisted, same for all
     @Transient
     protected String registrationToken; // token = domain part + email part
     @Temporal(TemporalType.TIMESTAMP)
@@ -87,7 +86,8 @@ public class GroupDomainRegistration implements Serializable {
     }
     
     public void activateRegistrationProtocol() {
-        this.registrationToken = this.getHashedConcatenatedHashedToken();
+        this.setPartEmailExpiringRandom(GroupDomainRegistration.generateRandomNumberToken());
+        this.registrationToken = this.getConcatenatedToken();
         this.registrationTimestamp = GroupDomainRegistration.now();
     }
     
@@ -106,13 +106,13 @@ public class GroupDomainRegistration implements Serializable {
         return (! invalid);
     }
     
-    private String getHashedConcatenatedHashedToken() {
-        final int hashIterations = 23;
-        final String hashSalt = "sisto.org";
-        final String concat = String.format("%s%s", this.partDomainDeliveredSeparately, this.partEmailExpiringRandom);
-        Sha256Hash hasher = new Sha256Hash(concat, hashSalt, hashIterations);
+    private String getConcatenatedToken() {
+        String concat;
+        
+        // Emailed part first, domain part then
+        concat = String.format("%s%s", this.partEmailExpiringRandom, this.partDomainDeliveredSeparately);
 
-        return (hasher.toHex());
+        return concat;
     }
     
     private static String generateRandomNumberToken() {

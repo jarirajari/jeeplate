@@ -73,6 +73,14 @@ public class GroupDomainEntity extends BusinessEntity implements Serializable {
         this.domainname = domainname;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public GroupDomainType.Type getDomaintype() {
         return domaintype;
     }

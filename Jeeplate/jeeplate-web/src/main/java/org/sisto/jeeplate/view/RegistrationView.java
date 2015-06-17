@@ -96,7 +96,7 @@ public class RegistrationView extends AbstractView implements Serializable {
     }
 
     public void setDomaincode(String domaincode) {
-        this.domaincode = String.format("%s", domaincode.replaceAll("-",""));
+        this.domaincode = String.format("%s", domaincode.replaceAll("[-|_]",""));
     }
 
     public String getPassword() {
@@ -132,6 +132,7 @@ public class RegistrationView extends AbstractView implements Serializable {
             this.newActionsecret();
         }
         this.iacceptTermsAndConditions = accept;
+        log.info("iacceptTermsAndConditions="+accept);
     }
     
     public void newActionsecret() {
@@ -173,7 +174,14 @@ public class RegistrationView extends AbstractView implements Serializable {
         String em = this.getUsername();
         
         this.user = user.findOneUser(em);
-        log.info("User registration request for user '%s' (%s)", em, String.valueOf(this.user.getEntity().getId()));
+        log.info("User registration request for user '%s'", em);
+    }
+    
+    private void findDomain() {
+        String dc = this.getDomaincode().substring(0, 8);
+        
+        this.domain = this.domain.findOneDomain(dc);
+        log.info("User registration request for domain '%s'", dc);
     }
     
     public void beginUserRegistrationPhase() {
@@ -181,15 +189,57 @@ public class RegistrationView extends AbstractView implements Serializable {
         final String recipient = this.getUsername();
         EmailMessage newUserMsg = new EmailMessage("Requested user-req NEW", String.format("did you do this, if yes %s",replace), recipient, "Jeeplate corp.");
         EmailMessage oldUserMsg = new EmailMessage("Requested user-req OLD", "somebody tried to register this to our service", recipient, "Jeeplate corp."); 
-        String token = this.domain.applyForUserAccount();
+        String token = "";
         
+        token = this.domain.applyForUserAccount();
         this.findUserAccount();
-        this.user.applyForUserAccount(oldUserMsg, newUserMsg, token);
-        
+        this.user.nofityUserForRegistration(oldUserMsg, newUserMsg, hideDomainPartFromCodeToBeEmailed(token));
     }
     
     public void endUserRegistrationPhase() {
+        Boolean completed = Boolean.FALSE;
+        Boolean actionSecretOK = userRegistrationCanBeCompleted(this.getActionsecret());
         
+        if (actionSecretOK) {
+            this.findDomain();
+            completed = this.domain.grantUserAccount(this.getMobile(), this.getPassword(), this.getDomaincode());
+        }
+        if (completed) {
+            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "OK, registered");
+        } else {
+            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, "Failed, not registered. please try again");
+        }
+        this.registered = completed;
+    }
+    
+    private String hideDomainPartFromCodeToBeEmailed(String code) {
+        final int blockLength = 4;
+        String[] parts = code.split(String.format("(?<=\\G.{%s})", blockLength));
+        int length = parts.length;
+        StringBuilder sb = new StringBuilder();
+        
+        for (int p=0; p<length; p++) {
+            
+            if (p < 2) {
+                sb.append(parts[p]);
+            } else {
+                sb.append("____"); // 4x"_"
+            }
+            if (p < (length-1)) {
+                sb.append("-"); // 1x"-"
+            }
+        }
+        log.error("Add domain and fill random part '%s'", code);
+        
+        return (sb.toString());
+    }
+    
+    private boolean userRegistrationCanBeCompleted(String hiddenActionSecretGenerated) {
+        String hiddenActionSecretCarried = findRequestStringParamValue("signupForm:signupWzdHidden");
+        boolean secretsAreSame = hiddenActionSecretGenerated.equals(hiddenActionSecretCarried);
+        boolean resetInitialized = this.flowing;
+        
+        return (secretsAreSame && resetInitialized);
     }
     
     // PrimeFaces use inherently wrong design for Wizards
@@ -253,7 +303,7 @@ public class RegistrationView extends AbstractView implements Serializable {
                     //         action secret is also needed in a
                     // Server: Sends email 1) No account or 2) Reset request with temp password
                     //         Creates reset token and timestamp
-                    Boolean userAgreement = this.checkUserAgreement();
+                    Boolean userAgreement = this.getIacceptTermsAndConditions();
                     if(userAgreement) {
                         next = step;
                     } else {
@@ -272,13 +322,14 @@ public class RegistrationView extends AbstractView implements Serializable {
                          */
                         
                     }
-                    
                     break;
                 case 2:
                     // Client: Valid reset token together with emailed reset secret (i.e. temp password)
                     //         changes the password if the action secret matches too, otherwise no change
                     // Server: 
-                    this.endUserRegistrationPhase();
+                    if(this.flowing) {
+                        this.endUserRegistrationPhase();
+                    }
                     next = step;
                     break;
                 case 3:

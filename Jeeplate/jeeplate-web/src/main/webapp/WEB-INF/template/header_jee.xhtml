@@ -97,7 +97,6 @@
                                 </h:outputLabel>
                                 <p:selectBooleanCheckbox value="#{registrationView.iacceptTermsAndConditions}" required="true"/>
                                 
-                                <h:inputHidden id="signupWzdHidden" value="#{registrationView.actionsecret}" />
                             </h:panelGrid>                            
                         </p:panel>
                     </p:tab>
@@ -117,12 +116,14 @@
                                 <p:password id="signupFormPwRetyped" label="ret pw" required="true" feedback="false"/>
                                 
                                 <h:outputText value="Domain Code:" />
-                                <p:inputMask value="#{registrationView.domaincode}" required="true" mask="****-*****-*****-****"/>
+                                <p:inputMask value="#{registrationView.domaincode}" required="true" mask="****-****-****-****"/>
+                                
+                                <h:inputHidden id="signupWzdHidden" value="#{registrationView.actionsecret}" />
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
                     <!--  -->
-                    <p:tab id="signupWzd9" title="Account registerd" >
+                    <p:tab id="signupWzd2" title="Account registerd" >
                         <p:panel header="Account Registered2">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid rendered="true" columns="2" columnClasses="label, value">
@@ -133,7 +134,7 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
-                    <p:tab id="signupWzdStop"  title="" titleStyleClass="ui-wizard-step-title-custom fa fa-check fa-2x">
+                    <p:tab id="signupWzd9"  title="" titleStyleClass="ui-wizard-step-title-custom fa fa-check fa-2x">
                     </p:tab>
                 </p:wizard>
                 
@@ -406,7 +407,7 @@
                                 <p:password id="resetFormPwRetyped" label="ret pw" required="true" feedback="false"/>
 
                                 <h:outputText value="Reset Code:" />
-                                <h:inputText id="resetWzdEmailed" value="#{passwordView.emailedsecret}" required="true" />
+                                <p:inputText id="resetWzdEmailed" value="#{passwordView.emailedsecret}" required="true" />
                                 
                                 <h:inputHidden id="resetWzdHidden" value="#{passwordView.actionsecret}" />
                                 

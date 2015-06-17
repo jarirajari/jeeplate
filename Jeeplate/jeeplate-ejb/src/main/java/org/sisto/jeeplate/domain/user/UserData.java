@@ -121,7 +121,7 @@ public class UserData implements Serializable {
             UserEntity id = result.get(0);
             this.entity = id;
        } else {
-            this.entity = UserEntity.newUserEntityBuilder().build(); // dont use 'new' op!
+            this.entity = UserEntity.newUserEntityBuilder().build(); // dont construct new UserData
             log.error("Finding one user by email address failed!");
         }
         
@@ -138,12 +138,11 @@ public class UserData implements Serializable {
     }
     
     @Transactional
-    public void applyForUserAccount(EmailMessage messageForOldUser, EmailMessage messageForNewUser, String registrationToken) {
+    public void nofityUserForRegistration(EmailMessage messageForOldUser, EmailMessage messageForNewUser, String registrationToken) {
         assert this.entity != null;
         final String replace = "${domain}";
         boolean userNotExist = this.getEntity().isDefault();
         EmailMessage message;
-        UserCredential uc  = this.getEntity().getCredential();
         
         if (userNotExist) {
             message = messageForNewUser;
@@ -153,13 +152,6 @@ public class UserData implements Serializable {
             log.info("User registration requested for an existing user (id=%s).", String.valueOf(this.getEntity().getId()));
         }
         sendEmailToUser(message, replace, registrationToken);
-    }
-    
-    @Transactional
-    public Boolean grantUserAccount(String typedMobile, String typedPassword, String emailedResetToken, String hiddenActionSecret) {
-        
-        
-        return Boolean.FALSE;
     }
     
     @Transactional
@@ -190,7 +182,7 @@ public class UserData implements Serializable {
     }
     
     @Transactional
-    public Boolean finalizePasswordReset(String typedMobile, String typedPassword, String emailedResetToken, String hiddenActionSecret) {
+    public Boolean finalizePasswordReset(String typedMobile, String typedPassword, String emailedResetToken) {
         assert this.entity != null;
         UserCredential uc = this.getEntity().getCredential();
         Boolean changed = Boolean.FALSE;

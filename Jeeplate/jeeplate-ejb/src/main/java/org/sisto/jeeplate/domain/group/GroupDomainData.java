@@ -18,6 +18,9 @@
  */
 package org.sisto.jeeplate.domain.group;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -85,9 +88,66 @@ public class GroupDomainData {
     }
     
     @Transactional
-    public Boolean grantUserAccount(String typedMobile, String typedPassword, String emailedResetToken, String hiddenActionSecret) {
+    public Boolean grantUserAccount(String typedMobile, String typedPassword, String emailedResetToken) {
+        Boolean granted = Boolean.FALSE;
+        GroupDomainRegistration gdr = this.getEntity().getRegistration();
+        Boolean oneDomainFound = emailedResetToken.startsWith(gdr.getPartDomainDeliveredSeparately());
         
+        if (oneDomainFound) {
+            log.info("User registration, found application domain"); // application domain
+        } else {
+            boolean systemUserRequestResponseChallengeHash = false;
+            if (systemUserRequestResponseChallengeHash) {
+                log.info("User registration, found system domain"); // system domain
+            } else {
+                log.info("User registration, found unknown domain"); // unknown domain
+            }
+        }
         
-        return Boolean.FALSE;
+        return granted;
+    }
+    
+    @Transactional
+    public List<GroupDomainEntity> findDomainByDomainIdentifier(final String domainIdentifier) {
+        final String query = "SELECT uge FROM GroupDomainEntity uge WHERE uge.registration.partDomainDeliveredSeparately = :domainId";
+        final Map<String, Object> params = new HashMap<String, Object>() {{
+            put("domainId", domainIdentifier);
+        }};
+        final List<GroupDomainEntity> result = this.store.executeCustomQuery(GroupDomainEntity.class, query, params);
+        
+        return result;
+    }
+    
+    @Transactional
+    public GroupDomainData findOneDomain(final String domainIdentifier) {
+        final List<GroupDomainEntity> result = this.findDomainByDomainIdentifier(domainIdentifier);
+        
+        if ((result != null) && (result.isEmpty() == false) && (result.size() == 1)) {
+            GroupDomainEntity id = result.get(0);
+            this.entity = id;
+       } else {
+            this.entity = new GroupDomainEntity(); // dont construct new UserData
+            log.error("Finding one domain by domain identifier address failed!");
+        }
+        
+        return (this);
+    }
+    
+    public void testHashing() {
+        GroupDomainEntity gde = new GroupDomainEntity();
+        gde.setDomainname("com.example");
+        gde.setDomaintype(GroupDomainType.Type.APPLICATION);
+        gde.getRegistration().setPartDomainDeliveredSeparately("01020304");
+        gde.setDescription("This is a test company");
+        this.entity = gde;
+        this.create();
+    }
+    
+    @Transactional
+    Boolean create() {
+        log.info("GroupDomain.create()");
+        this.entity = this.store.create(entity);
+        
+        return Boolean.TRUE;
     }
 }

@@ -163,7 +163,7 @@ public class PasswordView extends AbstractView implements Serializable {
         final String recipient = this.getUsername();
         EmailMessage newUserMsg = new EmailMessage("Requested pw reset NEW", "secret is ", recipient, "Jeeplate corp.");
         EmailMessage oldUserMsg = new EmailMessage("Requested pw reset OLD", String.format("did you do this, if yes %s",replace), recipient, "Jeeplate corp."); 
-        log.info("******************"+oldUserMsg.toString());
+        
         this.findUserAccount();
         this.user.initializePasswordReset(oldUserMsg, newUserMsg);
     }
@@ -177,7 +177,7 @@ public class PasswordView extends AbstractView implements Serializable {
         
         if (passwordResetCanBeCompleted(hiddenActionSecretGenerated)) {
             this.findUserAccount();
-            completed = this.user.finalizePasswordReset(typedMobile, typedPassword, emailedResetToken, hiddenActionSecretGenerated);
+            completed = this.user.finalizePasswordReset(typedMobile, typedPassword, emailedResetToken);
         }
         if (completed) {
             this.showFacesMessage(FacesMessage.SEVERITY_INFO, "OK, changed password");
