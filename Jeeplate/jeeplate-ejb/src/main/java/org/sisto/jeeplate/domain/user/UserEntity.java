@@ -28,6 +28,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -36,6 +37,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Digits;
 import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.domain.group.member.DomainGroupMemberEntity;
 
 /**
  * Business object model for an actual business object
@@ -56,6 +58,8 @@ public class UserEntity extends BusinessEntity implements Serializable {
     protected UserCredential credential;
     @Enumerated(EnumType.STRING)
     protected UserType.Type type;
+    @OneToOne(mappedBy = "ISAUser")
+    protected DomainGroupMemberEntity associateddomain; 
     
     protected UserEntity() {
         this.id = DEFAULT_ID;
@@ -63,6 +67,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
         this.mobile = 0L;
         this.credential = new UserCredential();
         this.type = UserType.Type.UNKNOWN;
+        this.associateddomain = null; // unfortunately we will have to use null!
     }
     
     @PostLoad @PostPersist @PostUpdate
@@ -97,6 +102,14 @@ public class UserEntity extends BusinessEntity implements Serializable {
 
     public void setType(UserType.Type type) {
         this.type = type;
+    }
+
+    public DomainGroupMemberEntity getAssociateddomain() {
+        return associateddomain;
+    }
+
+    public void setAssociateddomain(DomainGroupMemberEntity associateddomain) {
+        this.associateddomain = associateddomain;
     }
     
     public Boolean mobileNumberIsSame(String msisdn) {

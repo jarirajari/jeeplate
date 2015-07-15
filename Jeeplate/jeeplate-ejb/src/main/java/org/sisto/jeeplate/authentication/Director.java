@@ -18,10 +18,6 @@
  */
 package org.sisto.jeeplate.authentication;
 
-/**
- *
- * @author Jari
- */
 public class Director {
     
 }

@@ -30,26 +30,29 @@ import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import org.sisto.jeeplate.association.cardinality.OneToMany;
+import org.sisto.jeeplate.association.direction.Unidirectional;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import static org.sisto.jeeplate.domain.ObjectEntity.DEFAULT_ID;
 
 @Entity
 @Access(AccessType.FIELD)
 @Table(name = "group_domain_membership")
-public class GroupDomainMembershipEntity extends BusinessEntity implements Serializable {
+public class DomainGroupMembershipEntity extends BusinessEntity 
+ implements Serializable, Unidirectional, OneToMany {
     @Id
     @SequenceGenerator(name = "group_domain_membership_sqe", allocationSize = 1)
     @GeneratedValue(generator = "group_domain_membership_sqe", strategy = GenerationType.SEQUENCE)
     private Long id;
-    
     /*
      * When the foreign key references are not really references, but
      * just primary key values, we can better control loading and searching
      * of them, which is idea behind tearing down JPA collection mapping...
      * At this point NO FK constraints will be used!
      */
-    private Long domainReference;
+    private Long groupMemberReference;
     private Long groupReference;
+    private Long domainReference; // one user can belong to only one domain!
     
     @PostLoad @PostPersist @PostUpdate 
     @Override
@@ -57,12 +60,12 @@ public class GroupDomainMembershipEntity extends BusinessEntity implements Seria
         super.setId(this.id);
     }
 
-    public Long getDomainReference() {
-        return domainReference;
+    public Long getGroupMemberReference() {
+        return groupMemberReference;
     }
 
-    public void setDomainReference(Long domainReference) {
-        this.domainReference = domainReference;
+    public void setGroupMemberReference(Long groupMemberReference) {
+        this.groupMemberReference = groupMemberReference;
     }
 
     public Long getGroupReference() {
@@ -73,20 +76,28 @@ public class GroupDomainMembershipEntity extends BusinessEntity implements Seria
         this.groupReference = groupReference;
     }
     
-    public static GroupDomainMembershipEntity defaultApplicationDomainMembershipEntity() {
-        return (new ApplicationDomainMembershipEntityBuilder()).build();
+    public Long getDomainReference() {
+        return domainReference;
     }
-    
-    public static ApplicationDomainMembershipEntityBuilder newApplicationDomainMembershipEntity() {
-        return (new ApplicationDomainMembershipEntityBuilder());
-    }
-    
-    public static class ApplicationDomainMembershipEntityBuilder {
-        
-        private GroupDomainMembershipEntity object;
 
-        public ApplicationDomainMembershipEntityBuilder() {
-            this.object = new GroupDomainMembershipEntity();
+    public void setDomainReference(Long domainReference) {
+        this.domainReference = domainReference;
+    }
+    
+    public static DomainGroupMembershipEntity defaultDomainGroupMembershipEntity() {
+        return (new DomainGroupMembershipEntityBuilder()).build();
+    }
+    
+    public static DomainGroupMembershipEntityBuilder newDomainGroupMembershipEntity() {
+        return (new DomainGroupMembershipEntityBuilder());
+    }
+    
+    public static class DomainGroupMembershipEntityBuilder {
+        
+        private DomainGroupMembershipEntity object;
+
+        public DomainGroupMembershipEntityBuilder() {
+            this.object = new DomainGroupMembershipEntity();
             this.defaults();
         }
 
@@ -96,28 +107,28 @@ public class GroupDomainMembershipEntity extends BusinessEntity implements Seria
             this.object.groupReference = DEFAULT_ID;
         }
         
-        public ApplicationDomainMembershipEntityBuilder domain(Long domainId) {
+        public DomainGroupMembershipEntityBuilder domain(Long domainId) {
             
             this.object.domainReference = domainId;
             
             return (this);
         }
         
-        public ApplicationDomainMembershipEntityBuilder member(Long userId) {
+        public DomainGroupMembershipEntityBuilder member(Long userId) {
             
             this.object.groupReference = userId;
             
             return (this);
         }
         
-        public GroupDomainMembershipEntity build(){
+        public DomainGroupMembershipEntity build(){
             
             this.object.id = null;
             
             return (this.object);
         }
         
-        public GroupDomainMembershipEntity renovate(Long id) {
+        public DomainGroupMembershipEntity renovate(Long id) {
             
             this.object.id = id;
             

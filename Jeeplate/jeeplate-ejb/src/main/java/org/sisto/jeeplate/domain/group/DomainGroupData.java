@@ -16,11 +16,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.group.membership;
+package org.sisto.jeeplate.domain.group;
 
-public class GroupDomainMembership {
-    // Domain is defined as the subset of power set where all elements are present
-    // Basically this means that a domain is one specific group of groups. This 
-    // is to say that if there are N possible groups there are 2^N subgroups and 
-    // 1 super group, i.e {0, {a}, {b}, {a,b}} => domain is group {a,b}
+import java.io.Serializable;
+import javax.inject.Inject;
+import org.jboss.logging.Logger;
+import org.sisto.jeeplate.domain.BusinessEntityStore;
+
+public class DomainGroupData implements Serializable {
+    
+    @Inject
+    private transient Logger log;
+
+    @Inject
+    private transient BusinessEntityStore<DomainGroupEntity> store;
+    
+    private transient DomainGroupEntity entity;
+    
 }

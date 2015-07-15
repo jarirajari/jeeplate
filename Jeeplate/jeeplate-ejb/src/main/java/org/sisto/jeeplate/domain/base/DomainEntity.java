@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.group;
+package org.sisto.jeeplate.domain.base;
 
 import java.io.Serializable;
 import javax.persistence.Access;
@@ -36,27 +36,26 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import org.sisto.jeeplate.domain.BusinessEntity;
 
-@Entity
-@Access(AccessType.FIELD)
+@Entity @Access(AccessType.FIELD)
 @Table(name = "group_domain", uniqueConstraints = { 
        @UniqueConstraint(columnNames = "domainname")})
-public class GroupDomainEntity extends BusinessEntity implements Serializable {
+public class DomainEntity extends BusinessEntity implements Serializable {
     
     @Id @SequenceGenerator(name = "group_domain_seq", allocationSize = 1)
     @GeneratedValue(generator = "group_domain_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
-    protected String domainname; // alias
+    protected String domainname; // alias, qualified name?
     protected String description;
     @Enumerated(EnumType.STRING)
-    protected GroupDomainType.Type domaintype;
+    protected DomainType.Type domaintype;
     @Embedded
-    protected GroupDomainRegistration registration;
+    protected DomainRegistration registration;
             
-    public GroupDomainEntity() {
+    public DomainEntity() {
         this.id = DEFAULT_ID;
         this.domainname = "";
-        this.domaintype = GroupDomainType.Type.UNKNOWN;
-        this.registration = new GroupDomainRegistration();
+        this.domaintype = DomainType.Type.UNKNOWN;
+        this.registration = new DomainRegistration();
     }
     
     @PostLoad @PostPersist @PostUpdate
@@ -81,19 +80,19 @@ public class GroupDomainEntity extends BusinessEntity implements Serializable {
         this.description = description;
     }
 
-    public GroupDomainType.Type getDomaintype() {
+    public DomainType.Type getDomaintype() {
         return domaintype;
     }
 
-    public void setDomaintype(GroupDomainType.Type domaintype) {
+    public void setDomaintype(DomainType.Type domaintype) {
         this.domaintype = domaintype;
     }
 
-    public GroupDomainRegistration getRegistration() {
+    public DomainRegistration getRegistration() {
         return registration;
     }
 
-    public void setRegistration(GroupDomainRegistration registration) {
+    public void setRegistration(DomainRegistration registration) {
         this.registration = registration;
     }
     

@@ -18,16 +18,13 @@
  */
 package org.sisto.jeeplate.authentication.role;
 
-/**
- *
- * @author Jari
- */
 public class ApplicationRoles {
     public enum Role {
         ADMINISTRATOR("administrator"),
         DIRECTOR("director"),
         ACTOR("actor"),
-        VISITOR("visitor");
+        VISITOR("visitor"),
+        UNKNOWN("unknown");
         
         String role = "";
         

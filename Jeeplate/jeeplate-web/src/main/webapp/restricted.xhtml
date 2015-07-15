@@ -78,6 +78,11 @@
                     <p:commandButton value="Lisää käyttäjä ryhmään" action="#{restrictedView.addToGroup()}">
                     </p:commandButton>
                 </h:form>
+                <h:form id="adminConfigure" >
+                    <p:commandButton id="createAPP" value="Luo applikaatio" rendered="#{restrictedView.showConfigureApplication()}" process="adminConfigure">
+                        <f:ajax listener="#{restrictedView.configureApplication()}" event="click" render=":adminConfigure"/>
+                    </p:commandButton>
+                </h:form>
             </ui:define>
             <ui:define name="footer" rendered="false" />
         </ui:composition>

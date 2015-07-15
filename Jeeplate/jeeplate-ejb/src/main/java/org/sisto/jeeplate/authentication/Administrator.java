@@ -18,6 +18,6 @@
  */
 package org.sisto.jeeplate.authentication;
 
-public class Theatrealm {
+public class Administrator {
     
 }

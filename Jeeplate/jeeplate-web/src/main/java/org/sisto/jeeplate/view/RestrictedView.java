@@ -28,11 +28,11 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
+import org.sisto.jeeplate.application.Configuration;
 import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.logging.StringLogger;
 
-@Named
-@ViewScoped
+@Named @ViewScoped
 public class RestrictedView implements Serializable {
     
     // Grouping different model etc objects & instances, models are general
@@ -41,6 +41,8 @@ public class RestrictedView implements Serializable {
     transient private StringLogger log;
     @Inject
     private UserGroupMembershipData membership;
+    @Inject
+    private Configuration appConf;
     private Long selectedUser;
     private Long selectedGroup;
     private String input;
@@ -88,6 +90,16 @@ public class RestrictedView implements Serializable {
             log.info("RestrictedView+UserGroupController -> add =>> u="+this.getSelectedUser()+"g="+this.getSelectedGroup()+"; "+this.toString());
             membership.addNewMember(selectedUser, selectedGroup);
         }
+        return Boolean.FALSE;
+    }
+    
+    public Boolean showConfigureApplication() {
+        return (! this.appConf.configurationExists());
+    }
+    
+    public Boolean configureApplication() {
+        this.appConf.configure();
+        
         return Boolean.FALSE;
     }
     

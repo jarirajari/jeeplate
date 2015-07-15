@@ -16,8 +16,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.authentication;
+package org.sisto.jeeplate.domain.group.member;
 
-public class Theatrealm {
+import java.io.Serializable;
+
+public class DomainGroupMemberData implements Serializable {
     
 }

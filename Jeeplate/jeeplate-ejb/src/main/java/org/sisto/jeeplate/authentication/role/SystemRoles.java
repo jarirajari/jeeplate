@@ -18,10 +18,6 @@
  */
 package org.sisto.jeeplate.authentication.role;
 
-/**
- *
- * @author Jari
- */
 public class SystemRoles {
     /*
      * System means all domains,
@@ -32,7 +28,8 @@ public class SystemRoles {
         SYSTEM_ADMIN("root"),
         DOMAIN_ADMIN("domain-admin"),
         GROUP_ADMIN("group-admin"),
-        REGISTERED_USER("registered-user");
+        NOT_ADMIN("registered-user"),
+        UNKNOWN("unknown");
         
         private String role;
         

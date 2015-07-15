@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -39,18 +38,15 @@ import javax.persistence.PessimisticLockException;
 import javax.persistence.QueryTimeoutException;
 import javax.persistence.TypedQuery;
 import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.util.H2EM;
 import org.sisto.jeeplate.util.PGEM;
 
-@Stateless
-@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+@Stateless @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class BusinessEntityStore<T extends BusinessEntity> {
     
     @Inject
     private transient StringLogger log;
     
-    @Inject
-    @PGEM
+    @Inject @PGEM
     private EntityManager em;
     
     private EntityManager em() {

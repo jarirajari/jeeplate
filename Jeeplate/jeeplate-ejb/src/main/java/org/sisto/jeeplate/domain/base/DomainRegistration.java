@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.group;
+package org.sisto.jeeplate.domain.base;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -31,7 +31,7 @@ import org.apache.shiro.util.ByteSource;
 import org.sisto.jeeplate.util.DateAndTimeConverter;
 
 @Embeddable
-public class GroupDomainRegistration implements Serializable {
+public class DomainRegistration implements Serializable {
     @Transient
     protected static final String RESET = "";
     @Transient
@@ -44,7 +44,7 @@ public class GroupDomainRegistration implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     protected Date registrationTimestamp;
     
-    public GroupDomainRegistration() {
+    public DomainRegistration() {
         this.partDomainDeliveredSeparately = RESET;
         this.partEmailExpiringRandom = RESET;
         this.registrationToken = RESET;
@@ -86,9 +86,9 @@ public class GroupDomainRegistration implements Serializable {
     }
     
     public void activateRegistrationProtocol() {
-        this.setPartEmailExpiringRandom(GroupDomainRegistration.generateRandomNumberToken());
+        this.setPartEmailExpiringRandom(DomainRegistration.generateRandomNumberToken());
         this.registrationToken = this.getConcatenatedToken();
-        this.registrationTimestamp = GroupDomainRegistration.now();
+        this.registrationTimestamp = DomainRegistration.now();
     }
     
     public void deactivateRegistrationProtocol() {

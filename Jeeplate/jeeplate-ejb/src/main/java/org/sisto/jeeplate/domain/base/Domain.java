@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.group;
+package org.sisto.jeeplate.domain.base;
 
-public class GroupDomain {
+public class Domain {
     
 }

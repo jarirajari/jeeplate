@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.group;
+package org.sisto.jeeplate.domain.base;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +27,7 @@ import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
 import org.sisto.jeeplate.logging.StringLogger;
 
-public class GroupDomainData {
+public class DomainData {
     // id, name as reverse domain (ldap?), free description, domain code (i.e. hash?)
     // dn: uid=<userId>,ou=<groupname>,dc=<subdomain e.g.country code>,dc=sisto,dc=org 
     // but just drop uid and ou, and use two char country code?
@@ -43,26 +43,26 @@ public class GroupDomainData {
     private transient StringLogger log;
     
     @Inject
-    private GroupDomain domain;
+    private Domain domain;
     
     @Inject @New
-    private transient BusinessEntityStore<GroupDomainEntity> store;
+    private transient BusinessEntityStore<DomainEntity> store;
     
-    private GroupDomainEntity entity;
+    private DomainEntity entity;
     
-    public GroupDomainData() {
-        this.entity = new GroupDomainEntity();
+    public DomainData() {
+        this.entity = new DomainEntity();
     }
     
-    public GroupDomainData(GroupDomainEntity ade) {
+    public DomainData(DomainEntity ade) {
         this.entity = ade;
     }
     
-    public void setEntity(GroupDomainEntity ade) {
+    public void setEntity(DomainEntity ade) {
         this.entity = ade;
     }
     
-    public GroupDomainEntity getEntity() {
+    public DomainEntity getEntity() {
         return (this.entity);
     }
     
@@ -70,7 +70,7 @@ public class GroupDomainData {
     public String applyForUserAccount() {
         assert this.entity != null;
         Boolean userNotExist = this.getEntity().isDefault();
-        GroupDomainRegistration reg  = this.getEntity().getRegistration();
+        DomainRegistration reg  = this.getEntity().getRegistration();
         String token;
         
         if (userNotExist) {
@@ -90,7 +90,7 @@ public class GroupDomainData {
     @Transactional
     public Boolean grantUserAccount(String typedMobile, String typedPassword, String emailedResetToken) {
         Boolean granted = Boolean.FALSE;
-        GroupDomainRegistration gdr = this.getEntity().getRegistration();
+        DomainRegistration gdr = this.getEntity().getRegistration();
         Boolean oneDomainFound = emailedResetToken.startsWith(gdr.getPartDomainDeliveredSeparately());
         
         if (oneDomainFound) {
@@ -108,25 +108,25 @@ public class GroupDomainData {
     }
     
     @Transactional
-    public List<GroupDomainEntity> findDomainByDomainIdentifier(final String domainIdentifier) {
+    public List<DomainEntity> findDomainByDomainIdentifier(final String domainIdentifier) {
         final String query = "SELECT uge FROM GroupDomainEntity uge WHERE uge.registration.partDomainDeliveredSeparately = :domainId";
         final Map<String, Object> params = new HashMap<String, Object>() {{
             put("domainId", domainIdentifier);
         }};
-        final List<GroupDomainEntity> result = this.store.executeCustomQuery(GroupDomainEntity.class, query, params);
+        final List<DomainEntity> result = this.store.executeCustomQuery(DomainEntity.class, query, params);
         
         return result;
     }
     
     @Transactional
-    public GroupDomainData findOneDomain(final String domainIdentifier) {
-        final List<GroupDomainEntity> result = this.findDomainByDomainIdentifier(domainIdentifier);
+    public DomainData findOneDomain(final String domainIdentifier) {
+        final List<DomainEntity> result = this.findDomainByDomainIdentifier(domainIdentifier);
         
         if ((result != null) && (result.isEmpty() == false) && (result.size() == 1)) {
-            GroupDomainEntity id = result.get(0);
+            DomainEntity id = result.get(0);
             this.entity = id;
        } else {
-            this.entity = new GroupDomainEntity(); // dont construct new UserData
+            this.entity = new DomainEntity(); // dont construct new UserData
             log.error("Finding one domain by domain identifier address failed!");
         }
         
@@ -134,9 +134,9 @@ public class GroupDomainData {
     }
     
     public void testHashing() {
-        GroupDomainEntity gde = new GroupDomainEntity();
+        DomainEntity gde = new DomainEntity();
         gde.setDomainname("com.example");
-        gde.setDomaintype(GroupDomainType.Type.APPLICATION);
+        gde.setDomaintype(DomainType.Type.APPLICATION);
         gde.getRegistration().setPartDomainDeliveredSeparately("01020304");
         gde.setDescription("This is a test company");
         this.entity = gde;

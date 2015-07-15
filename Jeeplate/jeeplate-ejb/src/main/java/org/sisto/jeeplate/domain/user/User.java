@@ -20,8 +20,8 @@ package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
+import org.sisto.jeeplate.domain.group.member.DomainGroupMemberData;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.rules.GenericRule;
 
@@ -39,6 +39,11 @@ public class User implements Serializable {
     
     @Inject
     private UserLogic logic; // or requirements
+    
+    /*
+     * User is a domain group member. Note that here we use inner/
+     * inline relationship
+    */
     
     public Boolean updateUserName() {
         Boolean updated = Boolean.FALSE;

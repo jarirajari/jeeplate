@@ -16,8 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.authentication;
+package org.sisto.jeeplate.domain.base;
 
-public class Theatrealm {
-    
+public class DomainType {
+    public enum Type {
+        UNKNOWN,
+        APPLICATION,
+        SYSTEM,
+        LOCKED;
+    }
 }

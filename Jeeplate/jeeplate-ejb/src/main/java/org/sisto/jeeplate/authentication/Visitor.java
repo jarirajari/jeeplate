@@ -16,13 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.group;
+package org.sisto.jeeplate.authentication;
 
-public class GroupDomainType {
-    public enum Type {
-        UNKNOWN,
-        APPLICATION,
-        SYSTEM,
-        LOCKED;
-    }
+public class Visitor {
+    
 }

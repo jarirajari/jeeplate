@@ -28,7 +28,7 @@ import javax.inject.Named;
 import javax.mail.internet.MimeMessage;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
-import org.sisto.jeeplate.domain.group.GroupDomainData;
+import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.Email;
@@ -44,7 +44,7 @@ public class RegistrationView extends AbstractView implements Serializable {
     @Inject
     transient private Email emailSender;
     @Inject @New
-    transient private GroupDomainData domain;
+    transient private DomainData domain;
     @Inject @New
     transient private UserData user;
     @Inject

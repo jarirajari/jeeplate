@@ -23,7 +23,7 @@ import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import org.jboss.logging.Logger;
-import org.sisto.jeeplate.domain.group.GroupDomainData;
+import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.group.UserGroupData;
 
@@ -38,7 +38,7 @@ public class HelloService {
     @Inject
     private UserGroupData group;
     @Inject
-    private GroupDomainData domain;
+    private DomainData domain;
     
     public String testHelloServiceLogging() {
         

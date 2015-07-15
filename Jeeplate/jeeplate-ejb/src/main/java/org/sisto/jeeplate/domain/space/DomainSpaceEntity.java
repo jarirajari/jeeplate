@@ -16,8 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.authentication;
+package org.sisto.jeeplate.domain.space;
 
-public class Theatrealm {
-    
+public class DomainSpaceEntity {
+    // single entity
+    // java.util.collection of domains.
 }

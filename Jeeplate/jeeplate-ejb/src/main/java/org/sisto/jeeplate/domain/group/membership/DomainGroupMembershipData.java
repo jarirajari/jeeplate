@@ -26,36 +26,36 @@ import org.sisto.jeeplate.domain.BusinessEntityStore;
 import org.sisto.jeeplate.logging.StringLogger;
 
 @SessionScoped
-public class GroupDomainMembershipData implements Serializable {
+public class DomainGroupMembershipData implements Serializable {
     
     @Inject
     private transient StringLogger log;
     
     @Inject
-    private transient BusinessEntityStore<GroupDomainMembershipEntity> store;
+    private transient BusinessEntityStore<DomainGroupMembershipEntity> store;
     
-    private transient GroupDomainMembershipEntity entity;
+    private transient DomainGroupMembershipEntity entity;
     
-    public GroupDomainMembershipData() {
-        this.entity = GroupDomainMembershipEntity.defaultApplicationDomainMembershipEntity();
+    public DomainGroupMembershipData() {
+        this.entity = DomainGroupMembershipEntity.defaultDomainGroupMembershipEntity();
     }
     
-    protected GroupDomainMembershipData(GroupDomainMembershipEntity adme) {
+    protected DomainGroupMembershipData(DomainGroupMembershipEntity adme) {
         this.entity = adme;
     }
     
-    public void setEntity(GroupDomainMembershipEntity adme) {
+    public void setEntity(DomainGroupMembershipEntity adme) {
         this.entity = adme;
     }
     
-    public GroupDomainMembershipEntity getEntity() {
+    public DomainGroupMembershipEntity getEntity() {
         return (this.entity);
     }
     
     @Transactional
     public Boolean addNewMember(Long domain, Long group) {
-        GroupDomainMembershipEntity member = GroupDomainMembershipEntity
-                .newApplicationDomainMembershipEntity()
+        DomainGroupMembershipEntity member = DomainGroupMembershipEntity
+                .newDomainGroupMembershipEntity()
                 .domain(domain)
                 .member(group)
                 .build();

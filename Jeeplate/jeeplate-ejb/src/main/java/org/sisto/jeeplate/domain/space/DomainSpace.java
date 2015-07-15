@@ -16,8 +16,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.authentication;
+package org.sisto.jeeplate.domain.space;
 
-public class Theatrealm {
+public class DomainSpace {
+    /*
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
+    Domain space is not initially created!
+    
+    As "root" user logs in and creates the system =>
+    the domain space is created (if not exists) too.
+    
+    This means that the system can be created from nothing,
+    and still operate, but we NOW HAVE a creation button event from the root!
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    */
 }
