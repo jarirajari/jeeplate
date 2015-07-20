@@ -18,6 +18,7 @@
  */
 package org.sisto.jeeplate.application;
 
+import java.io.Serializable;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -25,7 +26,8 @@ import org.sisto.jeeplate.domain.space.DomainSpaceData;
 import org.sisto.jeeplate.util.PGEM;
 
 @Stateless
-public class Configuration {
+public class Configuration implements Serializable {
+    
     @Inject @PGEM
     EntityManager em;
     
@@ -34,15 +36,11 @@ public class Configuration {
     
     // Idempotent
     public void configure() {
-        PersistedConfiguration pc = this.find();
-        Boolean exists = (pc != null);
+        boolean aldreadyCreated = this.originateConfiguration();
         
-        if (exists) {
-            pc.setApplicationConfigured(Boolean.TRUE);
-        } else {
-            pc = new PersistedConfiguration(Boolean.TRUE);
+        if (! aldreadyCreated) {
+            this.domainSpace.originateSingletonDomainSpace();
         }
-        this.createOrUpdate(pc);
     }
     
     public Boolean configurationExists() {
@@ -58,7 +56,21 @@ public class Configuration {
         return exists;
     }
     
-    private PersistedConfiguration createOrUpdate(PersistedConfiguration pc) {
+    private Boolean originateConfiguration() {
+        PersistedConfiguration pc = this.find();
+        Boolean exists = (pc != null);
+        
+        if (exists) {
+            pc.setApplicationConfigured(Boolean.TRUE);
+        } else {
+            pc = new PersistedConfiguration(Boolean.TRUE);
+        }
+        this.createOrUpdate(pc);
+        
+        return exists;
+    }
+    
+    private PersistedConfiguration createOrUpdate(PersistedConfiguration pc) {    
         return em.merge(pc);
     }
     

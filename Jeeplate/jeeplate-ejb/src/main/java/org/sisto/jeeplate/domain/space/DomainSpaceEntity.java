@@ -18,7 +18,46 @@
  */
 package org.sisto.jeeplate.domain.space;
 
-public class DomainSpaceEntity {
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.PostUpdate;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.domain.base.DomainEntity;
+
+@Entity @Access(AccessType.FIELD)
+@Table(name = "system_application_space")
+public class DomainSpaceEntity extends BusinessEntity implements Serializable {
     // single entity
     // java.util.collection of domains.
+    @Transient
+    public static Long SINGLETON_DOMAIN_SPACE = 1L;
+    
+    @Id
+    private Long id;
+    @OneToMany(mappedBy = "domainspace")
+    private List<DomainEntity> allDomains; // loose if <Long> or tight if <DomainEntity>
+    
+    @PostLoad @PostPersist @PostUpdate
+    @Override
+    protected void updateParentId() {
+        super.setId(this.id);
+    }
+    
+    public DomainSpaceEntity() {
+        this.id = SINGLETON_DOMAIN_SPACE;
+        this.allDomains = new ArrayList<>();
+    }
 }

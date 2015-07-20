@@ -26,6 +26,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -33,6 +34,7 @@ import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.domain.group.DomainGroupEntity;
 import org.sisto.jeeplate.domain.user.UserEntity;
 
 @Entity
@@ -45,6 +47,8 @@ public class DomainGroupMemberEntity extends BusinessEntity implements Serializa
     protected String memberalias;
     @OneToOne @JoinColumn(name = "user_fk")
     protected UserEntity ISAUser;  // Here we use inline or normal JPA way because IS-A, one-to-many
+    @ManyToOne @JoinColumn(name = "domaingroup_fk")
+    protected DomainGroupEntity domaingroup;
     
     @PostLoad @PostPersist @PostUpdate 
     @Override

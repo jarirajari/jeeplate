@@ -24,18 +24,19 @@ import java.util.List;
 import java.util.Map;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
+import javax.persistence.Transient;
 import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
-import org.sisto.jeeplate.domain.base.DomainEntity;
 import org.sisto.jeeplate.logging.StringLogger;
 
 public class DomainSpaceData implements Serializable {
+    
     
     @Inject
     private transient StringLogger log;
     
     @Inject @New
-    private transient BusinessEntityStore<DomainEntity> store;
+    private transient BusinessEntityStore<DomainSpaceEntity> store;
     
     private DomainSpaceEntity entity;
     
@@ -49,5 +50,10 @@ public class DomainSpaceData implements Serializable {
         final List<DomainSpaceEntity> result = this.store.executeCustomQuery(DomainSpaceEntity.class, query, params);
         
         return result;
+    }
+    
+    @Transactional
+    public void originateSingletonDomainSpace() {
+        this.entity = this.store.create(entity);
     }
 }

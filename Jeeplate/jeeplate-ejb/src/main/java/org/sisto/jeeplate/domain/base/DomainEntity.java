@@ -19,6 +19,8 @@
 package org.sisto.jeeplate.domain.base;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embedded;
@@ -28,6 +30,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -35,6 +40,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.domain.group.DomainGroupEntity;
+import org.sisto.jeeplate.domain.space.DomainSpaceEntity;
 
 @Entity @Access(AccessType.FIELD)
 @Table(name = "group_domain", uniqueConstraints = { 
@@ -50,12 +57,36 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     protected DomainType.Type domaintype;
     @Embedded
     protected DomainRegistration registration;
-            
+    @ManyToOne @JoinColumn(name = "domain_space")
+    protected DomainSpaceEntity domainspace;
+    /*
+    
+    When you create a new domain => create also "ALL" group first!
+    String => name => immutable key, and "ALL" is reserved
+    NONE group is zero and default (empty)
+    
+    0L NONE (default)
+    1L ALL
+    .. <NAME>
+    
+    Again, after space created => "root" creates "domains"
+    
+    */
+    @OneToMany(mappedBy = "domain")
+    protected Map<String, DomainGroupEntity> allDomaingroups;
+    
     public DomainEntity() {
         this.id = DEFAULT_ID;
         this.domainname = "";
         this.domaintype = DomainType.Type.UNKNOWN;
         this.registration = new DomainRegistration();
+        this.domainspace = null;
+    }
+    
+    // should be replaced with a builder
+    public DomainEntity(DomainSpaceEntity dse) {
+        this();
+        this.domainspace = dse;
     }
     
     @PostLoad @PostPersist @PostUpdate
@@ -95,6 +126,12 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     public void setRegistration(DomainRegistration registration) {
         this.registration = registration;
     }
-    
-    
+
+    public DomainSpaceEntity getDomainspace() {
+        return domainspace;
+    }
+
+    public void setDomainspace(DomainSpaceEntity domainspace) {
+        this.domainspace = domainspace;
+    }
 }

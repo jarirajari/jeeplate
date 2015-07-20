@@ -19,27 +19,42 @@
 package org.sisto.jeeplate.domain.group;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.domain.base.DomainEntity;
+import org.sisto.jeeplate.domain.group.member.DomainGroupMemberEntity;
 
 @Entity
 @Access(AccessType.FIELD)
 @Table(name = "domain_groups")
 public class DomainGroupEntity extends BusinessEntity implements Serializable {
+    @Transient
+    public static final String ALL_GROUP = "ALL"; // everyone belongs
+    @Transient
+    public static final String NONE_GROUP = "NONE"; // noone belongs
     @Id @SequenceGenerator(name="domain_group_seq", allocationSize = 1)
     @GeneratedValue(generator = "domain_group_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
     protected String groupname;
+    @ManyToOne @JoinColumn(name = "domain_fk")
+    protected DomainEntity domain;
+    @OneToMany(mappedBy = "domaingroup")
+    protected List<DomainGroupMemberEntity> allDomaingroupmembers;
     
     @PostLoad @PostPersist @PostUpdate 
     @Override

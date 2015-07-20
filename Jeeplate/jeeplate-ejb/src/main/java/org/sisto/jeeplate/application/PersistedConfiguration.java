@@ -37,8 +37,7 @@ public class PersistedConfiguration implements Serializable {
     private Boolean applicationConfigured;
     
     public PersistedConfiguration() {
-        this.id = APPLICATION_CONFIGURATION;
-        this.applicationConfigured = Boolean.FALSE;
+        this(Boolean.FALSE);
     }
     
     public PersistedConfiguration(Boolean configured) {
