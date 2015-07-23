@@ -59,6 +59,15 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
         </dependency>
+        <!-- Rest -->
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson2-provider</artifactId>
+        </dependency>
         <!-- Other -->
         <dependency>
             <groupId>junit</groupId>

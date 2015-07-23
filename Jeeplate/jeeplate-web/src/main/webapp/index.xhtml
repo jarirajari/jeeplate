@@ -10,7 +10,11 @@
         <ui:composition template="WEB-INF/template/template_jee.xhtml">
             <!-- Override template content -->
             <ui:define name="content">
+                
                 <div>
+                    <p>
+                        Initialization moves to '/rest/restricted/initialize/sistoUser?queryParameter=sistoMsg'
+                    </p>
                     <h:form>
                         <h:inputText id="name" value="#{name}"  />
                         <h:commandButton value="Submit" />
