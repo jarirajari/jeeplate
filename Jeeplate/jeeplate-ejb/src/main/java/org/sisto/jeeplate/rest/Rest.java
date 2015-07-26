@@ -25,7 +25,9 @@ import javax.ws.rs.core.Application;
 
 @ApplicationPath("/rest") 
 public class Rest extends Application {
-    
+    /*
+     * This setup allows usage of multiple root contexts!
+     */
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> s = new HashSet<>();

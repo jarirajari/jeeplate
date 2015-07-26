@@ -32,8 +32,10 @@ public abstract class ObjectEntity {
     
     public abstract Object identity();
     
-    public abstract boolean isDefault();
-    
     public abstract void reset();
+    
+    public abstract Boolean isDefault();
+    
+    
     
 }

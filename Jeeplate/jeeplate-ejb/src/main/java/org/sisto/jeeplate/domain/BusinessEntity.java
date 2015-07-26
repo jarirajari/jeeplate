@@ -50,7 +50,7 @@ public abstract class BusinessEntity extends ObjectEntity {
     }
     
     @Override
-    public boolean isDefault() {
+    public Boolean isDefault() {
         return (this.getId().equals(DEFAULT_ID));
     }
     

@@ -53,6 +53,7 @@ public class DomainGroupEntity extends BusinessEntity implements Serializable {
     protected String groupname;
     @ManyToOne @JoinColumn(name = "domain_fk")
     protected DomainEntity domain;
+    // Domain groups will be mapped independently with separated association
     @OneToMany(mappedBy = "domaingroup")
     protected List<DomainGroupMemberEntity> allDomaingroupmembers;
     

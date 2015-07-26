@@ -33,12 +33,10 @@ import javax.persistence.Table;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import static org.sisto.jeeplate.domain.ObjectEntity.DEFAULT_ID;
 
-@Entity
-@Access(AccessType.FIELD)
+@Entity @Access(AccessType.FIELD)
 @Table(name = "system_user_group_membership")
 public class UserGroupMembershipEntity extends BusinessEntity implements Serializable {
-    @Id
-    @SequenceGenerator(name = "user_group_membership_seq", allocationSize = 1)
+    @Id @SequenceGenerator(name = "user_group_membership_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_group_membership_seq", strategy = GenerationType.SEQUENCE)
     private Long id;
     

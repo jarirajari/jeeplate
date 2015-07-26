@@ -53,6 +53,7 @@ public class UserData implements Serializable {
     private transient BusinessEntityStore<UserEntity> store;
     
     private UserEntity entity; // this is basically sort of proxy object!
+    private UserEntity dataModel; // pseudo alias for "this.entity"
     
     private transient final UserEntity hashed = UserEntity.newUserEntityBuilder()
             .withUsername("hashis")
@@ -67,19 +68,33 @@ public class UserData implements Serializable {
             .withPassword("pw")
             .build();
     
+    // public because of  bean specification
     public UserData() {
         this.entity = UserEntity.newUserEntityBuilder().build();
     }
     
-    public UserData(UserEntity ue) {
+    // private but needed because lambdas did not work
+    private UserData(UserEntity ue) {
         this.entity = ue;
     }
     
-    public void setEntity(UserEntity ude) {
+    /*
+     * these could be replaced with a data model:
+     * e.g. client side could have a function of form
+     * anyview.amethod.cdibeanData.(MODEL.Username) that
+     * would return entity.username. But for now let's 
+     * expose the entity itself...
+     */
+    public UserEntity getDataModel() {
+        
+        return (this.entity);
+    }
+    
+    protected void setEntity(UserEntity ude) {
         this.entity = ude;
     }
     
-    public UserEntity getEntity() {
+    protected UserEntity getEntity() {
         return (this.entity);
     }
     
@@ -89,14 +104,30 @@ public class UserData implements Serializable {
         return new HashMap<>();
     }
     
+    /*
+     *
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    
+    Actually, KISS! Let's give up for now from the strict enterpise layers:
+    
+    CDI SPEC: "A producer method acts as a source of objects to be injected, 
+    where the objects to be injected are not required to be instances of beans"
+    
+    So we are creating UserData objects with JPA entity dependency
+    
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    *
+    */
+    
     @Transactional
     public Map<Long, UserData> findAllUsers() {
         final String query = "SELECT ue FROM UserEntity ue";
         final Map<String, Object> params = new HashMap<>();
-        final List<UserEntity> result = this.store.executeQuery(UserEntity.class, query, params);
+        final List<UserEntity> results = this.store.executeQuery(UserEntity.class, query, params);
         
-        return (result.stream()
-                .collect(Collectors.toMap(UserEntity::getId, UserData::new)));
+        return (results.stream().collect(Collectors.toMap(UserEntity::getId, UserData::new)));
     }
     
     @Transactional
@@ -105,10 +136,9 @@ public class UserData implements Serializable {
         final Map<String, Object> params = new HashMap<String, Object>() {{
             put("userId", withId);
         }};
-        final List<UserEntity> result = this.store.executeQuery(UserEntity.class, query, params);
+        final List<UserEntity> results = this.store.executeQuery(UserEntity.class, query, params);
         
-        return (result.stream()
-                .collect(Collectors.toMap(UserEntity::getId, UserData::new)));
+        return (results.stream().collect(Collectors.toMap(UserEntity::getId, UserData::new)));
     }
     
     @Transactional
@@ -119,7 +149,7 @@ public class UserData implements Serializable {
             UserEntity id = result.get(0);
             this.entity = id;
        } else {
-            this.entity = UserEntity.newUserEntityBuilder().build(); // dont construct new UserData
+            this.entity = UserEntity.newUserEntityBuilder().build(); // OK to construct JPA entity
             log.error("Finding one user by email address failed!");
         }
         
@@ -246,14 +276,16 @@ public class UserData implements Serializable {
         this.store.create(this.hashed3);
         return Boolean.TRUE;
     }
-    /*
-     * Methods find() and bind(id) must be public
-     */
+    
+    // Must be public and return identity (Long): AS ID GETTER
     @Transactional
-    public UserData find() {
-        return (this);
+    public Long find() {
+        final Long id = this.getEntity().getId();
+        
+        return id;
     }
     
+    // Must be public and return domain object (UserData): AS ID SETTER
     @Transactional
     public UserData bind(Long id) {
         UserEntity tmp = UserEntity.newUserEntityBuilder().renovate(id);
@@ -262,9 +294,8 @@ public class UserData implements Serializable {
         
         return (this);
     }
-    /*
-     * Methods create(), read(), update(), and delete() must be package private!
-     */
+    
+    // Methods create(), read(), update(), and delete() must be package private!
     @Transactional
     Boolean create() {
         log.info("UserData.create()");

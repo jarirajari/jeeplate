@@ -30,6 +30,7 @@ import javax.transaction.Transactional;
 import org.jboss.logging.Logger;
 import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
+import org.sisto.jeeplate.domain.user.UserEntity;
 
 @SessionScoped
 public class UserGroupData implements Serializable {
@@ -60,11 +61,16 @@ public class UserGroupData implements Serializable {
         this.entity = uge;
     }
     
-    public void setEntity(UserGroupEntity uge) {
+    public UserGroupEntity getDataModel() {
+        
+        return (this.entity);
+    }
+    
+    private void setEntity(UserGroupEntity uge) {
         this.entity = uge;
     }
     
-    public UserGroupEntity getEntity() {
+    private UserGroupEntity getEntity() {
         return (this.entity);
     }
     
@@ -103,8 +109,8 @@ public class UserGroupData implements Serializable {
     }
     
     @Transactional
-    public UserGroupData find() {
-        return (this);
+    public Long find() {
+        return (this.getEntity().getId());
     }
     
     @Transactional

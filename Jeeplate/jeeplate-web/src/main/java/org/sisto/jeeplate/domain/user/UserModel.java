@@ -21,20 +21,17 @@ package org.sisto.jeeplate.domain.user;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.sisto.jeeplate.logging.StringLogger;
 
-@Named
-@RequestScoped
+@Named @RequestScoped
 public class UserModel { // model view control are backing beans => BACKING MVC?
     
     @Inject
     transient private StringLogger log;
     
     @Inject
-    @New
     private UserData backing;  
     private Map<Long, UserData> all;
     

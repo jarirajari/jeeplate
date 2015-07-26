@@ -35,13 +35,11 @@ import org.sisto.jeeplate.association.direction.Unidirectional;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import static org.sisto.jeeplate.domain.ObjectEntity.DEFAULT_ID;
 
-@Entity
-@Access(AccessType.FIELD)
+@Entity @Access(AccessType.FIELD)
 @Table(name = "group_domain_membership")
 public class DomainGroupMembershipEntity extends BusinessEntity 
  implements Serializable, Unidirectional, OneToMany {
-    @Id
-    @SequenceGenerator(name = "group_domain_membership_sqe", allocationSize = 1)
+    @Id @SequenceGenerator(name = "group_domain_membership_sqe", allocationSize = 1)
     @GeneratedValue(generator = "group_domain_membership_sqe", strategy = GenerationType.SEQUENCE)
     private Long id;
     /*

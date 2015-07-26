@@ -28,19 +28,26 @@ import org.sisto.jeeplate.domain.user.UserData;
 @Named("userToNameConverter")
 public class UserDataConverter implements Converter {
 
+    /*
+     * UserData bean should not even know about it's identity
+     */
     @Inject
-    private UserData bean;
-    
+    private UserData bean; // two-level lazy loading: 1st bean, 2nd database
+
     @Override
-    public Object getAsObject(FacesContext fc, UIComponent uic, String string) {
-        return null;
+    public Object getAsObject(FacesContext fc, UIComponent uic, String uiValue) {
+        final Long id = Long.valueOf(uiValue);
+        final UserData ud = bean.bind(id);
+                
+        return ud; // null is basically UserData with id=0L
     }
 
     @Override
-    public String getAsString(FacesContext fc, UIComponent uic, Object o) {
-        UserData ud = (UserData) o;
+    public String getAsString(FacesContext fc, UIComponent uic, Object uiValue) {
+        final UserData ud = (UserData) uiValue;
+        final Long id = ud.find();
         
-        return (ud.getEntity().getUsername());
+        return (id.toString()); // null is basically UserData with id=0L
     }
 
 }

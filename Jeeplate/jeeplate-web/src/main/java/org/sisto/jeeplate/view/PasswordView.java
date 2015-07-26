@@ -147,7 +147,7 @@ public class PasswordView extends AbstractView implements Serializable {
         String em = this.getUsername();
         
         this.user = user.findOneUser(em);
-        log.info("Lost password recovery for user '%s' (%s)", em, String.valueOf(this.user.getEntity().getId()));
+        log.info("Lost password recovery for user '%s' ", em);
     }
     
     private boolean passwordResetCanBeCompleted(String hiddenActionSecretGenerated) {
