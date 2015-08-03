@@ -18,6 +18,7 @@
  */
 package org.sisto.jeeplate.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,13 +42,13 @@ import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.PGEM;
 
 @Stateless @TransactionAttribute(TransactionAttributeType.SUPPORTS)
-public class BusinessEntityStore<T extends BusinessEntity> {
+public class BusinessEntityStore<T extends BusinessEntity> implements Serializable {
     
     @Inject
-    private transient StringLogger log;
+    StringLogger log;
     
     @Inject @PGEM
-    private EntityManager em;
+    EntityManager em;
     
     private EntityManager em() {
         

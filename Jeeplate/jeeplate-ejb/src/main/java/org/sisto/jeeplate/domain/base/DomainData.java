@@ -21,10 +21,12 @@ package org.sisto.jeeplate.domain.base;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
+import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
 import org.sisto.jeeplate.logging.StringLogger;
 
 public class DomainData {
@@ -48,6 +50,9 @@ public class DomainData {
     @Inject @New
     private transient BusinessEntityStore<DomainEntity> store;
     
+    @Inject @Dependent
+    private DomainGroupMembershipData groups;
+    
     private DomainEntity entity;
     
     public DomainData() {
@@ -64,6 +69,15 @@ public class DomainData {
     
     public DomainEntity getEntity() {
         return (this.entity);
+    }
+    
+    
+    // groups.addNewMember(this.getEntity().getId());
+    @Transactional
+    public void addNewDomain() {
+        assert this.entity != null;
+        // new domain with "all" group
+        
     }
     
     @Transactional

@@ -22,11 +22,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
+import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.user.group.UserGroupData;
 import org.sisto.jeeplate.domain.BusinessEntityStore;
 import org.sisto.jeeplate.logging.StringLogger;
@@ -35,10 +35,10 @@ import org.sisto.jeeplate.util.Email;
 import org.sisto.jeeplate.util.EmailMessage;
 
 @SessionScoped
-public class UserData implements Serializable {
+public class UserData extends BusinessBean<UserData, UserEntity> implements Serializable {
     
     @Inject
-    private transient StringLogger log;
+    private transient StringLogger slog;
     
     @Inject @ApplicationProperty(name = "test.message", defaultValue = "jee@pla.te")
     private String systemEmailAddress;
@@ -50,10 +50,10 @@ public class UserData implements Serializable {
     private Email emailSender;
     
     @Inject
-    private transient BusinessEntityStore<UserEntity> store;
+    private BusinessEntityStore<UserEntity> str;
     
-    private UserEntity entity; // this is basically sort of proxy object!
-    private UserEntity dataModel; // pseudo alias for "this.entity"
+    //private UserEntity entity; // this is basically sort of proxy object!
+    //private UserEntity dataModel; // pseudo alias for "this.entity"
     
     private transient final UserEntity hashed = UserEntity.newUserEntityBuilder()
             .withUsername("hashis")
@@ -68,16 +68,23 @@ public class UserData implements Serializable {
             .withPassword("pw")
             .build();
     
+    
+    public UserData() {
+        super(UserData.class, UserEntity.class);
+    }
+    /*
     // public because of  bean specification
     public UserData() {
+        super();
         this.entity = UserEntity.newUserEntityBuilder().build();
     }
     
     // private but needed because lambdas did not work
     private UserData(UserEntity ue) {
+        super();
         this.entity = ue;
     }
-    
+    */
     /*
      * these could be replaced with a data model:
      * e.g. client side could have a function of form
@@ -85,6 +92,7 @@ public class UserData implements Serializable {
      * would return entity.username. But for now let's 
      * expose the entity itself...
      */
+    /*
     public UserEntity getDataModel() {
         
         return (this.entity);
@@ -97,12 +105,7 @@ public class UserData implements Serializable {
     protected UserEntity getEntity() {
         return (this.entity);
     }
-    
-    @Transactional
-    public Map<Long, UserGroupData> findGroupsUserBelongsTo() {
-        
-        return new HashMap<>();
-    }
+    */
     
     /*
      *
@@ -121,11 +124,13 @@ public class UserData implements Serializable {
     *
     */
     
+    
+    /*
     @Transactional
     public Map<Long, UserData> findAllUsers() {
         final String query = "SELECT ue FROM UserEntity ue";
         final Map<String, Object> params = new HashMap<>();
-        final List<UserEntity> results = this.store.executeQuery(UserEntity.class, query, params);
+        final List<UserEntity> results = this.str.executeQuery(UserEntity.class, query, params);
         
         return (results.stream().collect(Collectors.toMap(UserEntity::getId, UserData::new)));
     }
@@ -136,11 +141,11 @@ public class UserData implements Serializable {
         final Map<String, Object> params = new HashMap<String, Object>() {{
             put("userId", withId);
         }};
-        final List<UserEntity> results = this.store.executeQuery(UserEntity.class, query, params);
+        final List<UserEntity> results = this.str.executeQuery(UserEntity.class, query, params);
         
         return (results.stream().collect(Collectors.toMap(UserEntity::getId, UserData::new)));
     }
-    
+    */
     @Transactional
     public UserData findOneUser(final String emailAddress) {
         final List<UserEntity> result = this.findUserByEmail(emailAddress);
@@ -150,7 +155,7 @@ public class UserData implements Serializable {
             this.entity = id;
        } else {
             this.entity = UserEntity.newUserEntityBuilder().build(); // OK to construct JPA entity
-            log.error("Finding one user by email address failed!");
+            slog.error("Finding one user by email address failed!");
         }
         
         return (this);
@@ -174,10 +179,10 @@ public class UserData implements Serializable {
         
         if (userNotExist) {
             message = messageForNewUser;
-            log.debug("User registration requested for a user that has no account!");
+            slog.debug("User registration requested for a user that has no account!");
         } else {
             message = messageForOldUser;
-            log.info("User registration requested for an existing user (id=%s).", String.valueOf(this.getEntity().getId()));
+            slog.info("User registration requested for an existing user (id=%s).", String.valueOf(this.getEntity().getId()));
         }
         sendEmailToUser(message, replace, registrationToken);
     }
@@ -198,11 +203,11 @@ public class UserData implements Serializable {
         if (userExists) {
             message = messageForOldUser;
             resetToken = uc.getPasswordResetToken();
-            log.debug("Password reset requested for an existing user.");
+            slog.debug("Password reset requested for an existing user.");
         } else {
             message = messageForNewUser;
             resetToken = "";
-            log.error("Password reset requested for a user that has no account!");
+            slog.error("Password reset requested for a user that has no account!");
         }
         sendEmailToUser(message, replace, resetToken);
         
@@ -227,10 +232,10 @@ public class UserData implements Serializable {
             if (changed) {
                 this.update();
             } else {
-                log.info("Did not change password for user '%s'...", this.getEntity().getUsername());
+                slog.info("Did not change password for user '%s'...", this.getEntity().getUsername());
             }
         } else {
-            log.error("Changing password for user '%s' failed: %s %s", this.getEntity().getUsername(),
+            slog.error("Changing password for user '%s' failed: %s %s", this.getEntity().getUsername(),
                       resetRequestValid.toString(), securityQuestionMobileNumberMatches.toString());
         }
         
@@ -255,7 +260,7 @@ public class UserData implements Serializable {
         final Map<String, Object> params = new HashMap<String, Object>() {{
             put("username", emailAddress);
         }};
-        final List<UserEntity> result = this.store.executeCustomQuery(UserEntity.class, query, params);
+        final List<UserEntity> result = this.str.executeCustomQuery(UserEntity.class, query, params);
         
         return result;
     }
@@ -271,9 +276,9 @@ public class UserData implements Serializable {
     
     @Transactional
     public Boolean testHashing() {
-        this.store.create(this.hashed);
-        this.store.create(this.hashed2);
-        this.store.create(this.hashed3);
+        this.str.create(this.hashed);
+        this.str.create(this.hashed2);
+        this.str.create(this.hashed3);
         return Boolean.TRUE;
     }
     
@@ -290,7 +295,7 @@ public class UserData implements Serializable {
     public UserData bind(Long id) {
         UserEntity tmp = UserEntity.newUserEntityBuilder().renovate(id);
         
-        this.entity = this.store.bind(tmp);
+        this.entity = this.str.bind(tmp);
         
         return (this);
     }
@@ -298,32 +303,32 @@ public class UserData implements Serializable {
     // Methods create(), read(), update(), and delete() must be package private!
     @Transactional
     Boolean create() {
-        log.info("UserData.create()");
-        this.entity = this.store.create(entity);
+        slog.info("UserData.create()");
+        this.entity = this.str.create(entity);
         
         return Boolean.TRUE;
     }
     
     @Transactional
     Boolean read() {
-        log.info("UserData.read() discards changes");
-        this.entity = this.store.read(entity);
+        slog.info("UserData.read() discards changes");
+        this.entity = this.str.read(entity);
         
         return Boolean.TRUE;
     }
     
     @Transactional
     Boolean update() {
-        log.info("UserData.update() overwrites");
-        this.entity = this.store.update(entity);
-        log.info("Updated"+this.entity.hashCode()+", "+this.entity.toString());
+        slog.info("UserData.update() overwrites");
+        this.entity = this.str.update(entity);
+        slog.info("Updated"+this.entity.hashCode()+", "+this.entity.toString());
         return Boolean.TRUE;
     }
     
     @Transactional
     Boolean delete() {
-        log.info("UserData.delete()");
-        this.entity = this.store.delete(entity);
+        slog.info("UserData.delete()");
+        this.entity = this.str.delete(entity);
         
         return Boolean.TRUE;
     }

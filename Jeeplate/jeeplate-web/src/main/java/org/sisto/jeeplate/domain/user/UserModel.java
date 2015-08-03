@@ -38,11 +38,13 @@ public class UserModel { // model view control are backing beans => BACKING MVC?
     
     @PostConstruct
     private void init() {
-        this.all = this.backing.findAllUsers();
+        //this.all = this.backing.findAllUsers();
+        this.all = this.backing.findAllUsersTestAbstract();
     }
     
     public Map<Long, UserData> allUsers() {
-        return (this.backing.findAllUsers());
+        //return (this.backing.findAllUsers());
+        return (this.backing.findAllUsersTestAbstract());
     }
 
 }
