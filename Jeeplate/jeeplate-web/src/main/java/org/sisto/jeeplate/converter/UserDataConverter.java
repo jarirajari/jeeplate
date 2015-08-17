@@ -37,9 +37,13 @@ public class UserDataConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String uiValue) {
         final Long id = Long.valueOf(uiValue);
-        final UserData ud = bean.bind(id);
+        final Long boundId = bean.bind(id);
+        
+        if (boundId != id) {
+            
+        }
                 
-        return ud; // null is basically UserData with id=0L
+        return (this.bean); // null is basically UserData with id=0L
     }
 
     @Override

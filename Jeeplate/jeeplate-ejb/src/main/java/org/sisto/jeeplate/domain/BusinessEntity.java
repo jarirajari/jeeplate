@@ -18,6 +18,7 @@
  */
 package org.sisto.jeeplate.domain;
 
+import java.util.Objects;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.MappedSuperclass;
@@ -43,6 +44,14 @@ public abstract class BusinessEntity extends ObjectEntity {
     public void setId(Long id) {
         this.transientSuperId = id;
     }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
     
     @Override
     public Long identity() {
@@ -57,5 +66,46 @@ public abstract class BusinessEntity extends ObjectEntity {
     @Override
     public void reset() {
         this.transientSuperId = DEFAULT_ID;
+    }
+
+    /*
+     * http://www.onjava.com/pub/a/onjava/2006/09/13/dont-let-hibernate-steal-your-identity.html?page=2:
+     * "Don't let Hibernate manage your ids. All of the problems discussed so far 
+     * derive from trying to create and maintain separate definitions of 
+     * identity for objects and database rows. These problems all go away if we 
+     * unify all forms of identity. That is, instead of having a database-centric 
+     * ID, or an object-centric ID" => see subclass impl of "updateParentId"
+     */
+    
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        
+        hash = 71 * hash + Objects.hashCode(this.transientSuperId);
+        hash = 71 * hash + Objects.hashCode(this.version);
+        
+        return hash;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        boolean equal = false;
+        final boolean objectIsNotNull = (obj != null);
+        
+        if (objectIsNotNull) {
+            final boolean isBusinessEntity = (obj instanceof BusinessEntity);
+
+            if (isBusinessEntity) {
+                final BusinessEntity other = (BusinessEntity) obj;
+                final boolean idsEqual = this.getId().equals(other.getId());
+                final boolean versionsEqual = this.getVersion().equals(other.getVersion());
+
+                if (idsEqual && versionsEqual) {
+                    equal = true;
+                }
+            }
+        }
+        
+        return equal;
     }
 }

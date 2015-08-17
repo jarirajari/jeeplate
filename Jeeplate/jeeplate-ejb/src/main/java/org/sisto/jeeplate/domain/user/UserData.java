@@ -19,17 +19,15 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
-import org.sisto.jeeplate.domain.user.group.UserGroupData;
-import org.sisto.jeeplate.domain.BusinessEntityStore;
-import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.domain.BusinessObject;
+import org.sisto.jeeplate.domain.ObjectEntity;
 import org.sisto.jeeplate.util.ApplicationProperty;
 import org.sisto.jeeplate.util.Email;
 import org.sisto.jeeplate.util.EmailMessage;
@@ -37,23 +35,14 @@ import org.sisto.jeeplate.util.EmailMessage;
 @SessionScoped
 public class UserData extends BusinessBean<UserData, UserEntity> implements Serializable {
     
-    @Inject
-    private transient StringLogger slog;
-    
     @Inject @ApplicationProperty(name = "test.message", defaultValue = "jee@pla.te")
-    private String systemEmailAddress;
+    String systemEmailAddress;
     
-    @Inject
-    private User user;
+    @Inject @Dependent
+    User user;
     
-    @Inject
-    private Email emailSender;
-    
-    @Inject
-    private BusinessEntityStore<UserEntity> str;
-    
-    //private UserEntity entity; // this is basically sort of proxy object!
-    //private UserEntity dataModel; // pseudo alias for "this.entity"
+    @Inject @Any
+    Email emailSender;
     
     private transient final UserEntity hashed = UserEntity.newUserEntityBuilder()
             .withUsername("hashis")
@@ -68,44 +57,15 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
             .withPassword("pw")
             .build();
     
+    @Transactional
+    public Boolean testHashing() {
+        this.createTestData(hashed, hashed2, hashed3);
+        return Boolean.TRUE;
+    }
     
     public UserData() {
         super(UserData.class, UserEntity.class);
     }
-    /*
-    // public because of  bean specification
-    public UserData() {
-        super();
-        this.entity = UserEntity.newUserEntityBuilder().build();
-    }
-    
-    // private but needed because lambdas did not work
-    private UserData(UserEntity ue) {
-        super();
-        this.entity = ue;
-    }
-    */
-    /*
-     * these could be replaced with a data model:
-     * e.g. client side could have a function of form
-     * anyview.amethod.cdibeanData.(MODEL.Username) that
-     * would return entity.username. But for now let's 
-     * expose the entity itself...
-     */
-    /*
-    public UserEntity getDataModel() {
-        
-        return (this.entity);
-    }
-    
-    protected void setEntity(UserEntity ude) {
-        this.entity = ude;
-    }
-    
-    protected UserEntity getEntity() {
-        return (this.entity);
-    }
-    */
     
     /*
      *
@@ -123,42 +83,10 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     *
     */
-    
-    
-    /*
-    @Transactional
-    public Map<Long, UserData> findAllUsers() {
-        final String query = "SELECT ue FROM UserEntity ue";
-        final Map<String, Object> params = new HashMap<>();
-        final List<UserEntity> results = this.str.executeQuery(UserEntity.class, query, params);
-        
-        return (results.stream().collect(Collectors.toMap(UserEntity::getId, UserData::new)));
-    }
-    
-    @Transactional
-    public Map<Long, UserData> findOneUser(final Long withId) {
-        final String query = "SELECT ue FROM UserEntity ue WHERE ue.id = :userId";
-        final Map<String, Object> params = new HashMap<String, Object>() {{
-            put("userId", withId);
-        }};
-        final List<UserEntity> results = this.str.executeQuery(UserEntity.class, query, params);
-        
-        return (results.stream().collect(Collectors.toMap(UserEntity::getId, UserData::new)));
-    }
-    */
+
     @Transactional
     public UserData findOneUser(final String emailAddress) {
-        final List<UserEntity> result = this.findUserByEmail(emailAddress);
-        
-        if ((result != null) && (result.isEmpty() == false) && (result.size() == 1)) {
-            UserEntity id = result.get(0);
-            this.entity = id;
-       } else {
-            this.entity = UserEntity.newUserEntityBuilder().build(); // OK to construct JPA entity
-            slog.error("Finding one user by email address failed!");
-        }
-        
-        return (this);
+        return (findOneAlternative(emailAddress));
     }
     
     private void sendEmailToUser(EmailMessage em, String secretKey, String secretVal) {
@@ -174,15 +102,15 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     public void nofityUserForRegistration(EmailMessage messageForOldUser, EmailMessage messageForNewUser, String registrationToken) {
         assert this.entity != null;
         final String replace = "${domain}";
-        boolean userNotExist = this.getEntity().isDefault();
+        boolean userNotExist = this.getDataModel().isDefault();
         EmailMessage message;
         
         if (userNotExist) {
             message = messageForNewUser;
-            slog.debug("User registration requested for a user that has no account!");
+            log.debug("User registration requested for a user that has no account!");
         } else {
             message = messageForOldUser;
-            slog.info("User registration requested for an existing user (id=%s).", String.valueOf(this.getEntity().getId()));
+            log.info("User registration requested for an existing user (id=%s).", String.valueOf(this.getDataModel().getId()));
         }
         sendEmailToUser(message, replace, registrationToken);
     }
@@ -191,10 +119,10 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     public String initializePasswordReset(EmailMessage messageForOldUser, EmailMessage messageForNewUser) {
         assert this.entity != null;
         final String replace = "${secret}";
-        boolean userExists =! this.getEntity().isDefault();
+        boolean userExists =! this.getDataModel().isDefault();
         String resetToken;
         EmailMessage message;
-        UserCredential uc  = this.getEntity().getCredential();
+        UserCredential uc  = this.getDataModel().getCredential();
         
         if (userExists) {
             uc.activateResetProtocol();
@@ -203,11 +131,11 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         if (userExists) {
             message = messageForOldUser;
             resetToken = uc.getPasswordResetToken();
-            slog.debug("Password reset requested for an existing user.");
+            log.debug("Password reset requested for an existing user.");
         } else {
             message = messageForNewUser;
             resetToken = "";
-            slog.error("Password reset requested for a user that has no account!");
+            log.error("Password reset requested for a user that has no account!");
         }
         sendEmailToUser(message, replace, resetToken);
         
@@ -217,10 +145,10 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     @Transactional
     public Boolean finalizePasswordReset(String typedMobile, String typedPassword, String emailedResetToken) {
         assert this.entity != null;
-        UserCredential uc = this.getEntity().getCredential();
+        UserCredential uc = this.getDataModel().getCredential();
         Boolean changed = Boolean.FALSE;
         Boolean resetRequestValid = uc.resetIsValid();
-        Boolean securityQuestionMobileNumberMatches = this.getEntity().mobileNumberIsSame(typedMobile);
+        Boolean securityQuestionMobileNumberMatches = this.getDataModel().mobileNumberIsSame(typedMobile);
         
         if (resetRequestValid && securityQuestionMobileNumberMatches) {
             final boolean resetTokenValid = uc.getPasswordResetToken().equals(emailedResetToken);
@@ -232,10 +160,10 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
             if (changed) {
                 this.update();
             } else {
-                slog.info("Did not change password for user '%s'...", this.getEntity().getUsername());
+                log.info("Did not change password for user '%s'...", this.getDataModel().getUsername());
             }
         } else {
-            slog.error("Changing password for user '%s' failed: %s %s", this.getEntity().getUsername(),
+            log.error("Changing password for user '%s' failed: %s %s", this.getDataModel().getUsername(),
                       resetRequestValid.toString(), securityQuestionMobileNumberMatches.toString());
         }
         
@@ -244,25 +172,15 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     
     @Transactional
     public Boolean noUserWithEmail(final String emailAddress) {
-        final List<UserEntity> result = this.findUserByEmail(emailAddress);
-        Boolean noUser = Boolean.TRUE;
+        final UserData ud = this.findOneAlternative(emailAddress);
+        Boolean noUser = Boolean.FALSE;
         
-        if (! result.isEmpty() && result.size() == 1) {
-            noUser = Boolean.FALSE;
+        if (ud == null || ud.getDataModel() == null || 
+            ud.getDataModel().getId().equals(ObjectEntity.DEFAULT_ID)) {
+            noUser = Boolean.TRUE;
         }
         
         return noUser;
-    }
-    
-    @Transactional
-    public List<UserEntity> findUserByEmail(final String emailAddress) {
-        final String query = "SELECT ue FROM UserEntity ue WHERE ue.username = :username";
-        final Map<String, Object> params = new HashMap<String, Object>() {{
-            put("username", emailAddress);
-        }};
-        final List<UserEntity> result = this.str.executeCustomQuery(UserEntity.class, query, params);
-        
-        return result;
     }
     
     public Boolean changeName(String name) {
@@ -273,64 +191,4 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
             return Boolean.FALSE;
         }
     }
-    
-    @Transactional
-    public Boolean testHashing() {
-        this.str.create(this.hashed);
-        this.str.create(this.hashed2);
-        this.str.create(this.hashed3);
-        return Boolean.TRUE;
-    }
-    
-    // Must be public and return identity (Long): AS ID GETTER
-    @Transactional
-    public Long find() {
-        final Long id = this.getEntity().getId();
-        
-        return id;
-    }
-    
-    // Must be public and return domain object (UserData): AS ID SETTER
-    @Transactional
-    public UserData bind(Long id) {
-        UserEntity tmp = UserEntity.newUserEntityBuilder().renovate(id);
-        
-        this.entity = this.str.bind(tmp);
-        
-        return (this);
-    }
-    
-    // Methods create(), read(), update(), and delete() must be package private!
-    @Transactional
-    Boolean create() {
-        slog.info("UserData.create()");
-        this.entity = this.str.create(entity);
-        
-        return Boolean.TRUE;
-    }
-    
-    @Transactional
-    Boolean read() {
-        slog.info("UserData.read() discards changes");
-        this.entity = this.str.read(entity);
-        
-        return Boolean.TRUE;
-    }
-    
-    @Transactional
-    Boolean update() {
-        slog.info("UserData.update() overwrites");
-        this.entity = this.str.update(entity);
-        slog.info("Updated"+this.entity.hashCode()+", "+this.entity.toString());
-        return Boolean.TRUE;
-    }
-    
-    @Transactional
-    Boolean delete() {
-        slog.info("UserData.delete()");
-        this.entity = this.str.delete(entity);
-        
-        return Boolean.TRUE;
-    }
-    void whatever() {}
 }
