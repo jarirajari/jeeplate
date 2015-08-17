@@ -16,12 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.group.membership;
+package org.sisto.jeeplate.domain.group;
 
-/**
- *
- * @author Jari
- */
-public class DomainGroup {
+import java.io.Serializable;
+import javax.enterprise.context.Dependent;
+
+@Dependent
+public class DomainGroup implements Serializable {
     
 }

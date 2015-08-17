@@ -21,42 +21,23 @@ package org.sisto.jeeplate.domain.group.membership;
 import java.io.Serializable;
 import java.util.Map;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import org.sisto.jeeplate.domain.BusinessEntityStore;
+import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
-import org.sisto.jeeplate.logging.StringLogger;
-
 
 @SessionScoped
-public class DomainGroupMembershipData implements Serializable {
+public class DomainGroupMembershipData extends BusinessBean<DomainGroupMembershipData, DomainGroupMembershipEntity> implements Serializable {
     
-    @Inject
-    private transient StringLogger log;
+    @Inject @Default
+    DomainGroupMembership membership;
     
-    @Inject
-    private transient BusinessEntityStore<DomainGroupMembershipEntity> store;
-    
-    private transient DomainGroupMembershipEntity entity;
-    
-    @Inject
+    @Inject @Default
     DomainGroupData member;
     
-    
     public DomainGroupMembershipData() {
-        this.entity = DomainGroupMembershipEntity.defaultDomainGroupMembershipEntity();
-    }
-    
-    protected DomainGroupMembershipData(DomainGroupMembershipEntity dgme) {
-        this.entity = dgme;
-    }
-    
-    protected void setEntity(DomainGroupMembershipEntity dgme) {
-        this.entity = dgme;
-    }
-    
-    protected DomainGroupMembershipEntity getEntity() {
-        return (this.entity);
+        super(DomainGroupMembershipData.class, DomainGroupMembershipEntity.class);
     }
     
     @Transactional
@@ -67,16 +48,14 @@ public class DomainGroupMembershipData implements Serializable {
     }
     
     @Transactional
-    public Boolean addNewMember(Long domain) {
-        DomainGroupData group = member.createNewDomainGroupForDomain();
+    public void addNewMember(Long domain) {
+        DomainGroupData group = this.member.createNewDomainGroupForDomain();
         DomainGroupMembershipEntity mship = DomainGroupMembershipEntity
                 .newDomainGroupMembershipEntity()
                 .domain(domain)
-                .member(group.getEntity().getId())
+                .member(group.getDataModel().getId())
                 .build();
-        this.setEntity(this.store.create(mship));
-        
-        return Boolean.TRUE;
+        this.setEntity(mship);
+        this.create();   
     }
-    
 }

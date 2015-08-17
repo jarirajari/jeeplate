@@ -27,6 +27,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 public @interface TernaryKeyField {
 
-    String name() default "";
-
+    String keyname() default "";
+    String description() default "";
 }

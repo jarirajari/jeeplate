@@ -29,7 +29,7 @@ import org.sisto.jeeplate.logging.StringLogger;
 public class UserModel { // model view control are backing beans => BACKING MVC?
     
     @Inject
-    transient private StringLogger log;
+    private StringLogger log;
     
     @Inject
     private UserData backing;  
@@ -38,12 +38,10 @@ public class UserModel { // model view control are backing beans => BACKING MVC?
     
     @PostConstruct
     private void init() {
-        //this.all = this.backing.findAllUsers();
         this.all = this.backing.findAll();
     }
     
     public Map<Long, UserData> allUsers() {
-        //return (this.backing.findAllUsers());
         return (this.backing.findAll());
     }
 

@@ -19,7 +19,18 @@
 package org.sisto.jeeplate.domain.group.member;
 
 import java.io.Serializable;
+import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Default;
+import javax.inject.Inject;
+import org.sisto.jeeplate.domain.BusinessBean;
 
-public class DomainGroupMemberData implements Serializable {
+@SessionScoped
+public class DomainGroupMemberData extends BusinessBean<DomainGroupMemberData, DomainGroupMemberEntity> implements Serializable {
     
+    @Inject @Default
+    DomainGroupMember member;
+    
+    public DomainGroupMemberData() {
+        super(DomainGroupMemberData.class, DomainGroupMemberEntity.class);
+    }
 }

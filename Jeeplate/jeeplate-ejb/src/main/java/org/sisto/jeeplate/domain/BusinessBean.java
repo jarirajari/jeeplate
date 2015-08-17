@@ -18,18 +18,22 @@
  */
 package org.sisto.jeeplate.domain;
 
-import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
+import org.sisto.jeeplate.domain.pk.TernaryKeyField;
+import org.sisto.jeeplate.domain.pk.TertiaryKeyField;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.ApplicationProperty;
 
@@ -74,8 +78,8 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     
     public void createTestData(E ... ents) {
         for (E e : ents) {
-            this.store.create(e)
-;        }
+            this.store.create(e);
+        }
     }
     
     private static String parseName(String name) {      
@@ -116,15 +120,38 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         return d;
     }
     
-    protected String alternativePrimaryKeyFieldName() {
+    // N-ary
+    protected String alternativeNaryKeyFieldName(int nary) {
         String name = "";
         final Field[] fields = entityBeanType.getDeclaredFields();
-    
+        Class<? extends Annotation> clazz;
+        
         for (final Field field : fields) {
-            final boolean annotationIsPresent = field.isAnnotationPresent(SecondaryKeyField.class);
+            if (nary <= 2) {
+                clazz = SecondaryKeyField.class;
+            } else if (nary == 3) {
+                clazz = TernaryKeyField.class;
+            } else if (nary == 4) {
+                clazz = TertiaryKeyField.class;
+            } else {
+                break;
+            }
+            final boolean annotationIsPresent = field.isAnnotationPresent(clazz);
+            final String defaultName = field.getName();
             
             if (annotationIsPresent) {
-                name = field.getName();
+                if (nary <= 2) {
+                    name = ((SecondaryKeyField) field.getAnnotation(clazz)).keyname();
+                } else if (nary == 3) {
+                    name = ((TernaryKeyField) field.getAnnotation(clazz)).keyname();
+                } else if (nary == 4) {
+                    name = ((TertiaryKeyField) field.getAnnotation(clazz)).keyname();
+                } else {
+                    name = "";
+                }
+                if (name.isEmpty()) {
+                    name = defaultName;
+                }
                 break;
             }
         }
@@ -144,11 +171,18 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     
     // Find ALL users with secondary (alternative) PK
     @Transactional
-    public Map<Long, D> findAllAlternative() {
-        final String entityAltPK = alternativePrimaryKeyFieldName();
-        final List<E> results = this.findUserByAltPK(entityAltPK);
+    private Map<Long, D> findAllAlternative(final int nary, final Object altKeyVal) {
+        final List<E> results = this.findEntityByAlternativeKey(nary, altKeyVal);
         
         return (collectAllResult(results));
+    }
+    
+    public Map<Long, D> findAllSecondary(final Object altKeyVal) {
+        return (findAllAlternative(2, altKeyVal));
+    }
+    
+    public Map<Long, D> findAllTertiary(final Object altKeyVal) {
+        return (findAllAlternative(3, altKeyVal));
     }
     
     // Find ONE with primary PK id, note return format
@@ -166,29 +200,41 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     
     // Find ONE user with secondary (alternative) PK, note return format
     @Transactional
-    public D findOneAlternative(final Object entityAltPK) {
-        List<E> results = this.findUserByAltPK(entityAltPK);
+    private D findOneAlternative(final int nary, final Object altKeyVal) {
+        List<E> results = this.findEntityByAlternativeKey(nary, altKeyVal);
         
         if ((results != null) && (results.isEmpty() == false) && (results.size() == 1)) {
             // pass;
-       } else {
+        } else {
             results = new ArrayList<>();
         }
         
         return (collectOneResult(results));
     }
     
+    public D findOneSecondary(final Object altKeyVal) {
+        return (findOneAlternative(2, altKeyVal));
+    }
+    
+    public D findOneTernary(final Object altKeyVal) {
+        return (findOneAlternative(3, altKeyVal));
+    }
+    
+    public D findOneTertiary(final Object altKeyVal) {
+        return (findOneAlternative(4, altKeyVal));
+    }
+    
     // Helper
     @Transactional
-    private List<E> findUserByAltPK(final Object altPKValue) {
-        final String entityAltPK = alternativePrimaryKeyFieldName();
-        final String query = String.format("SELECT e FROM %s e WHERE e.%s = :%s", entityString, entityAltPK, entityAltPK);
+    private List<E> findEntityByAlternativeKey(final int nary, final Object altKeyVal) {
+        final String entAltKey = alternativeNaryKeyFieldName(nary);
+        final String query = String.format("SELECT e FROM %s e WHERE e.%s = :%s", entityString, entAltKey, entAltKey);
         final Map<String, Object> params = new HashMap<String, Object>() {{
-            put(entityAltPK, altPKValue);
+            put(entAltKey, altKeyVal);
         }};
         final List<E> results;
         
-        if (entityAltPK.isEmpty()) {
+        if (entAltKey.isEmpty()) {
             results = new ArrayList<>();
         } else {
             results = this.store.executeQuery(entityBeanType, query, params);
@@ -198,7 +244,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     }
     
     @Transactional
-    void create() {
+    protected void create() {
         this.entity = this.store.create(entity);
     }
     
@@ -230,11 +276,15 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     public Long bind(Long id) {
         Long lid;
         E tmp;
+        Optional<E> bound;
         
         try {
             tmp = (E) entityBeanType.newInstance();
             tmp.setId(id); // renovate without pattern!
-            this.setEntity(this.store.bind(tmp));
+            bound = Optional.ofNullable(tmp);
+            if(bound.isPresent()) {
+                this.setEntity(this.store.bind(tmp));
+            }
             lid = id;
         } catch (InstantiationException | IllegalAccessException | NullPointerException ex) {
             lid = 0L;

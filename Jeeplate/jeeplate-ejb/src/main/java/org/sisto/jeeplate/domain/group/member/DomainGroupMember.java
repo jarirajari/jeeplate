@@ -18,6 +18,10 @@
  */
 package org.sisto.jeeplate.domain.group.member;
 
-public class DomainGroupMember {
+import java.io.Serializable;
+import javax.enterprise.context.Dependent;
+
+@Dependent
+public class DomainGroupMember implements Serializable {
     
 }

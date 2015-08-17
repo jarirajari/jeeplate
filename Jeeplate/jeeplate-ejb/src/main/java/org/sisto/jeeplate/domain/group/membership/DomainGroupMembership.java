@@ -18,7 +18,11 @@
  */
 package org.sisto.jeeplate.domain.group.membership;
 
-public class DomainGroupMembership {
+import java.io.Serializable;
+import javax.enterprise.context.Dependent;
+
+@Dependent
+public class DomainGroupMembership implements Serializable {
     // Domain is defined as the subset of power set where all elements are present
     // Basically this means that a domain is one specific group of groups. This 
     // is to say that if there are N possible groups there are 2^N subgroups and 

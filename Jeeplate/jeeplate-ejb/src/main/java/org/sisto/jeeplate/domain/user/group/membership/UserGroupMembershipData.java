@@ -20,48 +20,29 @@ package org.sisto.jeeplate.domain.user.group.membership;
 
 import java.io.Serializable;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import org.sisto.jeeplate.domain.BusinessEntityStore;
-import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.domain.BusinessBean;
 
 @SessionScoped
-public class UserGroupMembershipData implements Serializable {
+public class UserGroupMembershipData extends BusinessBean<UserGroupMembershipData, UserGroupMembershipEntity> implements Serializable {
     
-    @Inject
-    private transient StringLogger log;
-    
-    @Inject
-    private transient BusinessEntityStore<UserGroupMembershipEntity> store;
-    
-    private transient UserGroupMembershipEntity entity;
+    @Inject @Default
+    UserGroupMembership membership;
     
     public UserGroupMembershipData() {
-        this.entity = UserGroupMembershipEntity.defaultUserGroupMembershipEntity();
-    }
-    
-    protected UserGroupMembershipData(UserGroupMembershipEntity uge) {
-        this.entity = uge;
-    }
-    
-    public void setEntity(UserGroupMembershipEntity uge) {
-        this.entity = uge;
-    }
-    
-    public UserGroupMembershipEntity getEntity() {
-        return (this.entity);
+        super(UserGroupMembershipData.class, UserGroupMembershipEntity.class);
     }
     
     @Transactional
-    public Boolean addNewMember(Long user, Long toGroup) {
+    public void addNewMember(Long user, Long toGroup) {
         UserGroupMembershipEntity member = UserGroupMembershipEntity
                 .newUserGroupMembershipEntityBuilder()
                 .group(toGroup)
                 .member(user)
                 .build();
-        this.setEntity(this.store.create(member)); // entity is kind of proxied!
-        
-        return Boolean.TRUE;
+        this.setEntity(member);
+        this.create();
     }
-    
 }

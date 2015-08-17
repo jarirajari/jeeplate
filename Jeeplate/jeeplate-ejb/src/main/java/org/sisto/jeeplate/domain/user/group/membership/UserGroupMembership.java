@@ -19,7 +19,9 @@
 package org.sisto.jeeplate.domain.user.group.membership;
 
 import java.io.Serializable;
- 
+import javax.enterprise.context.Dependent;
+
+@Dependent
 public class UserGroupMembership implements Serializable {
     
 }

@@ -18,37 +18,29 @@
  */
 package org.sisto.jeeplate.domain.user.group;
 
-import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
 import org.sisto.jeeplate.logging.StringLogger;
 
-@Named
-@RequestScoped
+@Named @RequestScoped
 public class UserGroupModel {
     
     @Inject
-    transient private StringLogger log;
+    private StringLogger log;
     
     @Inject
     private UserGroupData backing;
-    private List<UserGroupData> allGroups;
+    private Map<Long, UserGroupData> all;
     
     @PostConstruct
     private void init() {
-        log.info("# UserGroupModel-init");
-        this.allGroups = this.backing.findAllUserGroups();
+        this.all = this.backing.findAll();
     }
     
-    @PreDestroy
-    private void lize() {
-        log.info("# UserGroupModel-lize");
-    }
-    
-    public List<UserGroupData> getAllGroups() {
-        return (this.backing.findAllUserGroups());
+    public Map<Long, UserGroupData> allGroups() {
+        return (this.backing.findAll());
     }
 }

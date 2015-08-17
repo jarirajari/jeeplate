@@ -21,7 +21,6 @@ package org.sisto.jeeplate.domain.user;
 import java.io.Serializable;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import org.sisto.jeeplate.domain.group.member.DomainGroupMemberData;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.rules.GenericRule;
 

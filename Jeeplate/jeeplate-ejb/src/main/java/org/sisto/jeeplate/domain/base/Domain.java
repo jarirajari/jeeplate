@@ -18,6 +18,10 @@
  */
 package org.sisto.jeeplate.domain.base;
 
-public class Domain {
+import java.io.Serializable;
+import javax.enterprise.context.Dependent;
+
+@Dependent
+public class Domain implements Serializable {
     
 }

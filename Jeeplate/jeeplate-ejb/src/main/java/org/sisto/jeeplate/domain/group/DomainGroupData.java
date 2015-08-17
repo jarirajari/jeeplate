@@ -19,42 +19,24 @@
 package org.sisto.jeeplate.domain.group;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import org.jboss.logging.Logger;
-import org.sisto.jeeplate.domain.BusinessEntityStore;
+import org.sisto.jeeplate.domain.BusinessBean;
 
-public class DomainGroupData implements Serializable {
+@SessionScoped
+public class DomainGroupData extends BusinessBean<DomainGroupData, DomainGroupEntity> implements Serializable {
     
-    public static final Long NONE_GROUP = 0L;
-    public static final Long ALL_GROUP =  1L;
+    private final Long NONE_GROUP = 0L;
+    private final Long ALL_GROUP =  1L;
     
-    @Inject
-    private transient Logger log;
-
-    @Inject
-    private transient BusinessEntityStore<DomainGroupEntity> store;
-    
-    private transient DomainGroupEntity entity;
+    @Inject @Default
+    DomainGroup group;
     
     public DomainGroupData() {
-        this.entity = new DomainGroupEntity();
-    }
-    
-    public DomainGroupData(DomainGroupEntity ade) {
-        this.entity = ade;
-    }
-    
-    public void setEntity(DomainGroupEntity ade) {
-        this.entity = ade;
-    }
-    
-    public DomainGroupEntity getEntity() {
-        return (this.entity);
+        super(DomainGroupData.class, DomainGroupEntity.class);
     }
     
     @Transactional
@@ -63,23 +45,9 @@ public class DomainGroupData implements Serializable {
         
         return this;
     }
-    
-    @Transactional
-    Boolean create() {
-        this.entity = this.store.create(entity);
-        
-        return Boolean.TRUE;
-    }
             
     @Transactional
     public Map<Long, DomainGroupData> findDomainGroups(final Long domainId) {
-        final String query = "SELECT dge FROM DomainGroupEntity dge WHERE dge.id = :domainId";
-        final Map<String, Object> params = new HashMap<String, Object>() {{
-            put("domainId", domainId);
-        }};
-        final List<DomainGroupEntity> results = this.store.executeQuery(DomainGroupEntity.class, query, params);
-        
-        return (results.stream().collect(
-                Collectors.toMap(DomainGroupEntity::getId, DomainGroupData::new)));
+        return (this.findAllSecondary(domainId));
     }
 }
