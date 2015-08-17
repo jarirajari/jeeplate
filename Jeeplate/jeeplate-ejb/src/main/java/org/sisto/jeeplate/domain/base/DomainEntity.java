@@ -41,6 +41,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.DomainGroupEntity;
+import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.space.DomainSpaceEntity;
 
 @Entity @Access(AccessType.FIELD)
@@ -55,7 +56,7 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     protected String description;
     @Enumerated(EnumType.STRING)
     protected DomainType.Type domaintype;
-    @Embedded
+    @Embedded @SecondaryKeyField(keyname = "registration.partDomainDeliveredSeparately", description = "Embedded domain name part")
     protected DomainRegistration registration;
     @ManyToOne @JoinColumn(name = "domain_space")
     protected DomainSpaceEntity domainspace;

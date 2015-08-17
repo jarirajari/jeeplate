@@ -32,12 +32,14 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 
 @Entity
 @Access(AccessType.FIELD)
 @Table(name = "system_groups", uniqueConstraints = {
        @UniqueConstraint(columnNames = "groupname")})
 public class UserGroupEntity extends BusinessEntity implements Serializable {
+    @SecondaryKeyField(description = "For finding certain groups")
     @Id @SequenceGenerator(name="user_group_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_group_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;

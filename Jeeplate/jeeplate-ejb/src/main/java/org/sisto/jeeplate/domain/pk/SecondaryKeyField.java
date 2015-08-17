@@ -27,6 +27,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 public @interface SecondaryKeyField {
 
-    String name() default "";
-
+    String keyname() default "";
+    String description() default "";
 }

@@ -19,41 +19,32 @@
 package org.sisto.jeeplate.domain.space;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.enterprise.inject.New;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
-import javax.persistence.Transient;
 import javax.transaction.Transactional;
-import org.sisto.jeeplate.domain.BusinessEntityStore;
-import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.domain.BusinessBean;
 
-public class DomainSpaceData implements Serializable {
+public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEntity> implements Serializable {
     
+    @Inject @Default
+    DomainSpace space;
     
-    @Inject
-    private transient StringLogger log;
-    
-    @Inject @New
-    private transient BusinessEntityStore<DomainSpaceEntity> store;
-    
-    private DomainSpaceEntity entity;
-    
-    @Transactional
-    public List<DomainSpaceEntity> findSingletonDomainSpace() {
-        final int domainSpaceId = 1;
-        final String query = "SELECT dse FROM DomainSpaceEntity dse WHERE dse.id = :domainSpaceId";
-        final Map<String, Object> params = new HashMap<String, Object>() {{
-            put("domainSpaceId", domainSpaceId);
-        }};
-        final List<DomainSpaceEntity> result = this.store.executeCustomQuery(DomainSpaceEntity.class, query, params);
-        
-        return result;
+    public DomainSpaceData() {
+        super(DomainSpaceData.class, DomainSpaceEntity.class);
     }
     
     @Transactional
-    public void originateSingletonDomainSpace() {
-        this.entity = this.store.create(entity);
+    public DomainSpaceData findSingletonDomainSpace() {
+        final Long singletonDomainId = 1L;
+        final DomainSpaceData singleton = this.findOne(singletonDomainId);
+        
+        // if not exist, create one here, idempotent?
+        
+        return singleton;
+    }
+    
+    @Transactional
+    public void originateSingletonDomainSpace() {this.create();
+        this.create();
     }
 }

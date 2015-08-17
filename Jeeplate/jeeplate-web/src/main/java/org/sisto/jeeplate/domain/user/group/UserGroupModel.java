@@ -19,11 +19,13 @@
 package org.sisto.jeeplate.domain.user.group;
 
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
+import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.logging.StringLogger;
 
 @Named
@@ -35,7 +37,7 @@ public class UserGroupModel {
     
     @Inject
     private UserGroupData backing;
-    private List<UserGroupData> allGroups;
+    private Map<Long, UserGroupData> allGroups;
     
     @PostConstruct
     private void init() {
@@ -48,7 +50,7 @@ public class UserGroupModel {
         log.info("# UserGroupModel-lize");
     }
     
-    public List<UserGroupData> getAllGroups() {
+    public Map<Long, UserGroupData> getAllGroups() {
         return (this.backing.findAllUserGroups());
     }
 }

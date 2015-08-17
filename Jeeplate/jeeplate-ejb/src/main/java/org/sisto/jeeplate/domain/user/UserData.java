@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
-import org.sisto.jeeplate.domain.BusinessObject;
 import org.sisto.jeeplate.domain.ObjectEntity;
 import org.sisto.jeeplate.util.ApplicationProperty;
 import org.sisto.jeeplate.util.Email;
@@ -35,11 +34,11 @@ import org.sisto.jeeplate.util.EmailMessage;
 @SessionScoped
 public class UserData extends BusinessBean<UserData, UserEntity> implements Serializable {
     
-    @Inject @ApplicationProperty(name = "test.message", defaultValue = "jee@pla.te")
-    String systemEmailAddress;
-    
     @Inject @Dependent
     User user;
+    
+    @Inject @ApplicationProperty(name = "test.message", defaultValue = "jee@pla.te")
+    String systemEmailAddress;
     
     @Inject @Any
     Email emailSender;
@@ -86,7 +85,7 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
 
     @Transactional
     public UserData findOneUser(final String emailAddress) {
-        return (findOneAlternative(emailAddress));
+        return (this.findOneSecondary(emailAddress));
     }
     
     private void sendEmailToUser(EmailMessage em, String secretKey, String secretVal) {
@@ -172,7 +171,7 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     
     @Transactional
     public Boolean noUserWithEmail(final String emailAddress) {
-        final UserData ud = this.findOneAlternative(emailAddress);
+        final UserData ud = this.findOneSecondary(emailAddress);
         Boolean noUser = Boolean.FALSE;
         
         if (ud == null || ud.getDataModel() == null || 

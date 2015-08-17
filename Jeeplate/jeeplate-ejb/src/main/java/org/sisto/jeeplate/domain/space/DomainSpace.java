@@ -30,6 +30,8 @@ public class DomainSpace {
     This means that the system can be created from nothing,
     and still operate, but we NOW HAVE a creation button event from the root!
     
+    This API URL will be protected with public key authentication!
+    
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     */
 }

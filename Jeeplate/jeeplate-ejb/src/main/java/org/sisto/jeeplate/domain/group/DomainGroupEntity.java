@@ -38,6 +38,7 @@ import javax.persistence.Transient;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.base.DomainEntity;
 import org.sisto.jeeplate.domain.group.member.DomainGroupMemberEntity;
+import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 
 @Entity
 @Access(AccessType.FIELD)
@@ -47,6 +48,7 @@ public class DomainGroupEntity extends BusinessEntity implements Serializable {
     public static final String ALL_GROUP = "ALL"; // everyone belongs
     @Transient
     public static final String NONE_GROUP = "NONE"; // noone belongs
+    @SecondaryKeyField(description = "For find out certain groups")
     @Id @SequenceGenerator(name="domain_group_seq", allocationSize = 1)
     @GeneratedValue(generator = "domain_group_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
