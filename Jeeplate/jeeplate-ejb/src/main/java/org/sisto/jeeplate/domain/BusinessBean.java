@@ -18,6 +18,7 @@
  */
 package org.sisto.jeeplate.domain;
 
+import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -120,7 +121,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         final Field[] fields = entityBeanType.getDeclaredFields();
     
         for (final Field field : fields) {
-            final boolean annotationIsPresent = field.isAnnotationPresent(AlternativePrimaryKeyField.class);
+            final boolean annotationIsPresent = field.isAnnotationPresent(SecondaryKeyField.class);
             
             if (annotationIsPresent) {
                 name = field.getName();

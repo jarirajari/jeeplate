@@ -36,7 +36,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Digits;
-import org.sisto.jeeplate.domain.AlternativePrimaryKeyField;
+import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.member.DomainGroupMemberEntity;
 
@@ -52,8 +52,8 @@ public class UserEntity extends BusinessEntity implements Serializable {
     @Id @SequenceGenerator(name = "user_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
-    @AlternativePrimaryKeyField
-    protected String username; // email address
+    @SecondaryKeyField(name = "Email address")
+    protected String username;
     @Digits(integer = 15, fraction = 0)
     protected Long mobile; // phone msisdn
     @Embedded
