@@ -51,6 +51,11 @@ public class UserGroupData extends BusinessBean<UserGroupData, UserGroupEntity> 
     }
     
     @Transactional
+    public Map<Long, UserGroupData> findAllUserGroups() {
+        return this.findAll();
+    }
+    
+    @Transactional
     public Map<Long, UserGroupData> findOneUserGroup(final Long withId) {
         return this.findAllSecondary(withId);
     }
