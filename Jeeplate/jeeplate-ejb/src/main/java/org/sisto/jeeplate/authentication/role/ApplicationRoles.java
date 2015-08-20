@@ -18,7 +18,21 @@
  */
 package org.sisto.jeeplate.authentication.role;
 
-public class ApplicationRoles {
+import org.sisto.jeeplate.association.cardinality.OneToMany;
+
+public class ApplicationRoles implements OneToMany {
+    
+    /*
+    
+    these are just for example, programmer should redefine them for customization
+    
+    initially every user registered is SystemRoles...SYSTEM_USER which is 
+    the only role that can have application roles
+    
+    System admin do not have application roles, but can temporarily get one...
+    
+    */
+    
     public enum Role {
         ADMINISTRATOR("administrator"),
         DIRECTOR("director"),

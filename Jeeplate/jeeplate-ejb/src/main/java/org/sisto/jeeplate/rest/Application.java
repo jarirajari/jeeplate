@@ -33,6 +33,19 @@ public class Application {
     @Inject
     private Configuration application;
     
+    
+    /*
+    
+    Initiate app through this public-key secured URL:
+    1. create domain space
+    2. create root user (ONLY SYSTEM ROLES)
+    3. if both domain space and root user are created => initialize application!
+    
+    For example: root user = "panda" and password = "bear"
+    initialize/user?username=panda&password"bear"
+    
+    */
+    
     @GET @Path("initialize/{pathParameter}")
     public Response responseMsg(@PathParam("pathParameter") String pathParameter,
             @DefaultValue("Nothing to say") @QueryParam("queryParameter") String queryParameter) {
@@ -42,4 +55,11 @@ public class Application {
         
         return (Response.status(200).entity(response).build());
     }
+    
+    // create the first user (root) here! => system user can have only one sys-role
+    // and no app-roles (i.e. empty) set of them! => normal users have one sys-role
+    // and 1-to-N many app-roles
+    
+    // all users are first created with sys-role => "registered-user" and app
+    // users are such until they UNREGISTER!
 }

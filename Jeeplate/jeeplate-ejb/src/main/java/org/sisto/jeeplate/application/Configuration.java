@@ -34,7 +34,7 @@ public class Configuration implements Serializable {
     @Inject
     DomainSpaceData domainSpace;
     
-    // Idempotent
+    // Idempotent, call from rest service?
     public void configure() {
         boolean aldreadyCreated = this.originateConfiguration();
         

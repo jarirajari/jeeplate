@@ -31,7 +31,6 @@ import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import org.sisto.jeeplate.domain.BusinessEntity;
-import static org.sisto.jeeplate.domain.ObjectEntity.DEFAULT_ID;
 
 @Entity @Access(AccessType.FIELD)
 @Table(name = "system_user_group_membership")
@@ -49,6 +48,10 @@ public class UserGroupMembershipEntity extends BusinessEntity implements Seriali
     private Long groupReference;
     private Long userReference;
     
+    public UserGroupMembershipEntity() {
+        
+    }
+    
     @PostLoad @PostPersist @PostUpdate 
     @Override
     protected void updateParentId() {
@@ -59,67 +62,19 @@ public class UserGroupMembershipEntity extends BusinessEntity implements Seriali
         return groupReference;
     }
 
-    public void setGroupReference(Long groupReference) {
+    public UserGroupMembershipEntity setGroupReference(Long groupReference) {
         this.groupReference = groupReference;
+        
+        return this;
     }
 
     public Long getUserReference() {
         return userReference;
     }
 
-    public void setUserReference(Long userReference) {
+    public UserGroupMembershipEntity setUserReference(Long userReference) {
         this.userReference = userReference;
-    }
-    
-    public static UserGroupMembershipEntity defaultUserGroupMembershipEntity() {
-        return (new UserGroupMembershipEntityBuilder()).build();
-    }
-    
-    public static UserGroupMembershipEntityBuilder newUserGroupMembershipEntityBuilder() {
-        return (new UserGroupMembershipEntityBuilder());
-    }
-    
-    public static class UserGroupMembershipEntityBuilder {
         
-        private UserGroupMembershipEntity object;
-
-        public UserGroupMembershipEntityBuilder() {
-            this.object = new UserGroupMembershipEntity();
-            this.defaults();
-        }
-
-        private void defaults() {
-            
-            this.object.groupReference = DEFAULT_ID;
-            this.object.userReference = DEFAULT_ID;
-        }
-        
-        public UserGroupMembershipEntityBuilder group(Long groupId) {
-            
-            this.object.groupReference = groupId;
-            
-            return (this);
-        }
-        
-        public UserGroupMembershipEntityBuilder member(Long userId) {
-            
-            this.object.userReference = userId;
-            
-            return (this);
-        }
-        
-        public UserGroupMembershipEntity build(){
-            
-            this.object.id = null;
-            
-            return (this.object);
-        }
-        
-        public UserGroupMembershipEntity renovate(Long id) {
-            
-            this.object.id = id;
-            
-            return (this.object);
-        }
+        return this;
     }
 }

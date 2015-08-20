@@ -59,6 +59,10 @@ public class DomainGroupEntity extends BusinessEntity implements Serializable {
     @OneToMany(mappedBy = "domaingroup")
     protected List<DomainGroupMemberEntity> allDomaingroupmembers;
     
+    public DomainGroupEntity() {
+        
+    }
+    
     @PostLoad @PostPersist @PostUpdate 
     @Override
     protected void updateParentId() {

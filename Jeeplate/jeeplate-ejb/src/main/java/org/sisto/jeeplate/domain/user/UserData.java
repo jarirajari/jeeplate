@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
+import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.ObjectEntity;
 import org.sisto.jeeplate.util.ApplicationProperty;
 import org.sisto.jeeplate.util.Email;
@@ -43,18 +44,15 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     @Inject @Any
     Email emailSender;
     
-    private transient final UserEntity hashed = UserEntity.newUserEntityBuilder()
-            .withUsername("hashis")
-            .withPassword("good")
-            .build();
-    private transient final UserEntity hashed2 = UserEntity.newUserEntityBuilder()
-            .withUsername("un")
-            .withPassword("pw")
-            .build();
-    private transient final UserEntity hashed3 = UserEntity.newUserEntityBuilder()
-            .withUsername("user@na.me")
-            .withPassword("pw")
-            .build();
+    private transient final UserEntity hashed = EntityBuilder.of().UserEntity()
+            .setUsername("hashis")
+            .setPassword("good");
+    private transient final UserEntity hashed2 = EntityBuilder.of().UserEntity()
+            .setUsername("un")
+            .setPassword("pw");
+    private transient final UserEntity hashed3 = EntityBuilder.of().UserEntity()
+            .setUsername("user@na.me")
+            .setPassword("pw");
     
     @Transactional
     public Boolean testHashing() {
@@ -99,7 +97,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     
     @Transactional
     public void nofityUserForRegistration(EmailMessage messageForOldUser, EmailMessage messageForNewUser, String registrationToken) {
-        assert this.entity != null;
         final String replace = "${domain}";
         boolean userNotExist = this.getDataModel().isDefault();
         EmailMessage message;
@@ -116,7 +113,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     
     @Transactional
     public String initializePasswordReset(EmailMessage messageForOldUser, EmailMessage messageForNewUser) {
-        assert this.entity != null;
         final String replace = "${secret}";
         boolean userExists =! this.getDataModel().isDefault();
         String resetToken;
@@ -143,7 +139,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     
     @Transactional
     public Boolean finalizePasswordReset(String typedMobile, String typedPassword, String emailedResetToken) {
-        assert this.entity != null;
         UserCredential uc = this.getDataModel().getCredential();
         Boolean changed = Boolean.FALSE;
         Boolean resetRequestValid = uc.resetIsValid();

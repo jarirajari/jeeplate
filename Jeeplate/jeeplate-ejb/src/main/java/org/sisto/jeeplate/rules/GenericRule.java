@@ -18,10 +18,11 @@
  */
 package org.sisto.jeeplate.rules;
 
+import java.io.Serializable;
 import javax.ejb.Stateless;
 
 @Stateless
-public class GenericRule {
+public class GenericRule implements Serializable {
     // contains shiro permission Java8 style
     public Boolean isAllowedToDoIt() {
         return Boolean.TRUE;

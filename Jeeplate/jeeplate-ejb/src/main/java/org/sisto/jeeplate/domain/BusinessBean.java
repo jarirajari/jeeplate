@@ -263,7 +263,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         this.entity = this.store.delete(entity);
     }
     
-    // Returns objects id
+    // Returns objects id :: getter
     @Transactional
     public Long find() {
         final Long id = this.getEntity().getId();
@@ -271,7 +271,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         return id;
     }
     
-    // Return objects id after binding it to a persisted entity
+    // Return objects id after binding it to a persisted entity :: setter
     @Transactional
     public Long bind(Long id) {
         Long lid;

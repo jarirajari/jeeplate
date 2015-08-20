@@ -19,6 +19,9 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embedded;
@@ -41,11 +44,7 @@ import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.member.DomainGroupMemberEntity;
 import org.sisto.jeeplate.domain.pk.TernaryKeyField;
 
-/**
- * Business object model for an actual business object
- */
-@Entity
-@Access(AccessType.FIELD)
+@Entity @Access(AccessType.FIELD)
 @Table(name = "system_users", uniqueConstraints = {
        @UniqueConstraint(columnNames = "username")})
 public class UserEntity extends BusinessEntity implements Serializable {
@@ -65,7 +64,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
     @OneToOne(mappedBy = "ISAUser")
     protected DomainGroupMemberEntity associateddomain; 
     
-    protected UserEntity() {
+    public UserEntity() {
         this.id = DEFAULT_ID;
         this.username = "";
         this.mobile = 0L;
@@ -84,16 +83,20 @@ public class UserEntity extends BusinessEntity implements Serializable {
         return (this.username);
     }
     
-    public void setUsername(String setUsername) {
+    public UserEntity setUsername(String setUsername) {
         this.username = setUsername;
+        
+        return this;
     }
 
     public Long getMobile() {
         return mobile;
     }
 
-    public void setMobile(Long mobile) {
+    public UserEntity setMobile(Long mobile) {
         this.mobile = mobile;
+        
+        return this;
     }
 
     public UserCredential getCredential() {
@@ -112,8 +115,17 @@ public class UserEntity extends BusinessEntity implements Serializable {
         return associateddomain;
     }
 
-    public void setAssociateddomain(DomainGroupMemberEntity associateddomain) {
+    public UserEntity setAssociateddomain(DomainGroupMemberEntity associateddomain) {
         this.associateddomain = associateddomain;
+        
+        return this;
+    }
+    
+    // Not a property since no field
+    public UserEntity setPassword(String password) {
+        this.credential.refresh(password);
+        
+        return this;
     }
     
     public Boolean mobileNumberIsSame(String msisdn) {
@@ -131,67 +143,5 @@ public class UserEntity extends BusinessEntity implements Serializable {
         }
         
         return same;
-    }
-    
-    /*
-    
-    username (Actor as login), and embedded
-    + ActorRole -> act_pw, act_salt, act_role (Role.ACTOR)
-    + DirectorRole -> dir_pw, dir_salt, dir_role (Role.DIR...)
-    + AdministratorRole -> adm_pw, adm_salt, adm_role (Role.ADM...) 
-    
-    */
-    
-    public static UserEntityBuilder newUserEntityBuilder() {
-        return (new UserEntityBuilder());
-    }
-    
-    public static class UserEntityBuilder {
-
-        private UserEntity object;
-
-        public UserEntityBuilder() {
-            
-            this.object = new UserEntity();
-            this.defaults();
-        }
-
-        private void defaults() {
-            this.object.username = "";
-            this.object.mobile = 0L;
-            this.object.credential = new UserCredential();
-        }
-        
-        public UserEntityBuilder withUsername(String name) {
-            this.object.username = name;
-            
-            return (this);
-        }
-        
-        public UserEntityBuilder withMobile(Long mobile) {
-            this.object.mobile = mobile;
-            
-            return (this);
-        }
-        
-        public UserEntityBuilder withPassword(String password) {
-            this.object.credential.refresh(password);
-            
-            return (this);
-        }
-        
-        public UserEntity build() {
-            
-            this.object.id = null;     
-            
-            return (this.object);
-        }
-        
-        public UserEntity renovate(Long id) {
-            
-            this.object.id = id;
-            
-            return (this.object);
-        }
     }
 }

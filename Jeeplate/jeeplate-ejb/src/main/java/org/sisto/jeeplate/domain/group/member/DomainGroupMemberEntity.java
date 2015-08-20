@@ -50,6 +50,10 @@ public class DomainGroupMemberEntity extends BusinessEntity implements Serializa
     @ManyToOne @JoinColumn(name = "domaingroup_fk")
     protected DomainGroupEntity domaingroup;
     
+    public DomainGroupMemberEntity() {
+        
+    }
+    
     @PostLoad @PostPersist @PostUpdate 
     @Override
     protected void updateParentId() {

@@ -25,6 +25,7 @@ import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
+import org.sisto.jeeplate.domain.EntityBuilder;
 
 @SessionScoped
 public class UserGroupData extends BusinessBean<UserGroupData, UserGroupEntity> implements Serializable {
@@ -32,12 +33,10 @@ public class UserGroupData extends BusinessBean<UserGroupData, UserGroupEntity> 
     @Inject @Default
     UserGroup group;
     
-    private transient final UserGroupEntity hashed = UserGroupEntity.newUserGroupEntityBuilder()
-            .withName("vip-group")
-            .build();
-    private transient final UserGroupEntity hashed2 = UserGroupEntity.newUserGroupEntityBuilder()
-            .withName("basic-group")
-            .build();
+    private transient final UserGroupEntity hashed = EntityBuilder.of().UserGroupEntity()
+            .setGroupname("vip-group");
+    private transient final UserGroupEntity hashed2 = EntityBuilder.of().UserGroupEntity()
+            .setGroupname("basic-group");
     
     public UserGroupData() {
         super(UserGroupData.class, UserGroupEntity.class);

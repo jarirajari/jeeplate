@@ -25,6 +25,7 @@ import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
+import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
 
 @SessionScoped
@@ -50,11 +51,10 @@ public class DomainGroupMembershipData extends BusinessBean<DomainGroupMembershi
     @Transactional
     public void addNewMember(Long domain) {
         DomainGroupData group = this.member.createNewDomainGroupForDomain();
-        DomainGroupMembershipEntity mship = DomainGroupMembershipEntity
-                .newDomainGroupMembershipEntity()
-                .domain(domain)
-                .member(group.getDataModel().getId())
-                .build();
+        Long memberId = group.getDataModel().getId();
+        DomainGroupMembershipEntity mship = EntityBuilder.of().DomainGroupMembershipEntity()
+                .setDomainReference(domain)
+                .setGroupMemberReference(memberId);
         this.setEntity(mship);
         this.create();   
     }

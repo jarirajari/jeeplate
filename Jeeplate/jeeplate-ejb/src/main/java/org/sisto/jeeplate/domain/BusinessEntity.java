@@ -37,6 +37,25 @@ public abstract class BusinessEntity extends ObjectEntity {
     
     protected abstract void updateParentId();
     
+    public BusinessEntity build() {
+        this.setId(DEFAULT_ID);
+        
+        return this;
+    }
+    
+    public BusinessEntity renovate(Long id) {
+        this.setId(id);
+        
+        return this;
+    }
+    
+    /*
+     * Java Language Specification: method name and parameter list are part of 
+     * method signature, thus No, return type is not part of method signature!
+     *
+     * Then http://www.webr2.com/does-java-bean-s-setter-permit-return-this/
+     */
+    
     public Long getId() {
         return (this.transientSuperId);
     }

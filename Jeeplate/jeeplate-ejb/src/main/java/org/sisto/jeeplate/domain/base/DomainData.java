@@ -52,13 +52,11 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
     
     @Transactional
     public void addNewDomain() {
-        assert this.entity != null;
         // new domain with "all" group  
     }
     
     @Transactional
     public String applyForUserAccount() {
-        assert this.entity != null;
         Boolean userNotExist = this.getDataModel().isDefault();
         DomainRegistration reg  = this.getDataModel().getRegistration();
         String token;

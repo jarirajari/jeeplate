@@ -20,8 +20,10 @@ package org.sisto.jeeplate.domain.space;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
@@ -47,8 +49,13 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
     
     @Id
     private Long id;
-    @OneToMany(mappedBy = "domainspace")
-    private List<DomainEntity> allDomains; // loose if <Long> or tight if <DomainEntity>
+    @OneToMany(mappedBy = "domainspace", fetch = FetchType.EAGER)
+    private Map<String, DomainEntity> allDomains; // loose if <Long> or tight if <DomainEntity>
+    
+    public DomainSpaceEntity() {
+        this.id = SINGLETON_DOMAIN_SPACE;
+        this.allDomains = new ConcurrentHashMap<>();
+    }
     
     @PostLoad @PostPersist @PostUpdate
     @Override
@@ -56,8 +63,33 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
         super.setId(this.id);
     }
     
-    public DomainSpaceEntity() {
-        this.id = SINGLETON_DOMAIN_SPACE;
-        this.allDomains = new ArrayList<>();
+    public Boolean insertNewDomain(String qualifiedDomainname) {
+        Boolean inserted;
+        
+        // create or renovate
+        
+        if (! this.allDomains.containsKey(qualifiedDomainname)) {
+            this.allDomains.put(qualifiedDomainname, null);
+            inserted = Boolean.TRUE;
+        } else {
+            inserted = Boolean.FALSE;
+        }
+        
+        return inserted;
+    }
+    
+    public Boolean removeOldDomain(String qualifiedDomainname) {
+        Boolean removed;
+        
+        // create or renovate
+        
+        if (this.allDomains.containsKey(qualifiedDomainname)) {
+            this.allDomains.put(qualifiedDomainname, null);
+            removed = Boolean.TRUE;
+        } else {
+            removed = Boolean.FALSE;
+        }
+        
+        return removed;
     }
 }

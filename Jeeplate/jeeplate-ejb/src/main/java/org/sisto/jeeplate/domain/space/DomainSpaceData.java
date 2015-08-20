@@ -22,6 +22,8 @@ import java.io.Serializable;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.sisto.jeeplate.domain.BusinessBean;
 
 public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEntity> implements Serializable {
@@ -44,7 +46,51 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
     }
     
     @Transactional
-    public void originateSingletonDomainSpace() {this.create();
+    public void originateSingletonDomainSpace() {
+        
         this.create();
+    }
+    
+    // DRAFT
+    
+    
+    
+    
+    private boolean isAuth() {                     // use producer here?
+        String ADMIN = "admin";
+        // domain:group:appRole(of-member):action:permissionInstance:resource // 6
+        // String.format("jeeplate:test:secretary:view,modify:name=%s:homepageurl", "*");
+        String PERM = "printer:print:laserjet4400n"; 
+        Subject currentUser = SecurityUtils.getSubject();
+        boolean auth;
+        
+        if (currentUser.hasRole(ADMIN) || 
+            currentUser.isPermitted(PERM)) {
+            auth = true;
+        } else {
+            auth = false;
+        }
+        
+        return auth;
+    }
+    
+    @Transactional
+    public void insertNewDomain(String fqdn) {
+        
+        // rules of who can do this
+        
+        this.getEntity().insertNewDomain(fqdn);
+        this.setEntity(null);
+        this.update();
+    }
+    
+    @Transactional
+    public void removeOldDomain(String fqdn) {
+        
+        // rules of who can do this
+        
+        this.getEntity().removeOldDomain(fqdn);
+        this.setEntity(null);
+        this.update();
     }
 }

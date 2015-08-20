@@ -33,7 +33,6 @@ import javax.persistence.Table;
 import org.sisto.jeeplate.association.cardinality.OneToMany;
 import org.sisto.jeeplate.association.direction.Unidirectional;
 import org.sisto.jeeplate.domain.BusinessEntity;
-import static org.sisto.jeeplate.domain.ObjectEntity.DEFAULT_ID;
 
 @Entity @Access(AccessType.FIELD)
 @Table(name = "group_domain_membership")
@@ -52,6 +51,10 @@ public class DomainGroupMembershipEntity extends BusinessEntity
     private Long groupReference;
     private Long domainReference; // one user can belong to only one domain!
     
+    public DomainGroupMembershipEntity() {
+        
+    }
+    
     @PostLoad @PostPersist @PostUpdate 
     @Override
     protected void updateParentId() {
@@ -62,75 +65,29 @@ public class DomainGroupMembershipEntity extends BusinessEntity
         return groupMemberReference;
     }
 
-    public void setGroupMemberReference(Long groupMemberReference) {
+    public DomainGroupMembershipEntity setGroupMemberReference(Long groupMemberReference) {
         this.groupMemberReference = groupMemberReference;
+        
+        return this;
     }
 
     public Long getGroupReference() {
         return groupReference;
     }
 
-    public void setGroupReference(Long groupReference) {
+    public DomainGroupMembershipEntity setGroupReference(Long groupReference) {
         this.groupReference = groupReference;
+        
+        return this;
     }
     
     public Long getDomainReference() {
         return domainReference;
     }
 
-    public void setDomainReference(Long domainReference) {
+    public DomainGroupMembershipEntity setDomainReference(Long domainReference) {
         this.domainReference = domainReference;
-    }
-    
-    public static DomainGroupMembershipEntity defaultDomainGroupMembershipEntity() {
-        return (new DomainGroupMembershipEntityBuilder()).build();
-    }
-    
-    public static DomainGroupMembershipEntityBuilder newDomainGroupMembershipEntity() {
-        return (new DomainGroupMembershipEntityBuilder());
-    }
-    
-    public static class DomainGroupMembershipEntityBuilder {
         
-        private DomainGroupMembershipEntity object;
-
-        public DomainGroupMembershipEntityBuilder() {
-            this.object = new DomainGroupMembershipEntity();
-            this.defaults();
-        }
-
-        private void defaults() {
-            
-            this.object.domainReference = DEFAULT_ID;
-            this.object.groupReference = DEFAULT_ID;
-        }
-        
-        public DomainGroupMembershipEntityBuilder domain(Long domainId) {
-            
-            this.object.domainReference = domainId;
-            
-            return (this);
-        }
-        
-        public DomainGroupMembershipEntityBuilder member(Long userId) {
-            
-            this.object.groupReference = userId;
-            
-            return (this);
-        }
-        
-        public DomainGroupMembershipEntity build(){
-            
-            this.object.id = null;
-            
-            return (this.object);
-        }
-        
-        public DomainGroupMembershipEntity renovate(Long id) {
-            
-            this.object.id = id;
-            
-            return (this.object);
-        }
+        return this;
     }
 }

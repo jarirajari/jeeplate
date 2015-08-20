@@ -18,7 +18,9 @@
  */
 package org.sisto.jeeplate.authentication.role;
 
-public class SystemRoles {
+import org.sisto.jeeplate.association.cardinality.OneToMany;
+
+public class SystemRoles implements OneToMany {
     /*
      * System means all domains,
      * One domain is many groups,
@@ -28,7 +30,7 @@ public class SystemRoles {
         SYSTEM_ADMIN("root"),
         DOMAIN_ADMIN("domain-admin"),
         GROUP_ADMIN("group-admin"),
-        NOT_ADMIN("registered-user"),
+        SYSTEM_USER("registered-user"), // application roles only for this
         UNKNOWN("unknown");
         
         private String role;

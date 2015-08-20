@@ -24,6 +24,7 @@ import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
+import org.sisto.jeeplate.domain.EntityBuilder;
 
 @SessionScoped
 public class UserGroupMembershipData extends BusinessBean<UserGroupMembershipData, UserGroupMembershipEntity> implements Serializable {
@@ -37,11 +38,9 @@ public class UserGroupMembershipData extends BusinessBean<UserGroupMembershipDat
     
     @Transactional
     public void addNewMember(Long user, Long toGroup) {
-        UserGroupMembershipEntity member = UserGroupMembershipEntity
-                .newUserGroupMembershipEntityBuilder()
-                .group(toGroup)
-                .member(user)
-                .build();
+        UserGroupMembershipEntity member = EntityBuilder.of().UserGroupMembershipEntity()
+                .setGroupReference(toGroup)
+                .setUserReference(user);
         this.setEntity(member);
         this.create();
     }

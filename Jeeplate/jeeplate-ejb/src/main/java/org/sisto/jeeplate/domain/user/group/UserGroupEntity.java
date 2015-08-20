@@ -34,8 +34,7 @@ import javax.persistence.UniqueConstraint;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 
-@Entity
-@Access(AccessType.FIELD)
+@Entity @Access(AccessType.FIELD)
 @Table(name = "system_groups", uniqueConstraints = {
        @UniqueConstraint(columnNames = "groupname")})
 public class UserGroupEntity extends BusinessEntity implements Serializable {
@@ -44,6 +43,10 @@ public class UserGroupEntity extends BusinessEntity implements Serializable {
     @GeneratedValue(generator = "user_group_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
     protected String groupname;
+    
+    public UserGroupEntity() {
+        
+    }
     
     @PostLoad @PostPersist @PostUpdate 
     @Override
@@ -55,50 +58,9 @@ public class UserGroupEntity extends BusinessEntity implements Serializable {
         return this.groupname;
     }
     
-    public void setGroupname(String name) {
+    public UserGroupEntity setGroupname(String name) {
         this.groupname = name;
-    }
-    
-    public static UserGroupEntity defaultUserGroupEntity() {
-        return (new UserGroupEntityBuilder()).build();
-    }
-    
-    public static UserGroupEntityBuilder newUserGroupEntityBuilder() {
-        return (new UserGroupEntityBuilder());
-    }
-    
-    public static class UserGroupEntityBuilder {
         
-        private UserGroupEntity object;
-
-        public UserGroupEntityBuilder() {
-            
-            this.object = new UserGroupEntity();
-            this.defaults();
-        }
-
-        private void defaults() {
-            this.object.groupname = "";
-        }
-        
-        public UserGroupEntityBuilder withName(String name) {
-            this.object.groupname = name;
-            
-            return (this);
-        }
-        
-        public UserGroupEntity build() {
-            
-            this.object.id = null;
-            
-            return (this.object);
-        }
-        
-        public UserGroupEntity renovate(Long id) {
-            
-            this.object.id = id;
-            
-            return (this.object);
-        }
+        return this;
     }
 }
