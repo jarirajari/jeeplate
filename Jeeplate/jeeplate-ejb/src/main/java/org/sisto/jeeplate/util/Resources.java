@@ -18,7 +18,9 @@
  */
 package org.sisto.jeeplate.util;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import org.jboss.logging.Logger;
@@ -33,17 +35,18 @@ public class Resources {
      * @Inject
      * private transient Logger log;
      */
-    @Produces
+    @Produces @Default
     public Logger jbossLogger(InjectionPoint ip) {
         final String name = ip.getMember().getDeclaringClass().getSimpleName();
         
         return Logger.getLogger(name);
     }
     
-    @Produces
+    @Produces @Default
     public StringLogger stringLogger(InjectionPoint ip) {
         final String name = ip.getMember().getDeclaringClass().getSimpleName();
         
         return (new StringLogger(name));
     }
+    
 }

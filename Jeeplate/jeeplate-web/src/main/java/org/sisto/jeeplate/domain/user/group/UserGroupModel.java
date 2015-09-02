@@ -23,13 +23,13 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
-import org.sisto.jeeplate.domain.user.UserData;
+import javax.enterprise.inject.Default;
 import org.sisto.jeeplate.logging.StringLogger;
 
 @Named @RequestScoped
 public class UserGroupModel {
     
-    @Inject
+    @Inject @Default
     private StringLogger log;
     
     @Inject
@@ -43,5 +43,5 @@ public class UserGroupModel {
     
     public Map<Long, UserGroupData> allGroups() {
         return (this.backing.findAll());
-    }
+    } 
 }

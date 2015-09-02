@@ -18,6 +18,10 @@
  */
 package org.sisto.jeeplate.rest;
 
+import javax.enterprise.context.Dependent;
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -26,13 +30,20 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import org.sisto.jeeplate.application.Configuration;
+import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.util.MultiValidator;
 
-@Path("restricted")
+@RequestScoped @Path("restricted")
 public class Application {
     
     @Inject
-    private Configuration application;
+    StringLogger log;
     
+    @Inject
+    Configuration application;
+    
+    @Inject
+    MultiValidator validator;
     
     /*
     
@@ -41,17 +52,31 @@ public class Application {
     2. create root user (ONLY SYSTEM ROLES)
     3. if both domain space and root user are created => initialize application!
     
-    For example: root user = "panda" and password = "bear"
-    initialize/user?username=panda&password"bear"
+    For example: root user = "panda" and password = "bear" (URL decode!)
+    initialize/root?username=panda@be.ar&msisdn=+111222333&password=china
     
     */
     
-    @GET @Path("initialize/{pathParameter}")
-    public Response responseMsg(@PathParam("pathParameter") String pathParameter,
-            @DefaultValue("Nothing to say") @QueryParam("queryParameter") String queryParameter) {
+    // From Java docs: "Values are URL decoded"
+    @GET @Path("initialize/{root}")
+    public Response responseMsg(@PathParam("root") String initializeSystemCreateRootCmd,
+            @DefaultValue("") @QueryParam("username") String username,
+            @DefaultValue("") @QueryParam("password") String password,
+            @DefaultValue("") @QueryParam("msisdn") String msisdn) {
         final Boolean conf = this.application.configurationExists();
-        final String response = String.format("Hello from: %s %s. Conf=%s", pathParameter, queryParameter, String.valueOf(conf));
-
+        final String response = String.format("Hello from: %s. Conf=%s", initializeSystemCreateRootCmd, String.valueOf(conf));
+        
+        if (application.configurationExists()) {
+            log.info("Application already initialized!");
+        } if (initializeSystemCreateRootCmd.equals("root") &&
+            validator.validateUserName(username) &&
+            validator.validateUserPassword(password) &&
+            validator.validateUserPhone(msisdn)) {
+            log.info("***************** CREATING ROOT USER !!!!!!!!!!!!!!!!!!!!!!");
+            application.configureIdempotent();
+        } else {
+            log.error("%s, %s, %s, %s", initializeSystemCreateRootCmd, username, password, msisdn);
+        }
         
         return (Response.status(200).entity(response).build());
     }

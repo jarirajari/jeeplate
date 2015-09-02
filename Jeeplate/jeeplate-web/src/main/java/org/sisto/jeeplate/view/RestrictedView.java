@@ -98,7 +98,7 @@ public class RestrictedView implements Serializable {
     }
     
     public Boolean configureApplication() {
-        this.appConf.configure();
+        this.appConf.configureIdempotent();
         
         return Boolean.FALSE;
     }
@@ -115,5 +115,5 @@ public class RestrictedView implements Serializable {
             
             log.info("%s = %s", key, Arrays.toString(val));
         }
-    }
+    } 
 }

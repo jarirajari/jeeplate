@@ -30,46 +30,25 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
+import javax.inject.Inject;
 
 @FacesValidator("urlValidator")
 public class UrlValidator implements Validator {
+    
+    @Inject
+    private org.sisto.jeeplate.util.MultiValidator validator;
     
     @Override
     public void validate(FacesContext fc, UIComponent c, 
                          Object value) throws ValidatorException {
         String url = (value == null) ? "" : (String) value;
+        Boolean validates = validator.validateURL(url);
         
-        // No value is not ok
-        if (url.isEmpty()) {
+        if (!validates) {
             FacesMessage msg = new FacesMessage("Email Validation Error");
             msg.setSeverity(FacesMessage.SEVERITY_ERROR);
             throw new ValidatorException(msg);
         }
-        
-        if (! UrlValidator.isValidURL(url)) {
-            FacesMessage msg = new FacesMessage("Email Validation Error");
-            msg.setSeverity(FacesMessage.SEVERITY_ERROR);
-            throw new ValidatorException(msg);
-        }
-
     }
-    public static boolean isValidURL(String surl) {
-        URL url = null;
-        boolean valid = true;
-        
-        try {
-            url= new URL(surl);
-        } catch (MalformedURLException murle) {
-            valid = false;
-        }
-        if (valid) {
-            try {
-                url.toURI();
-            } catch (URISyntaxException urise) {
-                valid = false;
-            }
-        }
-        
-        return valid;
-    }
+    
 }

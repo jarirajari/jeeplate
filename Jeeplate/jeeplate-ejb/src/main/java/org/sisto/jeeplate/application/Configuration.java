@@ -35,7 +35,10 @@ public class Configuration implements Serializable {
     DomainSpaceData domainSpace;
     
     // Idempotent, call from rest service?
-    public void configure() {
+    // create domainspace, create root system user with root role
+    // only after that we can start cre+add domains to domainspace and
+    // cre+add default-all groups to cre+add domain-groups
+    public void configureIdempotent() {
         boolean aldreadyCreated = this.originateConfiguration();
         
         if (! aldreadyCreated) {
@@ -45,7 +48,7 @@ public class Configuration implements Serializable {
     
     public Boolean configurationExists() {
         PersistedConfiguration pc = this.find();
-        Boolean exists;
+        Boolean exists; 
         
         if (pc == null) {
             exists = Boolean.FALSE;

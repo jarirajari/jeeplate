@@ -48,13 +48,10 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
     @Transactional
     public void originateSingletonDomainSpace() {
         
-        this.create();
+        this.create();  
     }
     
     // DRAFT
-    
-    
-    
     
     private boolean isAuth() {                     // use producer here?
         String ADMIN = "admin";
