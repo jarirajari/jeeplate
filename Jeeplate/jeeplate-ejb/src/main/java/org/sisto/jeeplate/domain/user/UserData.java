@@ -19,6 +19,8 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Any;
@@ -54,7 +56,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
             .setUsername("user@na.me")
             .setPassword("pw");
     
-    @Transactional
     public Boolean testHashing() {
         this.createTestData(hashed, hashed2, hashed3);
         return Boolean.TRUE;
@@ -80,8 +81,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     *
     */
-
-    @Transactional
     public UserData findOneUser(final String emailAddress) {
         return (this.findOneSecondary(emailAddress));
     }
@@ -95,7 +94,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         emailSender.sendMessage(mm);
     }
     
-    @Transactional
     public void nofityUserForRegistration(EmailMessage messageForOldUser, EmailMessage messageForNewUser, String registrationToken) {
         final String replace = "${domain}";
         boolean userNotExist = this.getDataModel().isDefault();
@@ -111,7 +109,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         sendEmailToUser(message, replace, registrationToken);
     }
     
-    @Transactional
     public String initializePasswordReset(EmailMessage messageForOldUser, EmailMessage messageForNewUser) {
         final String replace = "${secret}";
         boolean userExists =! this.getDataModel().isDefault();
@@ -137,7 +134,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         return resetToken;
     }
     
-    @Transactional
     public Boolean finalizePasswordReset(String typedMobile, String typedPassword, String emailedResetToken) {
         UserCredential uc = this.getDataModel().getCredential();
         Boolean changed = Boolean.FALSE;
@@ -164,7 +160,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         return changed;
     }
     
-    @Transactional
     public Boolean noUserWithEmail(final String emailAddress) {
         final UserData ud = this.findOneSecondary(emailAddress);
         Boolean noUser = Boolean.FALSE;
@@ -175,6 +170,11 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         }
         
         return noUser;
+    }
+    
+    public void createRootUser(UserEntity ue) {
+        this.setEntity(ue);
+        this.create();
     }
     
     public Boolean changeName(String name) {

@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
@@ -41,7 +42,7 @@ import javax.persistence.TypedQuery;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.PGEM;
 
-@Stateless @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+@Dependent @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class BusinessEntityStore<T extends BusinessEntity> implements Serializable {
     
     @Inject
@@ -188,7 +189,6 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
         T deleted = null;
         boolean isInDB = this.isOld(be);
         
-        
         if (isInDB) {
             deleted = (T) this.safeUnassociate(be);
         } else {
@@ -202,7 +202,9 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
     protected final Boolean isNew(T be) {
         boolean isNew = false;
         
-        if (be.isDefault()) {
+        if (be == null) {
+            isNew = false;
+        } else if (be.isDefault()) {
             isNew = true;
         } else {
             try {

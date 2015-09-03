@@ -45,7 +45,8 @@ public class UserGroupEntity extends BusinessEntity implements Serializable {
     protected String groupname;
     
     public UserGroupEntity() {
-        
+        this.id = BusinessEntity.DEFAULT_ID;
+        this.groupname = "";
     }
     
     @PostLoad @PostPersist @PostUpdate 

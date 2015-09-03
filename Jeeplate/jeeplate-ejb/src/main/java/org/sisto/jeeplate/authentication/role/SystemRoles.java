@@ -18,25 +18,48 @@
  */
 package org.sisto.jeeplate.authentication.role;
 
-import org.sisto.jeeplate.association.cardinality.OneToMany;
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
-public class SystemRoles implements OneToMany {
+// The access type for an embedded object is determined by the access type of the entity in which it is embedded.
+@Embeddable 
+public class SystemRoles implements Serializable {
     /*
      * System means all domains,
      * One domain is many groups,
      * One group is many single users
      */
-    public enum Role {
-        SYSTEM_ADMIN("root"),
-        DOMAIN_ADMIN("domain-admin"),
-        GROUP_ADMIN("group-admin"),
-        SYSTEM_USER("registered-user"), // application roles only for this
-        UNKNOWN("unknown");
+    
+    @Enumerated(EnumType.STRING) @Column(name = "system_roles_group")
+    protected SystemRole role;
+    
+    public SystemRoles() {
+        this.role = SystemRole.GUEST_USER;
+    }
+    
+    public SystemRole getRole() {
+        return this.role;
+    }
+    
+    public void setRole(SystemRole newRole) {
+        this.role = newRole;
+    }
+    
+    public Boolean isRoot() {
+        Boolean fact = Boolean.FALSE;
         
-        private String role;
-        
-        Role(String s) {
-            this.role = s;
+        if (this.role == SystemRole.SYSTEM_ADMIN) {
+            fact = Boolean.TRUE;
         }
+        
+        return fact;
+    }
+    
+    @Override
+    public String toString() {
+        return (this.role.toString());
     }
 }

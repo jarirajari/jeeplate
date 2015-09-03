@@ -22,7 +22,10 @@ import java.io.Serializable;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.space.DomainSpaceData;
+import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.util.PGEM;
 
 @Stateless
@@ -34,27 +37,29 @@ public class Configuration implements Serializable {
     @Inject
     DomainSpaceData domainSpace;
     
+    @Inject
+    UserData user;
+    
     // Idempotent, call from rest service?
     // create domainspace, create root system user with root role
     // only after that we can start cre+add domains to domainspace and
     // cre+add default-all groups to cre+add domain-groups
-    public void configureIdempotent() {
+    public void configureIdempotent(String rootUsername, String rootPassword, String rootMsisdn) {
         boolean aldreadyCreated = this.originateConfiguration();
         
         if (! aldreadyCreated) {
+            final UserEntity root = EntityBuilder.of().UserEntity()
+                .setUsername(rootUsername)
+                .setPassword(rootPassword)
+                .setMobile(Long.valueOf(rootMsisdn));
+            this.user.createRootUser(root);
             this.domainSpace.originateSingletonDomainSpace();
         }
     }
     
     public Boolean configurationExists() {
         PersistedConfiguration pc = this.find();
-        Boolean exists; 
-        
-        if (pc == null) {
-            exists = Boolean.FALSE;
-        } else {
-            exists = Boolean.TRUE;
-        }
+        Boolean exists = (pc != null);
         
         return exists;
     }
@@ -69,7 +74,6 @@ public class Configuration implements Serializable {
             pc = new PersistedConfiguration(Boolean.TRUE);
         }
         this.createOrUpdate(pc);
-        
         return exists;
     }
     

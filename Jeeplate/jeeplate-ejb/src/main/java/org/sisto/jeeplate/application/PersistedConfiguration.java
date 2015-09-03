@@ -30,7 +30,7 @@ import javax.persistence.Transient;
 @Table(name = "system_application_configuration")
 public class PersistedConfiguration implements Serializable {
     @Transient
-    public static Long APPLICATION_CONFIGURATION = 1L;
+    public transient static final Long APPLICATION_CONFIGURATION = 1L;
     
     @Id
     private Long id;

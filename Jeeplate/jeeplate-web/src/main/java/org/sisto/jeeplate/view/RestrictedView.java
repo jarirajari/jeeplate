@@ -98,7 +98,7 @@ public class RestrictedView implements Serializable {
     }
     
     public Boolean configureApplication() {
-        this.appConf.configureIdempotent();
+        this.appConf.configureIdempotent("root@us.er", "aaAA11!!","333222111");
         
         return Boolean.FALSE;
     }

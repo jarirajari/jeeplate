@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Any;
 import javax.inject.Inject;
@@ -57,16 +59,20 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     protected E entity;
     protected E dataModel;
     
-    protected void setEntity(E e) {
-        this.entity = e;
-    }
-    
     protected E getEntity() {
         return (this.entity);
     }
     
+    protected void setEntity(E e) {
+        this.entity = e;
+    }
+    
     public E getDataModel() {
         return (this.getEntity());
+    }
+    
+    public void setDataModel(E e) {
+        this.setEntity(e);
     }
     
     public BusinessBean(Class<D> dataType, Class<E> entityType) {
@@ -224,7 +230,6 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         return (findOneAlternative(4, altKeyVal));
     }
     
-    // Helper
     @Transactional
     private List<E> findEntityByAlternativeKey(final int nary, final Object altKeyVal) {
         final String entAltKey = alternativeNaryKeyFieldName(nary);
@@ -243,28 +248,23 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         return results;
     }
     
-    @Transactional
     protected void create() {
         this.entity = this.store.create(entity);
     }
     
-    @Transactional
     protected void read() {
         this.entity = this.store.read(entity);
     }
     
-    @Transactional
     protected void update() {
         this.entity = this.store.update(entity);
     }
     
-    @Transactional
     protected void delete() {
         this.entity = this.store.delete(entity);
     }
     
     // Returns objects id :: getter
-    @Transactional
     public Long find() {
         final Long id = this.getEntity().getId();
         
@@ -272,7 +272,6 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     }
     
     // Return objects id after binding it to a persisted entity :: setter
-    @Transactional
     public Long bind(Long id) {
         Long lid;
         E tmp;

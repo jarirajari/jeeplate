@@ -37,8 +37,11 @@ import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Digits;
+import org.sisto.jeeplate.authentication.role.ApplicationRoles;
+import org.sisto.jeeplate.authentication.role.SystemRoles;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.member.DomainGroupMemberEntity;
@@ -48,7 +51,6 @@ import org.sisto.jeeplate.domain.pk.TernaryKeyField;
 @Table(name = "system_users", uniqueConstraints = {
        @UniqueConstraint(columnNames = "username")})
 public class UserEntity extends BusinessEntity implements Serializable {
-    
     @Id @SequenceGenerator(name = "user_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
@@ -59,8 +61,10 @@ public class UserEntity extends BusinessEntity implements Serializable {
     protected Long mobile;
     @Embedded
     protected UserCredential credential;
-    @Enumerated(EnumType.STRING)
-    protected UserType.Type type;
+    @Embedded
+    protected ApplicationRoles appRole;
+    @Embedded
+    protected SystemRoles sysRole;
     @OneToOne(mappedBy = "ISAUser")
     protected DomainGroupMemberEntity associateddomain; 
     
@@ -69,7 +73,8 @@ public class UserEntity extends BusinessEntity implements Serializable {
         this.username = "";
         this.mobile = 0L;
         this.credential = new UserCredential();
-        this.type = UserType.Type.UNKNOWN;
+        this.appRole = new ApplicationRoles();
+        this.sysRole = new SystemRoles();
         this.associateddomain = null; // unfortunately we will have to use null!
     }
     
@@ -103,12 +108,20 @@ public class UserEntity extends BusinessEntity implements Serializable {
         return credential;
     }
 
-    public UserType.Type getType() {
-        return type;
+    public ApplicationRoles getAppRole() {
+        return appRole;
     }
 
-    public void setType(UserType.Type type) {
-        this.type = type;
+    public void setAppRole(ApplicationRoles appRole) {
+        this.appRole = appRole;
+    }
+
+    public SystemRoles getSysRole() {
+        return sysRole;
+    }
+
+    public void setSysRole(SystemRoles sysRole) {
+        this.sysRole = sysRole;
     }
 
     public DomainGroupMemberEntity getAssociateddomain() {

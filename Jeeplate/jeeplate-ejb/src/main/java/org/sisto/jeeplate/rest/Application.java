@@ -58,24 +58,26 @@ public class Application {
     */
     
     // From Java docs: "Values are URL decoded"
-    @GET @Path("initialize/{root}")
+    @GET @Path("initialize/{root}") @PKIRestricted
     public Response responseMsg(@PathParam("root") String initializeSystemCreateRootCmd,
             @DefaultValue("") @QueryParam("username") String username,
             @DefaultValue("") @QueryParam("password") String password,
             @DefaultValue("") @QueryParam("msisdn") String msisdn) {
-        final Boolean conf = this.application.configurationExists();
-        final String response = String.format("Hello from: %s. Conf=%s", initializeSystemCreateRootCmd, String.valueOf(conf));
-        
-        if (application.configurationExists()) {
+        final Boolean confCreated = this.application.configurationExists();
+        final Boolean validCMD = initializeSystemCreateRootCmd.equals("root");
+        final Boolean validUN = validator.validateUserName(username);
+        final Boolean validPW = validator.validateUserPassword(password);
+        final Boolean validPN = validator.validateUserPhone(msisdn);
+        final String response = String.format("Conf exists?=%s. un=%s pw=%s pn=%s", String.valueOf(confCreated),username,password,msisdn);
+        System.out.println(validCMD +","+ validUN +","+ validPW +","+ validPN);
+        if (confCreated) {
             log.info("Application already initialized!");
-        } if (initializeSystemCreateRootCmd.equals("root") &&
-            validator.validateUserName(username) &&
-            validator.validateUserPassword(password) &&
-            validator.validateUserPhone(msisdn)) {
+        } else if (validCMD && validUN && validPW && validPN) {
             log.info("***************** CREATING ROOT USER !!!!!!!!!!!!!!!!!!!!!!");
-            application.configureIdempotent();
+            
+            application.configureIdempotent(username, password, msisdn.replaceAll("[+]", ""));
         } else {
-            log.error("%s, %s, %s, %s", initializeSystemCreateRootCmd, username, password, msisdn);
+            log.error("err %s, %s, %s, %s", initializeSystemCreateRootCmd, username, password, msisdn);
         }
         
         return (Response.status(200).entity(response).build());
