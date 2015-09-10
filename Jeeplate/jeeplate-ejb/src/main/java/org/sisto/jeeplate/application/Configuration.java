@@ -22,6 +22,7 @@ import java.io.Serializable;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import org.sisto.jeeplate.authentication.role.SystemRole;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.space.DomainSpaceData;
 import org.sisto.jeeplate.domain.user.UserData;
@@ -51,7 +52,8 @@ public class Configuration implements Serializable {
             final UserEntity root = EntityBuilder.of().UserEntity()
                 .setUsername(rootUsername)
                 .setPassword(rootPassword)
-                .setMobile(Long.valueOf(rootMsisdn));
+                .setMobile(Long.valueOf(rootMsisdn))
+                .asRoot();
             this.user.createRootUser(root);
             this.domainSpace.originateSingletonDomainSpace();
         }

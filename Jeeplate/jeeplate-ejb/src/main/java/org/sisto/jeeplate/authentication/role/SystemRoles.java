@@ -27,6 +27,7 @@ import javax.persistence.Enumerated;
 // The access type for an embedded object is determined by the access type of the entity in which it is embedded.
 @Embeddable 
 public class SystemRoles implements Serializable {
+
     /*
      * System means all domains,
      * One domain is many groups,
@@ -48,10 +49,16 @@ public class SystemRoles implements Serializable {
         this.role = newRole;
     }
     
+    public SystemRoles asRoot() {
+        this.setRole(SystemRole.DOMAIN_ADMIN);
+        
+        return this;
+    }
+    
     public Boolean isRoot() {
         Boolean fact = Boolean.FALSE;
         
-        if (this.role == SystemRole.SYSTEM_ADMIN) {
+        if (this.role == SystemRole.DOMAIN_SPACE_ADMIN) {
             fact = Boolean.TRUE;
         }
         

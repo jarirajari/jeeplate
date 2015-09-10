@@ -41,6 +41,7 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Digits;
 import org.sisto.jeeplate.authentication.role.ApplicationRoles;
+import org.sisto.jeeplate.authentication.role.SystemRole;
 import org.sisto.jeeplate.authentication.role.SystemRoles;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.BusinessEntity;
@@ -122,6 +123,12 @@ public class UserEntity extends BusinessEntity implements Serializable {
 
     public void setSysRole(SystemRoles sysRole) {
         this.sysRole = sysRole;
+    }
+    
+    public UserEntity asRoot() {
+        this.getSysRole().setRole(SystemRole.DOMAIN_ADMIN);
+        
+        return this;
     }
 
     public DomainGroupMemberEntity getAssociateddomain() {

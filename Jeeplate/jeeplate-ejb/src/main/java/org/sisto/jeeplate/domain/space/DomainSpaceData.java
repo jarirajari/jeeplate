@@ -35,7 +35,6 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
         super(DomainSpaceData.class, DomainSpaceEntity.class);
     }
     
-    @Transactional
     public DomainSpaceData findSingletonDomainSpace() {
         final Long singletonDomainId = 1L;
         final DomainSpaceData singleton = this.findOne(singletonDomainId);
@@ -71,17 +70,15 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
         return auth;
     }
     
-    @Transactional
     public void insertNewDomain(String fqdn) {
         
-        // rules of who can do this
+        // rules of who can do this, string comes from mvc
         
         this.getEntity().insertNewDomain(fqdn);
         this.setEntity(null);
         this.update();
     }
     
-    @Transactional
     public void removeOldDomain(String fqdn) {
         
         // rules of who can do this

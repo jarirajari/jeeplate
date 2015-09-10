@@ -24,38 +24,44 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import org.jboss.logging.Logger;
+import org.sisto.jeeplate.logging.StringLogger;
 
-@SessionScoped
-@Named("language")
+@SessionScoped @Named("language")
 public class LanguageLocalisation implements Serializable {
+    private transient static final String DEFAULT_LANG = "europeanunion";
+    private transient static final String USA       = "en"; // en_US
+    private transient static final String ENGLISH   = "en"; // en_GB
+    private transient static final String FINNISH   = "fi"; // fi_FI
     
     @Inject
-    private transient Logger log;
-    // We need also separate lang for country US!
-    private static String USA       = "en"; // en_US
-    private static String ENGLISH   = "en"; // en_GB
-    private static String FINNISH   = "fi"; // fi_FI
+    private StringLogger log;
+    
     // Locale from Accept-Language header of users browser
-    private Locale browserLocale = FacesContext.getCurrentInstance().getExternalContext().getRequestLocale();
+    private Locale browserLocale;
     // Local from JSF view
-    private Locale viewLocale = FacesContext.getCurrentInstance().getViewRoot().getLocale();
+    private Locale viewLocale;
     // Locale from server
-    private Locale serverLocale = Locale.getDefault();
+    private Locale serverLocale;
+    // Languages
+    private static Map<String, Object> availableLanguages;
     
-    private static Map<String, Object> availableLanguages = null;
-    private String flagImageString = "";
-    
-    static {
+    @PostConstruct
+    public void init() {
         availableLanguages = new LinkedHashMap<>();
         availableLanguages.put("English(US)", USA);
         availableLanguages.put("English(UK)", ENGLISH);
         availableLanguages.put("Suomi", FINNISH);
+        
+        browserLocale = FacesContext.getCurrentInstance().getExternalContext().getRequestLocale();
+        viewLocale = FacesContext.getCurrentInstance().getViewRoot().getLocale();
+        serverLocale = Locale.getDefault();
     }
     
     public Map<String, Object> getAvailableLanguages() {
@@ -81,8 +87,7 @@ public class LanguageLocalisation implements Serializable {
     }
     
     public String getFlagImageString() {
-        String DEFAULT_LANG = "europeanunion";
-        String flag = DEFAULT_LANG;
+        String flag;
         Locale current = this.getCurrentLocale();
         String language = current.getLanguage();
         String country = current.getCountry();
@@ -117,7 +122,6 @@ public class LanguageLocalisation implements Serializable {
         if (isValidLang) {
             String country = this.serverLocale.getCountry();
             this.serverLocale = new Locale(language, country);
-            
         }
     }
 }

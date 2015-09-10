@@ -83,6 +83,15 @@
                         <f:ajax listener="#{restrictedView.configureApplication()}" event="click" render=":adminConfigure"/>
                     </p:commandButton>
                 </h:form>
+                <p>
+                    NEXT: as root add domain =&gt; create domain plus all-group for it<br/>
+                    NEXT: then finish new user registration flow (management for root for old users). Reg requires fqdn and domain secret in wizard.<br/>
+                    NEXT: admins can then add users to become members to certain domain groups in addition to all-group
+                    NEXT: domain group members can create and manage RESOURCES of the group
+                    NEXT: homepage for the group is ok
+                    
+                    JPA+Liquibase: http://www.operatornew.com/2012/11/automatic-db-migration-for-java-web.html
+                </p>
             </ui:define>
             <ui:define name="footer" rendered="false" />
         </ui:composition>

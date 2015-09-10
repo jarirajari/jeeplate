@@ -19,18 +19,25 @@
 package org.sisto.jeeplate.view;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
 import org.sisto.jeeplate.application.Configuration;
+import org.sisto.jeeplate.domain.space.DomainSpaceData;
 import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.util.MultiValidator;
 
 @Named @ViewScoped
 public class RestrictedView implements Serializable {
@@ -38,29 +45,26 @@ public class RestrictedView implements Serializable {
     // Grouping different model etc objects & instances, models are general
     
     @Inject
-    transient private StringLogger log;
+    StringLogger log;
     @Inject
-    private UserGroupMembershipData membership;
+    UserGroupMembershipData membership;
     @Inject
-    private Configuration appConf;
-    private Long selectedUser;
-    private Long selectedGroup;
-    private String input;
+    Configuration appConf;
+    @Inject
+    MultiValidator validator;
+    @Inject
+    DomainSpaceData space;
+    Long selectedUser;
+    Long selectedGroup;
+    String input;
+    String domain;
     
     @PostConstruct
     private void init() {
         this.selectedUser  = 0L;
         this.selectedGroup = 0L;
-    }
-    
-    public String getInput() {
-        return input;
-    }
- 
-    public void setInput(String input) {
-        if (input != null) {
-            this.input = input;
-        }
+        this.input = "";
+        this.domain = "";
     }
     
     public Long getSelectedUser() {
@@ -85,6 +89,34 @@ public class RestrictedView implements Serializable {
         return (this.selectedGroup);
     }
     
+    public String getInput() {
+        return input;
+    }
+ 
+    public void setInput(String input) {
+        if (input != null) {
+            this.input = input;
+        }
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        if (this.validator.validateURL(domain)) {
+            this.domain = this.findDomain(domain);
+        }
+    }
+    
+    public void createNewDomain() {
+        // create new ALL group
+        // create new domain
+        // add the group to it
+        // associate the domain to the space
+        
+    }
+    
     public Boolean addToGroup() {
         if (this.selectedUser != null && this.selectedGroup != null) {
             log.info("RestrictedView+UserGroupController -> add =>> u="+this.getSelectedUser()+"g="+this.getSelectedGroup()+"; "+this.toString());
@@ -98,9 +130,34 @@ public class RestrictedView implements Serializable {
     }
     
     public Boolean configureApplication() {
+        // TODO
         this.appConf.configureIdempotent("root@us.er", "aaAA11!!","333222111");
         
         return Boolean.FALSE;
+    }
+    
+    private String findDomain(String surl) {
+        URL url;
+        String domain;
+        
+        try {
+            url= new URL(surl);
+        } catch (MalformedURLException murle) {
+            url = null;
+        }
+        if (url != null) {
+            try {
+                final URI res = url.toURI();
+                final String host = res.getHost();
+                domain = host.startsWith("www.") ? host.substring(4) : host;
+            } catch (URISyntaxException urise) {
+                domain = "";
+            }
+        } else {
+            domain = "";
+        }
+        
+        return domain;
     }
     
     public void debug_HTTP_POST() {

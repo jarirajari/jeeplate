@@ -59,15 +59,11 @@
                     </p:commandButton>
                     
                     <!-- Primefaces' splitbutton cannot process dynamic lists, so we use this -->
-                    <h:outputLabel for="syslang" value="syslang"/>
-                   
-                        <p:inplace id="syslang" widgetVar="test" effect="none" label="#{language.getLocalisedLanguage()}">
-                            <h:selectOneMenu styleClass="selectLang" valueChangeListener="#{language.changeLanguage}">
-                                <p:ajax update="@all" />
-                                <f:selectItems value="#{language.availableLanguages}" />
-                            </h:selectOneMenu>
-                        </p:inplace>
-                    
+                    <h:outputLabel for="syslang" value=" "/>
+                    <h:selectOneMenu id="syslang" styleClass="selectLang" valueChangeListener="#{language.changeLanguage}">
+                        <p:ajax update="@all" />
+                        <f:selectItems value="#{language.availableLanguages}" />
+                    </h:selectOneMenu>
                 </f:facet>
             </p:menubar>
         </h:form>
@@ -137,54 +133,8 @@
                     <p:tab id="signupWzd9"  title="" titleStyleClass="ui-wizard-step-title-custom fa fa-check fa-2x">
                     </p:tab>
                 </p:wizard>
-                
             </h:form>
-            
         </p:dialog>
-        <!--<p:dialog rendered="{not mgr.authenticated()}" modal="true" header="Sign up" widgetVar="signupDlg" resizable="false">
-            <h:form id="signupForm">
-                <h:panelGrid id="signup" columns="1" >
-                    <f:facet name="header">
-                        <p:row>
-                            <p:column colspan="2">
-                                <p:outputPanel >
-                                    Register by filling out info below <p:commandLink value="link" />. 
-                                </p:outputPanel>
-                            </p:column>
-                        </p:row>
-                    </f:facet>
-
-                    <p:outputLabel for="signupEmail" value="Email:" />
-                    
-                    <p:inputText styleClass="signupEmail" id="signupEmail" value="{mgr.username}" required="true" >
-                        <p:graphicImage style="height:25px;width:25px" value="resources/images/football.png" />
-                        
-                    </p:inputText>
-                    <p:watermark for="signupEmail" value="user.name@email.com" />
-
-                    <p:outputLabel for="signupMobile" value="Mobile:" />
-                    
-                    <p:password id="signupMobile" value="{mgr.password}" required="true">
-                        <p:graphicImage style="height:25px;width:25px" value="resources/images/football.png" />
-                    </p:password>
-                    <p:watermark for="signupMobile" value="+358 12 3456789" />
-
-                    <p:commandLink value="Terms &amp; conds" onclick="PF('termsCondsDialog').show()" />
-                    <p:outputPanel id="signupResult">
-                        <h:message for="signupResult" styleClass="ui-outputlabel ui-widget ui-state-error" />
-                    </p:outputPanel>
-
-                    <p:outputLabel value="" />
-                    <p:outputPanel>
-                        <p:commandButton value="Sign up" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
-                                         update="signup" action="{mgr.submit}" />
-
-                        <p:commandButton value="Cancel" immediate="true" onclick="PF('signupDlg').hide();" 
-                                         update="signup,signupResult"/>
-                    </p:outputPanel>
-                </h:panelGrid>
-            </h:form>
-        </p:dialog>--><!-- /Signup dialog -->
         <!-- Signin dialog -->
         <p:dialog rendered="#{not mgr.authenticated()}" modal="true" header="Sign in" widgetVar="signinDlg" resizable="false">
             <h:form id="signinForm">

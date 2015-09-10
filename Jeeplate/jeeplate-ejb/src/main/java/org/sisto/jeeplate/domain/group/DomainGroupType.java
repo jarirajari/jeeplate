@@ -16,25 +16,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.authentication.role;
+package org.sisto.jeeplate.domain.group;
 
-public enum SystemRole {
+public enum DomainGroupType {
 
-    DOMAIN_SPACE_ADMIN("system-root"),
-    DOMAIN_ADMIN("domain-admin"),
-    DOMAIN_GROUP_ADMIN("group-admin"),
-    DOMAIN_GROUP_MEMBER("group-member"),
-    SYSTEM_USER("registered-user"),
-    GUEST_USER("unregistered-user");
+    ETY    ("EMPTY-Group", 0),
+    ANY    (" ANY -Group", 1),
+    ALL    (" ALL -Group", 2);
 
-    private final String role;
+    String name;
+    int id;
 
-    SystemRole(String s) {
-        this.role = s;
+    DomainGroupType(String name, int id) {
+        this.name = name;
+        this.id = id;
     }
     
-    @Override
-    public String toString() {
-        return (this.role);
+    public Integer emptyGroup() {
+        return 0;
+    }
+
+    private Integer anyGroup() {
+        return 1;
+    }
+    
+    public Integer allGroup() {
+        return 2;
     }
 }

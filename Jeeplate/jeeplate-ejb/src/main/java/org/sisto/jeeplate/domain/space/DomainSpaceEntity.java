@@ -39,8 +39,7 @@ import javax.persistence.Transient;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.base.DomainEntity;
 
-@Entity @Access(AccessType.FIELD)
-@Table(name = "system_application_space")
+@Entity @Access(AccessType.FIELD) @Table(name = "system_application_space")
 public class DomainSpaceEntity extends BusinessEntity implements Serializable {
     // single entity
     // java.util.collection of domains.
