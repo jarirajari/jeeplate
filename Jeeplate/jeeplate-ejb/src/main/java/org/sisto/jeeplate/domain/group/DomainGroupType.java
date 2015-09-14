@@ -20,27 +20,27 @@ package org.sisto.jeeplate.domain.group;
 
 public enum DomainGroupType {
 
-    ETY    ("EMPTY-Group", 0),
-    ANY    (" ANY -Group", 1),
-    ALL    (" ALL -Group", 2);
+    EMPTY   ("EMPTY", 0L),
+    ALL     ("ALL", 1L),
+    SOME    ("SOME", 2L); // 2...MAX
 
-    String name;
-    int id;
+    private String name;
+    private Long id;
 
-    DomainGroupType(String name, int id) {
+    DomainGroupType(String name, Long id) {
         this.name = name;
         this.id = id;
     }
     
-    public Integer emptyGroup() {
-        return 0;
-    }
-
-    private Integer anyGroup() {
-        return 1;
+    public Long id() {
+        return (this.id);
     }
     
-    public Integer allGroup() {
-        return 2;
+    public Long emptyGroup() {
+        return 0L;
+    }
+    
+    public Long allGroup() {
+        return 1L;
     }
 }

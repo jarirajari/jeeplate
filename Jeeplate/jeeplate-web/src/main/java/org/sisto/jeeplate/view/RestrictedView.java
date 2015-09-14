@@ -34,6 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
 import org.sisto.jeeplate.application.Configuration;
+import org.sisto.jeeplate.domain.base.DomainData;
+import org.sisto.jeeplate.domain.group.DomainGroupData;
+import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
 import org.sisto.jeeplate.domain.space.DomainSpaceData;
 import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.logging.StringLogger;
@@ -47,24 +50,28 @@ public class RestrictedView implements Serializable {
     @Inject
     StringLogger log;
     @Inject
-    UserGroupMembershipData membership;
-    @Inject
     Configuration appConf;
     @Inject
     MultiValidator validator;
     @Inject
     DomainSpaceData space;
+    @Inject
+    DomainData domain;
+    @Inject
+    DomainGroupData group;
+    @Inject
+    DomainGroupMembershipData membership;
     Long selectedUser;
     Long selectedGroup;
-    String input;
-    String domain;
+    String IOInput;
+    String IODomain;
     
     @PostConstruct
     private void init() {
         this.selectedUser  = 0L;
         this.selectedGroup = 0L;
-        this.input = "";
-        this.domain = "";
+        this.IOInput = "";
+        this.IODomain = "";
     }
     
     public Long getSelectedUser() {
@@ -89,23 +96,23 @@ public class RestrictedView implements Serializable {
         return (this.selectedGroup);
     }
     
-    public String getInput() {
-        return input;
+    public String getIOInput() {
+        return (this.IOInput);
     }
  
-    public void setInput(String input) {
-        if (input != null) {
-            this.input = input;
+    public void setIOInput(String newInput) {
+        if (newInput != null) {
+            this.IOInput = newInput;
         }
     }
 
-    public String getDomain() {
-        return domain;
+    public String getIODomain() {
+        return (this.IODomain);
     }
 
-    public void setDomain(String domain) {
-        if (this.validator.validateURL(domain)) {
-            this.domain = this.findDomain(domain);
+    public void setIODomain(String newdomain) {
+        if (this.validator.validateURL(newdomain)) {
+            this.IODomain = this.findDomain(newdomain);
         }
     }
     
@@ -114,13 +121,18 @@ public class RestrictedView implements Serializable {
         // create new domain
         // add the group to it
         // associate the domain to the space
-        
+        final String newAppDom = this.getIODomain();
+        group.createDefaultALLDomainGroupForNewDomain();
+        domain.createNewApplicatoinDomain(newAppDom);
+        // TODO
+        membership.addNewMember(0L);
+        space.insertNewDomain("na");
     }
     
     public Boolean addToGroup() {
         if (this.selectedUser != null && this.selectedGroup != null) {
             log.info("RestrictedView+UserGroupController -> add =>> u="+this.getSelectedUser()+"g="+this.getSelectedGroup()+"; "+this.toString());
-            membership.addNewMember(selectedUser, selectedGroup);
+            // old: membership.addNewMember(selectedUser, selectedGroup);
         }
         return Boolean.FALSE;
     }

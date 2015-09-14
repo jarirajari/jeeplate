@@ -19,26 +19,23 @@
 package org.sisto.jeeplate.domain.group;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.base.DomainEntity;
-import org.sisto.jeeplate.domain.group.member.DomainGroupMemberEntity;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 
 @Entity @Access(AccessType.FIELD) @Table(name = "domain_groups")
@@ -49,19 +46,20 @@ public class DomainGroupEntity extends BusinessEntity implements Serializable {
     @GeneratedValue(generator = "domain_group_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
     protected String groupname;
-    @ManyToOne @JoinColumn(name = "domain_fk")
-    protected DomainEntity domain;
-    // Domain groups will be mapped independently with separated association
-    @OneToMany(mappedBy = "domaingroup")
-    protected List<DomainGroupMemberEntity> allDomaingroupmembers;
+    @Enumerated(EnumType.STRING)
     protected DomainGroupType type;
+    @ManyToOne @JoinColumn(name = "domain_fk")
+    protected DomainEntity parentdomain;
+    /*
+     * DomainGroupMembers accessed via memberhips:
+     * NO! DomainGroupMembershipEntity allDomaingroupMemberships;
+     */
     
     public DomainGroupEntity() {
         this.id = BusinessEntity.DEFAULT_ID;
         this.groupname = "";
-        this.domain = null; // unfortunately we will have to use null
-        this.allDomaingroupmembers = new ArrayList<>();
-        this.type = DomainGroupType.ETY;
+        this.type = DomainGroupType.EMPTY;
+        this.parentdomain = null; // unfortunately we will have to use null
     }
     
     @PostLoad @PostPersist @PostUpdate 
@@ -81,31 +79,30 @@ public class DomainGroupEntity extends BusinessEntity implements Serializable {
     }
 
     public DomainEntity getDomain() {
-        return domain;
+        return parentdomain;
     }
 
     public DomainGroupEntity setDomain(DomainEntity domain) {
-        this.domain = domain;
+        this.parentdomain = domain;
         
         return this;
     }
-
-    public List<DomainGroupMemberEntity> getAllDomaingroupmembers() {
-        return allDomaingroupmembers;
-    }
-
-    public DomainGroupEntity setAllDomaingroupmembers(List<DomainGroupMemberEntity> allDomaingroupmembers) {
-        this.allDomaingroupmembers = allDomaingroupmembers;
-        
-        return this;
-    }
-
+    
     public DomainGroupType getType() {
         return type;
     }
 
     public DomainGroupEntity setType(DomainGroupType type) {
         this.type = type;
+        
+        return this;
+    }
+    
+    public DomainGroupEntity defaultALL() {
+        final DomainGroupType tall = DomainGroupType.ALL;
+        this.setType(tall);
+        this.setGroupname(tall.toString());
+        this.setId(tall.id());
         
         return this;
     }

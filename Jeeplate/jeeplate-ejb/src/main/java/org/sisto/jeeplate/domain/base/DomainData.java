@@ -19,12 +19,11 @@
 package org.sisto.jeeplate.domain.base;
 
 import java.io.Serializable;
-import javax.enterprise.context.Dependent;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
+import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
 
 @SessionScoped
@@ -43,19 +42,21 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
     @Inject @Default
     Domain domain;
     
-    @Inject @Dependent
+    @Inject @Default
     DomainGroupMembershipData groups;
     
     public DomainData() {
         super(DomainData.class, DomainEntity.class);
     }
     
-    @Transactional
-    public void addNewDomain() {
-        // new domain with "all" group  
+    public void createNewApplicatoinDomain(String domainName) {
+        DomainEntity entity = EntityBuilder.of().DomainEntity()
+                .setDomainname(domainName)
+                .setDomaintype(DomainType.Type.APPLICATION);
+        this.setEntity(entity);
+        this.create();
     }
     
-    @Transactional
     public String applyForUserAccount() {
         Boolean userNotExist = this.getDataModel().isDefault();
         DomainRegistration reg  = this.getDataModel().getRegistration();
@@ -75,7 +76,6 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
         return token;
     }
     
-    @Transactional
     public Boolean grantUserAccount(String typedMobile, String typedPassword, String emailedResetToken) {
         Boolean granted = Boolean.FALSE;
         DomainRegistration gdr = this.getDataModel().getRegistration();
@@ -95,7 +95,6 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
         return granted;
     }
     
-    @Transactional
     public DomainData findOneDomain(final String domainIdentifier) {
         return (this.findOneSecondary(domainIdentifier));
     }

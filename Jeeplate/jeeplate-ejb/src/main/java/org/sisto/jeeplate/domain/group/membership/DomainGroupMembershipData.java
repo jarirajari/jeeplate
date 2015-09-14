@@ -23,7 +23,6 @@ import java.util.Map;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
@@ -41,21 +40,25 @@ public class DomainGroupMembershipData extends BusinessBean<DomainGroupMembershi
         super(DomainGroupMembershipData.class, DomainGroupMembershipEntity.class);
     }
     
-    @Transactional
     public Map<Long, DomainGroupData> findDomainGroups(final Long domainId) {
         final Map<Long, DomainGroupData> results = this.member.findDomainGroups(domainId);
         
         return results;
     }
     
-    @Transactional
-    public void addNewMember(Long domain) {
-        DomainGroupData group = this.member.createNewDomainGroupForDomain();
-        Long memberId = group.getDataModel().getId();
+    public void makeUserNewMemberToDomain(Long userIdNewMember) {
         DomainGroupMembershipEntity mship = EntityBuilder.of().DomainGroupMembershipEntity()
-                .setDomainReference(domain)
+                .setGroupMemberReference(userIdNewMember);
+        this.setEntity(mship);
+        this.create();
+    }
+    
+    public void addNewMember(Long userIdNewMember) {
+        this.member.createNewDomainGroupForDomain();
+        Long memberId = this.member.getDataModel().getId();
+        DomainGroupMembershipEntity mship = EntityBuilder.of().DomainGroupMembershipEntity()
                 .setGroupMemberReference(memberId);
         this.setEntity(mship);
-        this.create();   
+        this.create();
     }
 }

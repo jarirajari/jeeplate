@@ -37,22 +37,24 @@ import org.sisto.jeeplate.domain.BusinessEntity;
 @Entity @Access(AccessType.FIELD)
 @Table(name = "group_domain_membership")
 public class DomainGroupMembershipEntity extends BusinessEntity 
- implements Serializable, Unidirectional, OneToMany {
+  implements Serializable, Unidirectional, OneToMany {
+    
     @Id @SequenceGenerator(name = "group_domain_membership_sqe", allocationSize = 1)
     @GeneratedValue(generator = "group_domain_membership_sqe", strategy = GenerationType.SEQUENCE)
-    private Long id;
+    protected Long id;
     /*
      * When the foreign key references are not really references, but
      * just primary key values, we can better control loading and searching
      * of them, which is idea behind tearing down JPA collection mapping...
      * At this point NO FK constraints will be used!
      */
-    private Long groupMemberReference;
-    private Long groupReference;
-    private Long domainReference; // one user can belong to only one domain!
+    protected Long domaingroupReference;
+    protected Long domaingroupMemberReference;
     
     public DomainGroupMembershipEntity() {
-        
+        this.id = BusinessEntity.DEFAULT_ID;
+        this.domaingroupReference = BusinessEntity.DEFAULT_ID;
+        this.domaingroupMemberReference = BusinessEntity.DEFAULT_ID;
     }
     
     @PostLoad @PostPersist @PostUpdate 
@@ -61,32 +63,22 @@ public class DomainGroupMembershipEntity extends BusinessEntity
         super.setId(this.id);
     }
 
-    public Long getGroupMemberReference() {
-        return groupMemberReference;
-    }
-
-    public DomainGroupMembershipEntity setGroupMemberReference(Long groupMemberReference) {
-        this.groupMemberReference = groupMemberReference;
-        
-        return this;
-    }
-
     public Long getGroupReference() {
-        return groupReference;
+        return domaingroupReference;
     }
 
     public DomainGroupMembershipEntity setGroupReference(Long groupReference) {
-        this.groupReference = groupReference;
+        this.domaingroupReference = groupReference;
         
         return this;
     }
     
-    public Long getDomainReference() {
-        return domainReference;
+    public Long getGroupMemberReference() {
+        return domaingroupMemberReference;
     }
 
-    public DomainGroupMembershipEntity setDomainReference(Long domainReference) {
-        this.domainReference = domainReference;
+    public DomainGroupMembershipEntity setGroupMemberReference(Long groupMemberReference) {
+        this.domaingroupMemberReference = groupMemberReference;
         
         return this;
     }

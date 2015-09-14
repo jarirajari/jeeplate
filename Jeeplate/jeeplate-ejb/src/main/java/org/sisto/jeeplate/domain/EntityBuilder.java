@@ -18,61 +18,86 @@
  */
 package org.sisto.jeeplate.domain;
 
+import org.sisto.jeeplate.domain.base.DomainEntity;
+import org.sisto.jeeplate.domain.group.DomainGroupEntity;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipEntity;
+import org.sisto.jeeplate.domain.space.DomainSpaceEntity;
 import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.domain.user.group.UserGroupEntity;
 import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipEntity;
 
 public class EntityBuilder<T> {
-        
-        private Class<T> type;
-        private Object entity;
-        
-        private EntityBuilder() {}
-        
-        private Class init(Class clazz) {
-            type = clazz;
-            try {
-                entity = type.newInstance();
-            } catch (InstantiationException | IllegalAccessException ex) {
-                entity = null;
-            }
-            
-            return clazz;
-        }
-        
-        public static EntityBuilder of() {
-            return (new EntityBuilder());
-        }
-        
-        /*
-         * Hacking semi-generic builder for entities 
-         */
-        public UserEntity UserEntity() {
-            Class c = this.init(UserEntity.class);
-            UserEntity e = (UserEntity) entity;
-            
-            return e;
-        }
-        
-        public UserGroupEntity UserGroupEntity() {
-            Class c = this.init(UserGroupEntity.class);
-            UserGroupEntity e = (UserGroupEntity) entity;
-            
-            return e;
-        }
-        
-        public DomainGroupMembershipEntity DomainGroupMembershipEntity() {
-            Class c = this.init(DomainGroupMembershipEntity.class);
-            DomainGroupMembershipEntity e = (DomainGroupMembershipEntity) entity;
-            
-            return e;
-        }
-        
-        public UserGroupMembershipEntity UserGroupMembershipEntity() {
-            Class c = this.init(UserGroupMembershipEntity.class);
-            UserGroupMembershipEntity e = (UserGroupMembershipEntity) entity;
-            
-            return e;
-        }
+
+    private Class<T> type;
+    private Object entity;
+
+    private EntityBuilder() {
     }
+
+    private Class init(Class clazz) {
+        type = clazz;
+        try {
+            entity = type.newInstance();
+        } catch (InstantiationException | IllegalAccessException ex) {
+            entity = null;
+        }
+
+        return clazz;
+    }
+
+    public static EntityBuilder of() {
+        return (new EntityBuilder());
+    }
+
+    /*
+     * Hacking semi-generic builder for entities 
+     */
+    public UserEntity UserEntity() {
+        Class c = this.init(UserEntity.class);
+        UserEntity e = (UserEntity) entity;
+
+        return e;
+    }
+
+    public UserGroupEntity UserGroupEntity() {
+        Class c = this.init(UserGroupEntity.class);
+        UserGroupEntity e = (UserGroupEntity) entity;
+
+        return e;
+    }
+
+    public UserGroupMembershipEntity UserGroupMembershipEntity() {
+        Class c = this.init(UserGroupMembershipEntity.class);
+        UserGroupMembershipEntity e = (UserGroupMembershipEntity) entity;
+
+        return e;
+    }
+
+    public DomainSpaceEntity DomainSpaceEntity() {
+        Class c = this.init(DomainSpaceEntity.class);
+        DomainSpaceEntity e = (DomainSpaceEntity) entity;
+
+        return e;
+    }
+
+    public DomainEntity DomainEntity() {
+        Class c = this.init(DomainEntity.class);
+        DomainEntity e = (DomainEntity) entity;
+
+        return e;
+    }
+    
+    public DomainGroupEntity DomainGroupEntity() {
+        Class c = this.init(DomainGroupEntity.class);
+        DomainGroupEntity e = (DomainGroupEntity) entity;
+
+        return e;
+    }
+
+    public DomainGroupMembershipEntity DomainGroupMembershipEntity() {
+        Class c = this.init(DomainGroupMembershipEntity.class);
+        DomainGroupMembershipEntity e = (DomainGroupMembershipEntity) entity;
+
+        return e;
+    }
+}

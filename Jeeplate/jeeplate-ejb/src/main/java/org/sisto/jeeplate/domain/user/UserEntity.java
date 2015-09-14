@@ -19,25 +19,20 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
-import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Digits;
 import org.sisto.jeeplate.authentication.role.ApplicationRoles;
@@ -46,12 +41,14 @@ import org.sisto.jeeplate.authentication.role.SystemRoles;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.member.DomainGroupMemberEntity;
+import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipEntity;
 import org.sisto.jeeplate.domain.pk.TernaryKeyField;
 
 @Entity @Access(AccessType.FIELD)
 @Table(name = "system_users", uniqueConstraints = {
        @UniqueConstraint(columnNames = "username")})
 public class UserEntity extends BusinessEntity implements Serializable {
+    
     @Id @SequenceGenerator(name = "user_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
@@ -66,8 +63,12 @@ public class UserEntity extends BusinessEntity implements Serializable {
     protected ApplicationRoles appRole;
     @Embedded
     protected SystemRoles sysRole;
-    @OneToOne(mappedBy = "ISAUser")
-    protected DomainGroupMemberEntity associateddomain; 
+    // User is a member in many groups and each group can contain many members
+    /*
+     * Domain <-- membership --> Domaingroup. Memberships is a separately accessed object:
+     * NO reference at entity level should be used
+     */
+    // protected UserAccount account; // User has one account
     
     public UserEntity() {
         this.id = DEFAULT_ID;
@@ -76,7 +77,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
         this.credential = new UserCredential();
         this.appRole = new ApplicationRoles();
         this.sysRole = new SystemRoles();
-        this.associateddomain = null; // unfortunately we will have to use null!
+
     }
     
     @PostLoad @PostPersist @PostUpdate
@@ -131,15 +132,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
         return this;
     }
 
-    public DomainGroupMemberEntity getAssociateddomain() {
-        return associateddomain;
-    }
 
-    public UserEntity setAssociateddomain(DomainGroupMemberEntity associateddomain) {
-        this.associateddomain = associateddomain;
-        
-        return this;
-    }
     
     // Not a property since no field
     public UserEntity setPassword(String password) {

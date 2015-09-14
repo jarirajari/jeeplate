@@ -30,6 +30,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapKey;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -48,7 +51,7 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
     
     @Id
     private Long id;
-    @OneToMany(mappedBy = "domainspace", fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER) @MapKeyColumn(name = "domain_name")
     private Map<String, DomainEntity> allDomains; // loose if <Long> or tight if <DomainEntity>
     
     public DomainSpaceEntity() {

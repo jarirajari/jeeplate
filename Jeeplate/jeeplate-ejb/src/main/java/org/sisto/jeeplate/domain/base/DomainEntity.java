@@ -32,6 +32,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKey;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -58,8 +60,10 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     protected DomainType.Type domaintype;
     @Embedded @SecondaryKeyField(keyname = "registration.partDomainDeliveredSeparately", description = "Embedded domain name part")
     protected DomainRegistration registration;
-    @ManyToOne @JoinColumn(name = "domain_space")
+    @ManyToOne @JoinColumn(name = "domain_fk")
     protected DomainSpaceEntity domainspace;
+    @OneToMany(mappedBy = "parentdomain") @MapKeyColumn(name = "group_name")
+    protected Map<String, DomainGroupEntity> allDomaingroups;
     /*
     
     When you create a new domain => create also "ALL" group first!
@@ -73,8 +77,6 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     Again, after space created => "root" creates "domains"
     
     */
-    @OneToMany(mappedBy = "domain")
-    protected Map<String, DomainGroupEntity> allDomaingroups;
     
     public DomainEntity() {
         this.id = DEFAULT_ID;
@@ -100,39 +102,49 @@ public class DomainEntity extends BusinessEntity implements Serializable {
         return domainname;
     }
 
-    public void setDomainname(String domainname) {
+    public DomainEntity setDomainname(String domainname) {
         this.domainname = domainname;
+        
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public DomainEntity setDescription(String description) {
         this.description = description;
+        
+        return this;
     }
 
     public DomainType.Type getDomaintype() {
         return domaintype;
     }
 
-    public void setDomaintype(DomainType.Type domaintype) {
+    public DomainEntity setDomaintype(DomainType.Type domaintype) {
         this.domaintype = domaintype;
+        
+        return this;
     }
 
     public DomainRegistration getRegistration() {
         return registration;
     }
 
-    public void setRegistration(DomainRegistration registration) {
+    public DomainEntity setRegistration(DomainRegistration registration) {
         this.registration = registration;
+        
+        return this;
     }
 
     public DomainSpaceEntity getDomainspace() {
         return domainspace;
     }
 
-    public void setDomainspace(DomainSpaceEntity domainspace) {
+    public DomainEntity setDomainspace(DomainSpaceEntity domainspace) {
         this.domainspace = domainspace;
+        
+        return this;
     }
 }
