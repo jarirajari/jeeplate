@@ -25,6 +25,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -33,6 +34,8 @@ import javax.persistence.Table;
 import org.sisto.jeeplate.association.cardinality.OneToMany;
 import org.sisto.jeeplate.association.direction.Unidirectional;
 import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.domain.EntityBuilder;
+import org.sisto.jeeplate.domain.user.UserEntity;
 
 @Entity @Access(AccessType.FIELD)
 @Table(name = "group_domain_membership")
@@ -50,11 +53,14 @@ public class DomainGroupMembershipEntity extends BusinessEntity
      */
     protected Long domaingroupReference;
     protected Long domaingroupMemberReference;
+    @ManyToOne
+    protected UserEntity systemUser; 
     
     public DomainGroupMembershipEntity() {
         this.id = BusinessEntity.DEFAULT_ID;
         this.domaingroupReference = BusinessEntity.DEFAULT_ID;
         this.domaingroupMemberReference = BusinessEntity.DEFAULT_ID;
+        this.systemUser = EntityBuilder.of().UserEntity();
     }
     
     @PostLoad @PostPersist @PostUpdate 

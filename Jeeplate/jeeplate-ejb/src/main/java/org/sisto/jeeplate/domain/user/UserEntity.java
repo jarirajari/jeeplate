@@ -18,7 +18,10 @@
  */
 package org.sisto.jeeplate.domain.user;
 
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embedded;
@@ -27,6 +30,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -63,12 +67,10 @@ public class UserEntity extends BusinessEntity implements Serializable {
     protected ApplicationRoles appRole;
     @Embedded
     protected SystemRoles sysRole;
-    // User is a member in many groups and each group can contain many members
-    /*
-     * Domain <-- membership --> Domaingroup. Memberships is a separately accessed object:
-     * NO reference at entity level should be used
-     */
-    // protected UserAccount account; // User has one account
+    // User is a member in many groups and each group can contain many members => membership
+    @OneToMany(mappedBy = "systemUser")
+    protected List<DomainGroupMembershipEntity> domaingroupMemberships;
+    //protected UserAccount account; // User has one account
     
     public UserEntity() {
         this.id = DEFAULT_ID;
@@ -77,7 +79,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
         this.credential = new UserCredential();
         this.appRole = new ApplicationRoles();
         this.sysRole = new SystemRoles();
-
+        this.domaingroupMemberships = new ArrayList<>();
     }
     
     @PostLoad @PostPersist @PostUpdate
@@ -114,16 +116,30 @@ public class UserEntity extends BusinessEntity implements Serializable {
         return appRole;
     }
 
-    public void setAppRole(ApplicationRoles appRole) {
+    public UserEntity setAppRole(ApplicationRoles appRole) {
         this.appRole = appRole;
+        
+        return this;
     }
 
     public SystemRoles getSysRole() {
         return sysRole;
     }
 
-    public void setSysRole(SystemRoles sysRole) {
+    public UserEntity setSysRole(SystemRoles sysRole) {
         this.sysRole = sysRole;
+        
+        return this;
+    }
+
+    public List<DomainGroupMembershipEntity> getDomaingroupMemberships() {
+        return domaingroupMemberships;
+    }
+
+    public UserEntity setDomaingroupMemberships(List<DomainGroupMembershipEntity> memberships) {
+        this.domaingroupMemberships = memberships;
+        
+        return this;
     }
     
     public UserEntity asRoot() {
@@ -131,8 +147,6 @@ public class UserEntity extends BusinessEntity implements Serializable {
         
         return this;
     }
-
-
     
     // Not a property since no field
     public UserEntity setPassword(String password) {

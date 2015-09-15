@@ -49,7 +49,9 @@ public class UserGroupMembershipEntity extends BusinessEntity implements Seriali
     private Long userReference;
     
     public UserGroupMembershipEntity() {
-        
+        this.id = BusinessEntity.DEFAULT_ID;
+        this.groupReference = BusinessEntity.DEFAULT_ID;
+        this.userReference = BusinessEntity.DEFAULT_ID;
     }
     
     @PostLoad @PostPersist @PostUpdate 

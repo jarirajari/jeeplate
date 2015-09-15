@@ -29,11 +29,10 @@ import org.sisto.jeeplate.util.ApplicationProperty;
 public class HelloEJBBean {
 
     @Inject
-    private transient Logger log;
+    Logger log;
     
-    @Inject
-    @ApplicationProperty(name = "test.message", defaultValue = "test msg prop ok")
-    private String myProperty;
+    @Inject @ApplicationProperty(name = "test.message", defaultValue = "test msg prop ok")
+    String myProperty;
     
     public HelloEJBBean() {}
     
