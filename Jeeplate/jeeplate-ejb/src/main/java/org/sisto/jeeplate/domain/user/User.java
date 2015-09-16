@@ -24,20 +24,17 @@ import javax.inject.Inject;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.rules.GenericRule;
 
-@Dependent
+
 public class User implements Serializable {
 
     @Inject
-    private transient StringLogger log;
+    StringLogger log;
     
     @Inject
-    private UserData data;
+    GenericRule rule;
     
     @Inject
-    private GenericRule rule;
-    
-    @Inject
-    private UserLogic logic; // or requirements
+    UserLogic logic; // or requirements
     
     /*
      * User is a domain group member. Note that here we use inner/

@@ -27,29 +27,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.ejb.Stateful;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Any;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.pk.TernaryKeyField;
 import org.sisto.jeeplate.domain.pk.TertiaryKeyField;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.ApplicationProperty;
 
-@Dependent
 public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEntity> implements Serializable {
     
-    @Inject @Any
+    @Inject  
     protected StringLogger log;
     
     @Inject @ApplicationProperty(name = "test.message", defaultValue = "jee@pla.te")
-    String systemEmailAddress;
+    protected String systemEmailAddress;
     
-    @Inject @Any
-    BusinessEntityStore<E> store;
+    @Inject 
+    protected BusinessEntityStore<E> store;
     
     protected final Class<E> entityBeanType;
     protected final Class<D> dataBeanType;
@@ -75,11 +71,24 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         this.setEntity(e);
     }
     
+    public BusinessBean() {
+        this.entityBeanType = null;
+        this.dataBeanType   = null;
+        this.entityString = null;
+        this.dataString   = null;
+        this.entity = null;
+    }
+    
     public BusinessBean(Class<D> dataType, Class<E> entityType) {
         this.entityBeanType = entityType;
         this.dataBeanType   = dataType;
         this.entityString = parseName(entityBeanType.getSimpleName());
         this.dataString   = parseName(dataBeanType.getSimpleName());
+        try {
+            this.entity = (E) this.entityBeanType.newInstance();
+        } catch (InstantiationException | IllegalAccessException ex) {
+            this.entity = null;
+        }
     }
     
     public void createTestData(E ... ents) {
@@ -166,7 +175,6 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     }
     
     // Find ALL users with primary PK id
-    @Transactional
     public Map<Long, D> findAll() {
         final String query = String.format("SELECT e FROM %s e", entityString);
         final Map<String, Object> params = new HashMap<>();
@@ -176,7 +184,6 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     }
     
     // Find ALL users with secondary (alternative) PK
-    @Transactional
     private Map<Long, D> findAllAlternative(final int nary, final Object altKeyVal) {
         final List<E> results = this.findEntityByAlternativeKey(nary, altKeyVal);
         
@@ -192,7 +199,6 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     }
     
     // Find ONE with primary PK id, note return format
-    @Transactional
     public D findOne(final Long withId) {
         final String entityId = "entityId";
         final String query = String.format("SELECT e FROM %s e WHERE e.id = :%s", entityString, entityId);
@@ -205,7 +211,6 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     }
     
     // Find ONE user with secondary (alternative) PK, note return format
-    @Transactional
     private D findOneAlternative(final int nary, final Object altKeyVal) {
         List<E> results = this.findEntityByAlternativeKey(nary, altKeyVal);
         
@@ -230,7 +235,6 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         return (findOneAlternative(4, altKeyVal));
     }
     
-    @Transactional
     private List<E> findEntityByAlternativeKey(final int nary, final Object altKeyVal) {
         final String entAltKey = alternativeNaryKeyFieldName(nary);
         final String query = String.format("SELECT e FROM %s e WHERE e.%s = :%s", entityString, entAltKey, entAltKey);
@@ -266,9 +270,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     
     // Returns objects id :: getter
     public Long find() {
-        final Long id = this.getEntity().getId();
-        
-        return id;
+        return (this.bind(this.entity.getId()));
     }
     
     // Return objects id after binding it to a persisted entity :: setter

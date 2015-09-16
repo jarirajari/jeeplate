@@ -32,7 +32,7 @@ public class UserDataConverter implements Converter {
      * UserData bean should not even know about it's identity
      */
     @Inject
-    private UserData bean; // two-level lazy loading: 1st bean, 2nd database
+    UserData bean; // two-level lazy loading: 1st bean, 2nd database
 
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String uiValue) {

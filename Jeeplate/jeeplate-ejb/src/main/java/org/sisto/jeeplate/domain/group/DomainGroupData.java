@@ -20,16 +20,16 @@ package org.sisto.jeeplate.domain.group;
 
 import java.io.Serializable;
 import java.util.Map;
+import javax.ejb.Stateful;
 import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 
-@SessionScoped
+@Stateful
 public class DomainGroupData extends BusinessBean<DomainGroupData, DomainGroupEntity> implements Serializable {
-    
-    @Inject @Default
+            
+    @Inject
     DomainGroup group;
     
     public DomainGroupData() {
@@ -42,9 +42,10 @@ public class DomainGroupData extends BusinessBean<DomainGroupData, DomainGroupEn
     }
     
     public void createDefaultALLDomainGroupForNewDomain() {
-        DomainGroupEntity entity = EntityBuilder.of().DomainGroupEntity()
+        DomainGroupEntity dge = EntityBuilder.of().DomainGroupEntity()
+                .setGroupname(DomainGroupType.ALL.name())
                 .defaultALL();
-        this.setEntity(entity);
+        this.setEntity(dge);
         this.create();
     }
     

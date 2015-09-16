@@ -29,7 +29,7 @@
             <!-- Override template content -->
             <ui:define name="content">
                 <p>Restricted.xhtml default content</p>
-                <h:form>
+                <h:form id="first">
                     <p>
                         <p:outputLabel for="domains" value="Domains: " />
                         <h:selectOneMenu id="domains">
@@ -37,7 +37,7 @@
                         </h:selectOneMenu>
                         <br />
                         <p:outputLabel for="domain" value="Add domain: " />
-                        <h:inputText id="domain" />
+                        <p:inputText id="domain" value="#{restrictedView.IODomain}" />
                         <br />
                         <p:outputLabel for="users" value="Users: " />
                         <h:selectOneMenu id="users">
@@ -45,7 +45,7 @@
                         </h:selectOneMenu>
                         <br />
                         <p:outputLabel for="user" value="Add user: " />
-                        <h:inputText id="user" />
+                            <p:inputText id="user" />
                         <br />
                         <p:outputLabel for="groups" value="Groups: " />
                         <h:selectOneMenu id="groups">
@@ -56,7 +56,11 @@
                         <h:inputText id="group" />
                         <br />
                     </p>
-                    <p:commandButton value="Lähetä" actionListener="#{userController.addUserToGroups()}" icon="fa fa-edit" type="button"/>
+                    
+                    <p:commandButton value="+Domain" icon="fa fa-edit" process="@form" 
+                                     action="#{restrictedView.createNewDomain()}">
+                        
+                    </p:commandButton>
                 </h:form>
                 <h:form id="add">
                     <p>

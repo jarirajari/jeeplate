@@ -31,23 +31,21 @@ public class EntityManagerProducer {
     @PersistenceContext(type=PersistenceContextType.TRANSACTION, unitName = "h2PU")
     private EntityManager h2EntityManager;
     
-    @PersistenceContext(type=PersistenceContextType.TRANSACTION, unitName = "pgPU")
+    // http://docs.jboss.org/ejb3/app-server/tutorial/extended_pc/extended.html
+    @PersistenceContext(type=PersistenceContextType.EXTENDED, unitName = "pgPU")
     private EntityManager pgEntityManager;
 
-    @Produces
-    @Default
+    @Produces @Default 
     public EntityManager createDefault() {
-        return this.h2EntityManager;
+        return this.pgEntityManager;
     }
     
-    @Produces
-    @H2EM
+    @Produces @H2EM 
     public EntityManager createH2() {
         return this.h2EntityManager;
     }
     
-    @Produces
-    @PGEM
+    @Produces @PGEM 
     public EntityManager createPG() {
         return this.pgEntityManager;
     }

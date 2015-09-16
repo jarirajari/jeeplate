@@ -18,7 +18,6 @@
  */
 package org.sisto.jeeplate.domain.user;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +28,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -44,7 +41,6 @@ import org.sisto.jeeplate.authentication.role.SystemRole;
 import org.sisto.jeeplate.authentication.role.SystemRoles;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.BusinessEntity;
-import org.sisto.jeeplate.domain.group.member.DomainGroupMemberEntity;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipEntity;
 import org.sisto.jeeplate.domain.pk.TernaryKeyField;
 

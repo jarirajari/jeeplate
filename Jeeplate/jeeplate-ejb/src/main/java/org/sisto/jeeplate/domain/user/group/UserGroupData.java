@@ -20,6 +20,7 @@ package org.sisto.jeeplate.domain.user.group;
 
 import java.io.Serializable;
 import java.util.Map;
+import javax.ejb.Stateful;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
@@ -27,10 +28,10 @@ import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 
-@SessionScoped
+@Stateful
 public class UserGroupData extends BusinessBean<UserGroupData, UserGroupEntity> implements Serializable {
     
-    @Inject @Default
+    @Inject 
     UserGroup group;
     
     private transient final UserGroupEntity hashed = EntityBuilder.of().UserGroupEntity()
@@ -42,19 +43,16 @@ public class UserGroupData extends BusinessBean<UserGroupData, UserGroupEntity> 
         super(UserGroupData.class, UserGroupEntity.class);
     }
     
-    @Transactional
     public Boolean testHashing() {
         this.createTestData(hashed, hashed2);
         
         return Boolean.TRUE;
     }
     
-    @Transactional
     public Map<Long, UserGroupData> findAllUserGroups() {
         return this.findAll();
     }
     
-    @Transactional
     public Map<Long, UserGroupData> findOneUserGroup(final Long withId) {
         return this.findAllSecondary(withId);
     }

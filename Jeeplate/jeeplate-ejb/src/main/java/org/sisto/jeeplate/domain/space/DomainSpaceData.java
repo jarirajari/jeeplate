@@ -19,17 +19,23 @@
 package org.sisto.jeeplate.domain.space;
 
 import java.io.Serializable;
-import javax.enterprise.inject.Default;
+import javax.ejb.Stateful;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.sisto.jeeplate.domain.BusinessBean;
+import org.sisto.jeeplate.domain.base.DomainData;
+import org.sisto.jeeplate.domain.group.DomainGroupData;
 
+@Stateful
 public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEntity> implements Serializable {
     
-    @Inject @Default
+    @Inject
     DomainSpace space;
+    @Inject
+    DomainData domain;
+    @Inject
+    DomainGroupData group;
     
     public DomainSpaceData() {
         super(DomainSpaceData.class, DomainSpaceEntity.class);
@@ -44,7 +50,6 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
         return singleton;
     }
     
-    @Transactional
     public void originateSingletonDomainSpace() {
         
         this.create();  
@@ -70,21 +75,29 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
         return auth;
     }
     
-    public void insertNewDomain(String fqdn) {
-        
+    public void insertNewDomain(String name) {
+        log.info("insertNewDomain -> createNewDomain="+name);
+        group.createDefaultALLDomainGroupForNewDomain();
+        log.info("group ="+group.getDataModel().getId());
+        domain.createNewApplicationDomain(name, group.getDataModel().getId());
+        log.info("domain="+domain.getDataModel().getId());
         // rules of who can do this, string comes from mvc
+        DomainSpaceEntity dse = this.getEntity();
+        dse.insertNewDomain(name, domain);
+        this.setEntity(dse);
+        this.create();
+    }
+    
+    public void removeOldDomain(String name, DomainData dd) {
         
-        this.getEntity().insertNewDomain(fqdn);
-        this.setEntity(null);
+        // rules of who can do this
+        DomainSpaceEntity dse = this.getEntity();
+        dse.removeOldDomain(name, dd);
+        this.setEntity(dse);
         this.update();
     }
     
-    public void removeOldDomain(String fqdn) {
-        
-        // rules of who can do this
-        
-        this.getEntity().removeOldDomain(fqdn);
-        this.setEntity(null);
-        this.update();
+    public Integer size() {
+        return (this.getEntity().size());
     }
 }

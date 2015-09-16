@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +39,6 @@ import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
 import org.sisto.jeeplate.domain.space.DomainSpaceData;
-import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipData;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.MultiValidator;
 
@@ -67,7 +67,7 @@ public class RestrictedView implements Serializable {
     String IODomain;
     
     @PostConstruct
-    private void init() {
+    public void init() {
         this.selectedUser  = 0L;
         this.selectedGroup = 0L;
         this.IOInput = "";
@@ -103,6 +103,8 @@ public class RestrictedView implements Serializable {
     public void setIOInput(String newInput) {
         if (newInput != null) {
             this.IOInput = newInput;
+        } else {
+            this.IOInput = "";
         }
     }
 
@@ -111,22 +113,30 @@ public class RestrictedView implements Serializable {
     }
 
     public void setIODomain(String newdomain) {
+        
         if (this.validator.validateURL(newdomain)) {
             this.IODomain = this.findDomain(newdomain);
+        } else {
+            this.IODomain = "";
         }
     }
     
     public void createNewDomain() {
-        // create new ALL group
-        // create new domain
-        // add the group to it
-        // associate the domain to the space
+        /*
+        
+        move into domain, get string from user only
+        
+        */
         final String newAppDom = this.getIODomain();
+        /*
+        log.info("createNewDomain="+newAppDom);
         group.createDefaultALLDomainGroupForNewDomain();
-        domain.createNewApplicatoinDomain(newAppDom);
-        // TODO
-        membership.addNewMember(0L);
-        space.insertNewDomain("na");
+        log.info("group ="+group.getDataModel().getId());
+        domain.createNewApplicationDomain(newAppDom, group.getDataModel().getId());
+        log.info("domain="+domain.getDataModel().getId());
+        */
+        space.insertNewDomain(newAppDom);
+        log.info("domain size="+space.size());
     }
     
     public Boolean addToGroup() {
@@ -148,12 +158,12 @@ public class RestrictedView implements Serializable {
         return Boolean.FALSE;
     }
     
-    private String findDomain(String surl) {
+    private String findDomain(String hostname) {
         URL url;
         String domain;
         
         try {
-            url= new URL(surl);
+            url= new URL("https", hostname, "");
         } catch (MalformedURLException murle) {
             url = null;
         }

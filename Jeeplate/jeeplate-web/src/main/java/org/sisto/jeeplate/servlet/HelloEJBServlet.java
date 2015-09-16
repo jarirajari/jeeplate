@@ -31,18 +31,19 @@ import javax.servlet.http.HttpServletResponse;
 import org.sisto.jeeplate.hello.HelloEJBBean;
 import org.jboss.logging.Logger;
 import org.sisto.jeeplate.hello.HelloService;
+import org.sisto.jeeplate.logging.StringLogger;
 
 @WebServlet(urlPatterns = {"/test"})
 public class HelloEJBServlet extends HttpServlet {
     
     @Inject
-    private HelloEJBBean bean;
+    HelloEJBBean bean;
     
     @Inject
-    private HelloService service;
+    HelloService service;
     
     @Inject
-    private transient Logger log;
+    StringLogger log;
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) 

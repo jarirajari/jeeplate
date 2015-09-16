@@ -25,8 +25,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
-@MappedSuperclass
-@Access(AccessType.FIELD)
+@MappedSuperclass @Access(AccessType.FIELD)
 public abstract class BusinessEntity extends ObjectEntity {
     
     @Transient

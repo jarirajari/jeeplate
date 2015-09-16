@@ -19,6 +19,7 @@
 package org.sisto.jeeplate.hello;
 
 import javax.ejb.Stateless;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.New;
 import javax.inject.Inject;
@@ -26,23 +27,18 @@ import org.jboss.logging.Logger;
 import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.group.UserGroupData;
+import org.sisto.jeeplate.logging.StringLogger;
 
-@Stateless
+@RequestScoped
 public class HelloService {
-    
     @Inject
-    private transient Logger log;
-    
+    UserData user;
     @Inject
-    private UserData user;
+    UserGroupData group;
     @Inject
-    private UserGroupData group;
-    @Inject
-    private DomainData domain;
+    DomainData domain;
     
     public String testHelloServiceLogging() {
-        
-        log.info("creating a test users and groups!");
         user.testHashing();
         group.testHashing();
         domain.testHashing();

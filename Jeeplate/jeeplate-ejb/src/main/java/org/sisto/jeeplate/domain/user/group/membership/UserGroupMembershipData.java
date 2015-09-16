@@ -19,17 +19,17 @@
 package org.sisto.jeeplate.domain.user.group.membership;
 
 import java.io.Serializable;
+import javax.ejb.Stateful;
 import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 
-@SessionScoped
+@Stateful
 public class UserGroupMembershipData extends BusinessBean<UserGroupMembershipData, UserGroupMembershipEntity> implements Serializable {
     
-    @Inject @Default
+    @Inject 
     UserGroupMembership membership;
     
     public UserGroupMembershipData() {

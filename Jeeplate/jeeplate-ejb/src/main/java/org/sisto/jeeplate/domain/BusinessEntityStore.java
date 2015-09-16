@@ -60,7 +60,7 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
         return (this.em);
     }
     
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public <S> List<S> executeCustomQuery(final Class<S> target, final String JPQLQuery, final Map<String, Object> JPQLParams) throws PersistenceException {
         TypedQuery<S> q = this.em().createQuery(JPQLQuery, target);
         List<S> queryResult = new ArrayList();
@@ -88,7 +88,7 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
         return (queryResult);
     }
     
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public List<T> executeQuery(final Class<T> target, final String JPQLQuery, final Map<String, Object> JPQLParams) throws PersistenceException  {
         
         TypedQuery<T> q = this.em().createQuery(JPQLQuery, target);
@@ -117,7 +117,7 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
         return (queryResult);
     }
     
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public T bind(T be) throws PersistenceException  {
         T bound = be;
         boolean actualEntity = (be == null) ? false : true;
@@ -135,7 +135,7 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
     /**
      * Creates an object in database
      */
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public T create(T be) throws PersistenceException  {
         T created = be;
         boolean isNotInDB = this.isNew(be);
@@ -150,7 +150,7 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
     /**
      * Reads from database and overwrites any changes to be
      */
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public T read(T be) throws PersistenceException {
         T read = null;
         boolean isInDB = this.isOld(be);
@@ -167,7 +167,7 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
     /**
      * Updates to database and overwrites any changes in db
      */
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public T update(T be) throws PersistenceException {
         T updated = null;
         boolean isInDB = this.isOld(be);
@@ -184,7 +184,7 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
     /**
      * Deletes but leaves object in memory
      */
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public T delete(T be) throws PersistenceException {
         T deleted = null;
         boolean isInDB = this.isOld(be);
@@ -210,7 +210,6 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
             try {
                 T tmp = (T) this.em().find(be.getClass(), be.getId());
                 isNew = (tmp == null) ? true : false;
-                log.info("isNew entity, " + tmp.toString());
             } catch (IllegalArgumentException iae) {
                 isNew = false;
                 log.warn("isNew error: " + iae.getMessage());
@@ -281,7 +280,7 @@ public class BusinessEntityStore<T extends BusinessEntity> implements Serializab
                 this.em().persist(be);
             }
         } catch (EntityExistsException | IllegalArgumentException |
-                TransactionRequiredException | NullPointerException ex) {
+                 TransactionRequiredException | NullPointerException ex) {
             log.error("safeAssociate error: " + ex.getMessage());
         }
         

@@ -19,14 +19,12 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.ejb.Stateful;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
-import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.ObjectEntity;
@@ -34,16 +32,16 @@ import org.sisto.jeeplate.util.ApplicationProperty;
 import org.sisto.jeeplate.util.Email;
 import org.sisto.jeeplate.util.EmailMessage;
 
-@SessionScoped
+@Stateful
 public class UserData extends BusinessBean<UserData, UserEntity> implements Serializable {
     
-    @Inject @Dependent
+    @Inject
     User user;
     
     @Inject @ApplicationProperty(name = "test.message", defaultValue = "jee@pla.te")
-    String systemEmailAddress;
+    String systemEmailAddress2;
     
-    @Inject @Any
+    @Inject
     Email emailSender;
     
     private transient final UserEntity hashed = EntityBuilder.of().UserEntity()
@@ -89,7 +87,7 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         String subject = em.getSubject();
         // Convention and loose contract that secretKey will be replaced with secretVal
         String content = em.getContent().replace(secretKey, secretVal);
-        MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress, em.getContentRecipient());
+        MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress2, em.getContentRecipient());
         
         emailSender.sendMessage(mm);
     }

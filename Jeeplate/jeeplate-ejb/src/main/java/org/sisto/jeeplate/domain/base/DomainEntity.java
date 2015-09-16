@@ -19,6 +19,7 @@
 package org.sisto.jeeplate.domain.base;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.Access;
@@ -54,7 +55,7 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     @Id @SequenceGenerator(name = "group_domain_seq", allocationSize = 1)
     @GeneratedValue(generator = "group_domain_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
-    protected String domainname; // alias, qualified name?
+    protected String domainname;
     protected String description;
     @Enumerated(EnumType.STRING)
     protected DomainType.Type domaintype;
@@ -83,6 +84,7 @@ public class DomainEntity extends BusinessEntity implements Serializable {
         this.domainname = "";
         this.domaintype = DomainType.Type.UNKNOWN;
         this.registration = new DomainRegistration();
+        this.allDomaingroups = new HashMap<>();
         this.domainspace = null;
     }
     
@@ -146,5 +148,13 @@ public class DomainEntity extends BusinessEntity implements Serializable {
         this.domainspace = domainspace;
         
         return this;
+    }
+    
+    public void insertNewGroup(String fqdn, DomainGroupEntity dge) {
+        this.allDomaingroups.put(fqdn, dge);
+    }
+    
+    public void removeOldGroup(String fqdn, DomainGroupEntity dge) {
+        this.allDomaingroups.remove(fqdn);
     }
 }

@@ -18,9 +18,11 @@
  */
 package org.sisto.jeeplate.view;
 
+import java.beans.Transient;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.New;
+import javax.enterprise.inject.TransientReference;
 import javax.faces.application.FacesMessage;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -35,20 +37,19 @@ import org.sisto.jeeplate.util.Email;
 import org.sisto.jeeplate.util.EmailMessage;
 import org.sisto.jeeplate.util.Randomness;
 
-@Named
-@ViewScoped
+@Named @ViewScoped
 public class RegistrationView extends AbstractView implements Serializable {
     
     @Inject
-    transient private StringLogger log;
+    StringLogger log;
     @Inject
-    transient private Email emailSender;
-    @Inject @New
-    transient private DomainData domain;
-    @Inject @New
-    transient private UserData user;
+    Email emailSender;
     @Inject
-    transient private Randomness random;
+    DomainData domain;
+    @Inject
+    UserData user;
+    @Inject
+    transient Randomness random;
     
     private String username;
     private String mobile;

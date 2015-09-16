@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.enterprise.context.Dependent;
@@ -59,18 +60,19 @@ public class MultiValidator implements Serializable {
         return validates;
     }
     
-    public Boolean validateURL(String surl) {
+    public Boolean validateURL(String hostname) {
         URL url = null;
+        URI uri = null;
         boolean valid = true;
         
         try {
-            url= new URL(surl);
+            url = new URL("https", hostname, "");
         } catch (MalformedURLException murle) {
             valid = false;
         }
         if (valid) {
             try {
-                url.toURI();
+                uri = url.toURI();
             } catch (URISyntaxException urise) {
                 valid = false;
             }

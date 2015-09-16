@@ -19,14 +19,14 @@
 package org.sisto.jeeplate.domain.base;
 
 import java.io.Serializable;
-import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Default;
+import javax.ejb.Stateful;
 import javax.inject.Inject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
+import org.sisto.jeeplate.domain.group.DomainGroupData;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
 
-@SessionScoped
+@Stateful
 public class DomainData extends BusinessBean<DomainData, DomainEntity> implements Serializable {
     // id, name as reverse domain (ldap?), free description, domain code (i.e. hash?)
     // dn: uid=<userId>,ou=<groupname>,dc=<subdomain e.g.country code>,dc=sisto,dc=org 
@@ -39,22 +39,28 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
     // usergroupgroup i.e. app-domain (assoc=DomainMembership)
     
     // Loan something from LDAP world! DN gives nice hierarchy and multiple geolocations!
-    @Inject @Default
+    @Inject
     Domain domain;
     
-    @Inject @Default
+    @Inject
+    DomainGroupData group;
+    
+    @Inject
     DomainGroupMembershipData groups;
     
     public DomainData() {
         super(DomainData.class, DomainEntity.class);
     }
     
-    public void createNewApplicatoinDomain(String domainName) {
-        DomainEntity entity = EntityBuilder.of().DomainEntity()
+    public void createNewApplicationDomain(String domainName, Long domainGroupId) {
+        DomainEntity de = EntityBuilder.of().DomainEntity()
                 .setDomainname(domainName)
                 .setDomaintype(DomainType.Type.APPLICATION);
-        this.setEntity(entity);
-        this.create();
+        // domain space key and domain name of entity are same
+        group.bind(domainGroupId);
+        de.insertNewGroup(domainName, group.getDataModel());
+        this.setEntity(de);
+        this.create();//safeAssociate error: JBAS011469
     }
     
     public String applyForUserAccount() {

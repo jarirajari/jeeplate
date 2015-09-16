@@ -19,9 +19,6 @@
 package org.sisto.jeeplate.domain.space;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.persistence.Access;
@@ -29,10 +26,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.MapKey;
 import javax.persistence.MapKeyColumn;
-import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -40,6 +34,7 @@ import javax.persistence.PostUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.base.DomainEntity;
 
 @Entity @Access(AccessType.FIELD) @Table(name = "system_application_space")
@@ -50,9 +45,9 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
     public static Long SINGLETON_DOMAIN_SPACE = 1L;
     
     @Id
-    private Long id;
+    protected Long id;
     @OneToMany(fetch = FetchType.EAGER) @MapKeyColumn(name = "domain_name")
-    private Map<String, DomainEntity> allDomains; // loose if <Long> or tight if <DomainEntity>
+    protected Map<String, DomainEntity> allDomains; // loose if <Long> or tight if <DomainEntity>
     
     public DomainSpaceEntity() {
         this.id = SINGLETON_DOMAIN_SPACE;
@@ -65,13 +60,13 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
         super.setId(this.id);
     }
     
-    public Boolean insertNewDomain(String qualifiedDomainname) {
+    public Boolean insertNewDomain(String qualifiedDomainname, DomainData dd) {
         Boolean inserted;
         
         // create or renovate
         
         if (! this.allDomains.containsKey(qualifiedDomainname)) {
-            this.allDomains.put(qualifiedDomainname, null);
+            this.allDomains.put(qualifiedDomainname, dd.getDataModel());
             inserted = Boolean.TRUE;
         } else {
             inserted = Boolean.FALSE;
@@ -80,18 +75,22 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
         return inserted;
     }
     
-    public Boolean removeOldDomain(String qualifiedDomainname) {
+    public Boolean removeOldDomain(String qualifiedDomainname, DomainData dd) {
         Boolean removed;
         
         // create or renovate
         
         if (this.allDomains.containsKey(qualifiedDomainname)) {
-            this.allDomains.put(qualifiedDomainname, null);
+            this.allDomains.remove(qualifiedDomainname);
             removed = Boolean.TRUE;
         } else {
             removed = Boolean.FALSE;
         }
         
         return removed;
+    }
+    
+    public Integer size() {
+        return (this.allDomains.size());
     }
 }
