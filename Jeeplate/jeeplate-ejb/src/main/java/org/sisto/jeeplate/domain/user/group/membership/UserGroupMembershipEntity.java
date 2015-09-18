@@ -32,8 +32,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import org.sisto.jeeplate.domain.BusinessEntity;
 
-@Entity @Access(AccessType.FIELD)
-@Table(name = "system_user_group_membership")
+@Entity @Access(AccessType.FIELD) 
+@Table(name = "system_application_system_group_membership_old")
 public class UserGroupMembershipEntity extends BusinessEntity implements Serializable {
     @Id @SequenceGenerator(name = "user_group_membership_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_group_membership_seq", strategy = GenerationType.SEQUENCE)

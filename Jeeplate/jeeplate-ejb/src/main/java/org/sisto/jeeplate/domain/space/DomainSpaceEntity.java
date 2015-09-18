@@ -23,10 +23,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -46,7 +46,7 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
     
     @Id
     protected Long id;
-    @OneToMany(fetch = FetchType.EAGER) @MapKeyColumn(name = "domain_name")
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
     protected Map<String, DomainEntity> allDomains; // loose if <Long> or tight if <DomainEntity>
     
     public DomainSpaceEntity() {

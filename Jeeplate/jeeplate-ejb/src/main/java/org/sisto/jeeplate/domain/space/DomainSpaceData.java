@@ -20,6 +20,8 @@ package org.sisto.jeeplate.domain.space;
 
 import java.io.Serializable;
 import javax.ejb.Stateful;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -27,8 +29,10 @@ import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
 
-@Stateful
+@Stateful 
 public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEntity> implements Serializable {
+    
+    private transient final static Long SINGLETON_SPACE = 1L;
     
     @Inject
     DomainSpace space;
@@ -42,7 +46,7 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
     }
     
     public DomainSpaceData findSingletonDomainSpace() {
-        final Long singletonDomainId = 1L;
+        final Long singletonDomainId = SINGLETON_SPACE;
         final DomainSpaceData singleton = this.findOne(singletonDomainId);
         
         // if not exist, create one here, idempotent?
@@ -75,17 +79,29 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
         return auth;
     }
     
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void insertNewDomain(String name) {
+        /*
+        
+        save the transient instance before flushing: 
+        org.sisto.jeeplate.domain.group.DomainGroupEntity
+        
+        */
+        this.bind(SINGLETON_SPACE);
         log.info("insertNewDomain -> createNewDomain="+name);
         group.createDefaultALLDomainGroupForNewDomain();
         log.info("group ="+group.getDataModel().getId());
-        domain.createNewApplicationDomain(name, group.getDataModel().getId());
+        domain.createNewApplicationDomain(name, group.getDataModel());
         log.info("domain="+domain.getDataModel().getId());
         // rules of who can do this, string comes from mvc
+        
+        /*
         DomainSpaceEntity dse = this.getEntity();
         dse.insertNewDomain(name, domain);
         this.setEntity(dse);
-        this.create();
+        */
+        this.getEntity().insertNewDomain(name, domain);
+        this.update();
     }
     
     public void removeOldDomain(String name, DomainData dd) {

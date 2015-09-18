@@ -18,9 +18,6 @@
  */
 package org.sisto.jeeplate.domain.user.account;
 
-import javax.enterprise.context.Dependent;
-
-@Dependent
 public class UserAccount {
     
 }

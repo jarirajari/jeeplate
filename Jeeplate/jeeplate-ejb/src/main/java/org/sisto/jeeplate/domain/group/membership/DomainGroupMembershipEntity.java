@@ -37,8 +37,8 @@ import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.user.UserEntity;
 
-@Entity @Access(AccessType.FIELD)
-@Table(name = "group_domain_membership")
+@Entity @Access(AccessType.FIELD) 
+@Table(name = "system_application_group_membership")
 public class DomainGroupMembershipEntity extends BusinessEntity 
   implements Serializable, Unidirectional, OneToMany {
     

@@ -20,13 +20,16 @@ package org.sisto.jeeplate.domain.base;
 
 import java.io.Serializable;
 import javax.ejb.Stateful;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
+import org.sisto.jeeplate.domain.group.DomainGroupEntity;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
 
-@Stateful
+@Stateful 
 public class DomainData extends BusinessBean<DomainData, DomainEntity> implements Serializable {
     // id, name as reverse domain (ldap?), free description, domain code (i.e. hash?)
     // dn: uid=<userId>,ou=<groupname>,dc=<subdomain e.g.country code>,dc=sisto,dc=org 
@@ -52,15 +55,15 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
         super(DomainData.class, DomainEntity.class);
     }
     
-    public void createNewApplicationDomain(String domainName, Long domainGroupId) {
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public void createNewApplicationDomain(String domainName, DomainGroupEntity dge) {
         DomainEntity de = EntityBuilder.of().DomainEntity()
                 .setDomainname(domainName)
                 .setDomaintype(DomainType.Type.APPLICATION);
         // domain space key and domain name of entity are same
-        group.bind(domainGroupId);
-        de.insertNewGroup(domainName, group.getDataModel());
+        de.insertNewGroup(domainName, dge);
         this.setEntity(de);
-        this.create();//safeAssociate error: JBAS011469
+        //this.create();
     }
     
     public String applyForUserAccount() {
