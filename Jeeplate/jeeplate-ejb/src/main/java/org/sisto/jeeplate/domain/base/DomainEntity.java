@@ -20,10 +20,10 @@ package org.sisto.jeeplate.domain.base;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -33,8 +33,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKey;
-import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -47,8 +45,8 @@ import org.sisto.jeeplate.domain.group.DomainGroupEntity;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.space.DomainSpaceEntity;
 
-@Entity @Access(AccessType.FIELD)
-@Table(name = "group_domain", uniqueConstraints = { 
+@Entity @Access(AccessType.FIELD) 
+@Table(name = "system_application_domain", uniqueConstraints = { 
        @UniqueConstraint(columnNames = "domainname")})
 public class DomainEntity extends BusinessEntity implements Serializable {
     
@@ -63,7 +61,7 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     protected DomainRegistration registration;
     @ManyToOne @JoinColumn(name = "domain_fk")
     protected DomainSpaceEntity domainspace;
-    @OneToMany(mappedBy = "parentdomain") @MapKeyColumn(name = "group_name")
+    @OneToMany(mappedBy = "parentdomain", cascade = {CascadeType.ALL})
     protected Map<String, DomainGroupEntity> allDomaingroups;
     /*
     
@@ -82,6 +80,7 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     public DomainEntity() {
         this.id = DEFAULT_ID;
         this.domainname = "";
+        this.description = "";
         this.domaintype = DomainType.Type.UNKNOWN;
         this.registration = new DomainRegistration();
         this.allDomaingroups = new HashMap<>();

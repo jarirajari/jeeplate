@@ -21,12 +21,13 @@ package org.sisto.jeeplate.domain.group;
 import java.io.Serializable;
 import java.util.Map;
 import javax.ejb.Stateful;
-import javax.enterprise.context.SessionScoped;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 
-@Stateful
+@Stateful 
 public class DomainGroupData extends BusinessBean<DomainGroupData, DomainGroupEntity> implements Serializable {
             
     @Inject
@@ -41,12 +42,13 @@ public class DomainGroupData extends BusinessBean<DomainGroupData, DomainGroupEn
         this.create();
     }
     
+    @TransactionAttribute(TransactionAttributeType.MANDATORY)
     public void createDefaultALLDomainGroupForNewDomain() {
         DomainGroupEntity dge = EntityBuilder.of().DomainGroupEntity()
                 .setGroupname(DomainGroupType.ALL.name())
                 .defaultALL();
         this.setEntity(dge);
-        this.create();
+        //this.create();
     }
     
     public Map<Long, DomainGroupData> findDomainGroups(final Long domainId) {

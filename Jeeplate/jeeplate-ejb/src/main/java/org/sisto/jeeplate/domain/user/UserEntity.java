@@ -44,8 +44,8 @@ import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipEntity;
 import org.sisto.jeeplate.domain.pk.TernaryKeyField;
 
-@Entity @Access(AccessType.FIELD)
-@Table(name = "system_users", uniqueConstraints = {
+@Entity @Access(AccessType.FIELD) 
+@Table(name = "system_application_system_user", uniqueConstraints = {
        @UniqueConstraint(columnNames = "username")})
 public class UserEntity extends BusinessEntity implements Serializable {
     

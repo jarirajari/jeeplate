@@ -21,6 +21,7 @@ package org.sisto.jeeplate.domain.group;
 import java.io.Serializable;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -38,7 +39,7 @@ import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.base.DomainEntity;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 
-@Entity @Access(AccessType.FIELD) @Table(name = "domain_groups")
+@Entity @Access(AccessType.FIELD) @Table(name = "system_application_group") 
 public class DomainGroupEntity extends BusinessEntity implements Serializable {
     
     @SecondaryKeyField(description = "For find out certain groups")
@@ -48,8 +49,9 @@ public class DomainGroupEntity extends BusinessEntity implements Serializable {
     protected String groupname;
     @Enumerated(EnumType.STRING)
     protected DomainGroupType type;
-    @ManyToOne @JoinColumn(name = "domain_fk")
+    @ManyToOne(cascade = {CascadeType.ALL}) @JoinColumn(name = "domain_fk")
     protected DomainEntity parentdomain;
+    
     /*
      * DomainGroupMembers accessed via memberhips:
      * NO! DomainGroupMembershipEntity allDomaingroupMemberships;

@@ -37,9 +37,8 @@ import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.DomainGroupEntity;
 import org.sisto.jeeplate.domain.user.UserEntity;
 
-@Entity
-@Access(AccessType.FIELD)
-@Table(name = "domain_group_members")
+@Entity @Access(AccessType.FIELD) 
+@Table(name = "system_application_group_members")
 public class DomainGroupMemberEntity extends BusinessEntity implements Serializable {
     @Id @SequenceGenerator(name="domain_group_member_seq", allocationSize = 1)
     @GeneratedValue(generator = "domain_group_member_seq", strategy = GenerationType.SEQUENCE)
