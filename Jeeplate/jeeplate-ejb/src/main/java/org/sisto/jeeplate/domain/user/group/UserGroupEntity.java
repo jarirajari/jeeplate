@@ -35,7 +35,7 @@ import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 
 @Entity @Access(AccessType.FIELD) 
-@Table(name = "system_application_system_groups_old", uniqueConstraints = {
+@Table(name = "system_groups_old", uniqueConstraints = {
        @UniqueConstraint(columnNames = "groupname")})
 public class UserGroupEntity extends BusinessEntity implements Serializable {
     @SecondaryKeyField(description = "For finding certain groups")

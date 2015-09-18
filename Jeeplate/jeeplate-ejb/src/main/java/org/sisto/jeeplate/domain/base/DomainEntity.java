@@ -46,7 +46,7 @@ import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.space.DomainSpaceEntity;
 
 @Entity @Access(AccessType.FIELD) 
-@Table(name = "system_application_domain", uniqueConstraints = { 
+@Table(name = "system_domains", uniqueConstraints = { 
        @UniqueConstraint(columnNames = "domainname")})
 public class DomainEntity extends BusinessEntity implements Serializable {
     
@@ -59,7 +59,7 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     protected DomainType.Type domaintype;
     @Embedded @SecondaryKeyField(keyname = "registration.partDomainDeliveredSeparately", description = "Embedded domain name part")
     protected DomainRegistration registration;
-    @ManyToOne @JoinColumn(name = "domain_fk")
+    @ManyToOne @JoinColumn(name = "domainspace_fk")
     protected DomainSpaceEntity domainspace;
     @OneToMany(mappedBy = "parentdomain", cascade = {CascadeType.ALL})
     protected Map<String, DomainGroupEntity> allDomaingroups;
@@ -150,10 +150,12 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     }
     
     public void insertNewGroup(String fqdn, DomainGroupEntity dge) {
+        dge.setDomain(this);
         this.allDomaingroups.put(fqdn, dge);
     }
     
     public void removeOldGroup(String fqdn, DomainGroupEntity dge) {
+        dge.setDomain(null);
         this.allDomaingroups.remove(fqdn);
     }
 }

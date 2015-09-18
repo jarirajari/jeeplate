@@ -37,7 +37,8 @@ import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.base.DomainEntity;
 
-@Entity @Access(AccessType.FIELD) @Table(name = "system_application_space")
+@Entity @Access(AccessType.FIELD) 
+@Table(name = "system_domain_space")
 public class DomainSpaceEntity extends BusinessEntity implements Serializable {
     // single entity
     // java.util.collection of domains.
@@ -66,7 +67,9 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
         // create or renovate
         
         if (! this.allDomains.containsKey(qualifiedDomainname)) {
-            this.allDomains.put(qualifiedDomainname, dd.getDataModel());
+            final DomainEntity de = dd.getDataModel();
+            de.setDomainspace(this);
+            this.allDomains.put(qualifiedDomainname, de);
             inserted = Boolean.TRUE;
         } else {
             inserted = Boolean.FALSE;

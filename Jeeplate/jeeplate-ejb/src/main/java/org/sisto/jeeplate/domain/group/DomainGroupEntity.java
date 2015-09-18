@@ -39,7 +39,8 @@ import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.base.DomainEntity;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 
-@Entity @Access(AccessType.FIELD) @Table(name = "system_application_group") 
+@Entity @Access(AccessType.FIELD) 
+@Table(name = "system_domain_groups") 
 public class DomainGroupEntity extends BusinessEntity implements Serializable {
     
     @SecondaryKeyField(description = "For find out certain groups")
