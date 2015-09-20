@@ -28,6 +28,8 @@ import org.apache.shiro.subject.Subject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
+import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.logging.StringLogger;
 
 @Stateful 
 public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEntity> implements Serializable {
@@ -43,6 +45,7 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
     
     public DomainSpaceData() {
         super(DomainSpaceData.class, DomainSpaceEntity.class);
+        this.log = new StringLogger(this.getClass());
     }
     
     public DomainSpaceData findSingletonDomainSpace() {

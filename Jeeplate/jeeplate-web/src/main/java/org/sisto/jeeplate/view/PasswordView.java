@@ -24,7 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.inject.New;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
+import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.context.RequestContext;

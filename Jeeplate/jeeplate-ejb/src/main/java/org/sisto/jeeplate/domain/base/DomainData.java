@@ -28,6 +28,8 @@ import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
 import org.sisto.jeeplate.domain.group.DomainGroupEntity;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
+import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.logging.StringLogger;
 
 @Stateful 
 public class DomainData extends BusinessBean<DomainData, DomainEntity> implements Serializable {
@@ -53,6 +55,7 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
     
     public DomainData() {
         super(DomainData.class, DomainEntity.class);
+        this.log = new StringLogger(this.getClass());
     }
     
     @TransactionAttribute(TransactionAttributeType.REQUIRED)

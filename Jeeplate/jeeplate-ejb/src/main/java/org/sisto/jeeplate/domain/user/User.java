@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.rules.GenericRule;
 
-
 public class User implements Serializable {
 
     @Inject

@@ -32,15 +32,15 @@ import org.jboss.logging.Logger;
 import javax.persistence.EntityNotFoundException;
 import org.sisto.jeeplate.domain.ObjectEntity;
 import org.sisto.jeeplate.domain.ObjectId;
+import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.H2EM;
 import org.sisto.jeeplate.util.PGEM;
 
-@Stateful
-@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+@Stateful @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class EntityStore<T extends ObjectEntity> {
     
     @Inject
-    private transient Logger log;
+    private transient StringLogger log;
     
     @Inject
     @PGEM

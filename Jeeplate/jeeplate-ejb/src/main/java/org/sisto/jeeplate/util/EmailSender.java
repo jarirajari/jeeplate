@@ -16,24 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.group.member;
+package org.sisto.jeeplate.util;
 
-import java.io.Serializable;
-import javax.ejb.Stateful;
-import javax.enterprise.context.SessionScoped;
-import javax.inject.Inject;
-import org.sisto.jeeplate.domain.BusinessBean;
-import org.sisto.jeeplate.domain.user.UserData;
-import org.sisto.jeeplate.logging.StringLogger;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
+import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
+import javax.inject.Qualifier;
 
-@Stateful
-public class DomainGroupMemberData extends BusinessBean<DomainGroupMemberData, DomainGroupMemberEntity> implements Serializable {
-    
-    @Inject
-    DomainGroupMember member;
-    
-    public DomainGroupMemberData() {
-        super(DomainGroupMemberData.class, DomainGroupMemberEntity.class);
-        this.log = new StringLogger(this.getClass());
-    }
-}
+@Qualifier
+@Retention(RUNTIME)
+@Target({METHOD, FIELD, PARAMETER, TYPE})
+public @interface EmailSender {}

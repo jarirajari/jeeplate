@@ -32,6 +32,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 import org.jboss.logging.Logger;
+import org.sisto.jeeplate.logging.StringLogger;
 
 @SuppressWarnings("ConsistentAccessType")
 @Entity
@@ -39,9 +40,8 @@ import org.jboss.logging.Logger;
 @Access(AccessType.FIELD)
 public class HelloEntity implements Serializable {
     
-    @Transient
-    @Inject
-    protected Logger log;
+    @Transient @Inject
+    protected StringLogger log;
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

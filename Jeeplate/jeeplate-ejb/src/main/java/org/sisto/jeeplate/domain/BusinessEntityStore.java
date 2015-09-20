@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -42,7 +43,7 @@ import javax.persistence.TypedQuery;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.PGEM;
 
-@Dependent @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+@Stateful @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class BusinessEntityStore<T extends BusinessEntity> implements Serializable {
     
     @Inject

@@ -20,14 +20,18 @@ package org.sisto.jeeplate.logging;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Vetoed;
 import org.jboss.logging.Logger;
 
-@Dependent
+@Vetoed
 public class StringLogger implements Serializable {
     
-    public static final String[] EMPTY_ARRAY = new String[0];
+    public transient static final String[] EMPTY_ARRAY = new String[0];
     private Logger jbossLogger;
+    
+    public StringLogger() {
+        
+    }
     
     public StringLogger(String name) {
         this.jbossLogger = Logger.getLogger(name);
@@ -35,6 +39,14 @@ public class StringLogger implements Serializable {
     
     public StringLogger(Class clazz) {
         this.jbossLogger = Logger.getLogger(clazz.getName());
+    }
+
+    public Logger getJbossLogger() {
+        return jbossLogger;
+    }
+
+    public void setJbossLogger(Logger jbossLogger) {
+        this.jbossLogger = jbossLogger;
     }
     
     private static String buildMessage(String text, String ... args) {

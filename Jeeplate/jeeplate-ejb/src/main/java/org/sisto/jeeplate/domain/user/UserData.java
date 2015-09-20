@@ -19,18 +19,20 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.Stateful;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.ObjectEntity;
+import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.ApplicationProperty;
 import org.sisto.jeeplate.util.Email;
 import org.sisto.jeeplate.util.EmailMessage;
+import org.sisto.jeeplate.util.EmailSender;
 
 @Stateful
 public class UserData extends BusinessBean<UserData, UserEntity> implements Serializable {
@@ -61,6 +63,7 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     
     public UserData() {
         super(UserData.class, UserEntity.class);
+        this.log = new StringLogger(this.getClass());
     }
     
     /*
@@ -88,7 +91,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         // Convention and loose contract that secretKey will be replaced with secretVal
         String content = em.getContent().replace(secretKey, secretVal);
         MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress2, em.getContentRecipient());
-        
         emailSender.sendMessage(mm);
     }
     
@@ -158,13 +160,18 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         return changed;
     }
     
-    public Boolean noUserWithEmail(final String emailAddress) {
+    public Boolean noUserWithEmail(final String emailAddress, String subject, String content, 
+                                   String source, String destination) {
         final UserData ud = this.findOneSecondary(emailAddress);
-        Boolean noUser = Boolean.FALSE;
+        Boolean noUser;
         
         if (ud == null || ud.getDataModel() == null || 
             ud.getDataModel().getId().equals(ObjectEntity.DEFAULT_ID)) {
             noUser = Boolean.TRUE;
+        } else {
+            MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress2, destination);
+            emailSender.sendMessage(mm);
+            noUser = Boolean.FALSE;
         }
         
         return noUser;

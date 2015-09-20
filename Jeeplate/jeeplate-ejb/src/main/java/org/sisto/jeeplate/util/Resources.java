@@ -23,7 +23,6 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
-import org.jboss.logging.Logger;
 import org.sisto.jeeplate.logging.StringLogger;
 
 @Dependent
@@ -35,13 +34,6 @@ public class Resources {
      * @Inject
      * private transient Logger log;
      */
-    @Produces @Default
-    public Logger jbossLogger(InjectionPoint ip) {
-        final String name = ip.getMember().getDeclaringClass().getSimpleName();
-        
-        return Logger.getLogger(name);
-    }
-    
     @Produces @Default
     public StringLogger stringLogger(InjectionPoint ip) {
         final String name = ip.getMember().getDeclaringClass().getSimpleName();
