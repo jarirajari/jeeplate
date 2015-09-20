@@ -29,8 +29,7 @@ public class ApplicationPropertyProducer {
     @Inject
     private ApplicationPropertyProvider provider;
     
-    @Produces
-    @ApplicationProperty(name = "", defaultValue = "")
+    @Produces @ApplicationProperty(name = "", defaultValue = "")
     public String getPropertyAsString(InjectionPoint injectionPoint) {
         
         String propertyName = injectionPoint.getAnnotated().getAnnotation(ApplicationProperty.class).name();

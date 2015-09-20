@@ -18,22 +18,17 @@
  */
 package org.sisto.jeeplate.view;
 
-import java.beans.Transient;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
-import javax.enterprise.inject.New;
-import javax.enterprise.inject.TransientReference;
 import javax.faces.application.FacesMessage;
-import javax.faces.view.ViewScoped;
+import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.mail.internet.MimeMessage;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
 import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.util.Email;
 import org.sisto.jeeplate.util.EmailMessage;
 import org.sisto.jeeplate.util.Randomness;
 
@@ -42,8 +37,6 @@ public class RegistrationView extends AbstractView implements Serializable {
     
     @Inject
     StringLogger log;
-    @Inject
-    Email emailSender;
     @Inject
     DomainData domain;
     @Inject
@@ -135,6 +128,22 @@ public class RegistrationView extends AbstractView implements Serializable {
         this.iacceptTermsAndConditions = accept;
         log.info("iacceptTermsAndConditions="+accept);
     }
+
+    public UserData getUser() {
+        return user;
+    }
+
+    public void setUser(UserData user) {
+        this.user.bind(user.getDataModel().getId());
+    }
+
+    public DomainData getDomain() {
+        return domain;
+    }
+
+    public void setDomain(DomainData domain) {
+        this.domain.bind(domain.getDataModel().getId());
+    }
     
     public void newActionsecret() {
         if (! this.flowing) {
@@ -149,14 +158,8 @@ public class RegistrationView extends AbstractView implements Serializable {
     
     public Boolean accountForEmailExists(String enteredUserEmailAddress) {
         log.info("accountForEmailExists="+enteredUserEmailAddress);
-        
-        boolean exists = user.noUserWithEmail(enteredUserEmailAddress);
-        
-        if (exists) {
-            MimeMessage m = emailSender.constructEmail("Greeting from Jeeplate!", "Account already exists!", 
-                                                       "jee@pla.te", enteredUserEmailAddress);
-            emailSender.sendMessage(m);
-        }
+        boolean exists = user.noUserWithEmail(enteredUserEmailAddress, "Greeting from Jeeplate!",
+                                              "Account already exists!", "jee@pla.te", enteredUserEmailAddress);
         
         return exists;
     }
@@ -174,14 +177,14 @@ public class RegistrationView extends AbstractView implements Serializable {
     private void findUserAccount() {
         String em = this.getUsername();
         
-        this.user = user.findOneUser(em);
+        this.setUser(user.findOneUser(em));
         log.info("User registration request for user '%s'", em);
     }
     
     private void findDomain() {
         String dc = this.getDomaincode().substring(0, 8);
         
-        this.domain = this.domain.findOneDomain(dc);
+        this.setDomain(domain.findOneDomain(dc));
         log.info("User registration request for domain '%s'", dc);
     }
     

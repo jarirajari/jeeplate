@@ -42,13 +42,13 @@ import org.apache.shiro.web.util.SavedRequest;
 import org.apache.shiro.web.util.WebUtils;
 import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
+import org.sisto.jeeplate.logging.StringLogger;
 
-@RequestScoped
-@Named("mgr")
+@Named("mgr") @RequestScoped
 public class SystemManager {
     
     @Inject
-    private transient Logger log;
+    private transient StringLogger log;
     
     private transient FacesContext facesContext = FacesContext.getCurrentInstance();
     private transient String messageBundleName = facesContext.getApplication().getMessageBundle();

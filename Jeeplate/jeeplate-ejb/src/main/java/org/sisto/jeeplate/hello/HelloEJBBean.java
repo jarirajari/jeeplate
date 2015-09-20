@@ -22,14 +22,14 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import org.jboss.logging.Logger;
+import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.ApplicationProperty;
 
 @Stateless
 public class HelloEJBBean {
 
     @Inject
-    Logger log;
+    StringLogger log;
     
     @Inject @ApplicationProperty(name = "test.message", defaultValue = "test msg prop ok")
     String myProperty;

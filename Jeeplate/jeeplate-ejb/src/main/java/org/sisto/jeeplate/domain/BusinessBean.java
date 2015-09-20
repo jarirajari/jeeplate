@@ -27,8 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.Stateful;
-import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Default;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.pk.TernaryKeyField;
@@ -38,14 +42,13 @@ import org.sisto.jeeplate.util.ApplicationProperty;
 
 public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEntity> implements Serializable {
     
-    @Inject  
     protected StringLogger log;
     
     @Inject @ApplicationProperty(name = "test.message", defaultValue = "jee@pla.te")
-    protected String systemEmailAddress;
+    String systemEmailAddress;
     
     @Inject 
-    protected BusinessEntityStore<E> store;
+    BusinessEntityStore<E> store;
     
     protected final Class<E> entityBeanType;
     protected final Class<D> dataBeanType;
@@ -117,18 +120,27 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
                     } catch (InstantiationException | IllegalAccessException ex) {
                         d = null;
                     }
+                    
                     return d;
                 })));
     }
     
-    private D collectOneResult(final List<E> results) {
+    private D collectOneResult(List<E> results) {
         final int FIRST = 0;
         D d;
+        E e;
         
+        if ((results != null) && (results.isEmpty() == false) && (results.size() == 1)) {
+            // pass;
+        } else {
+            results = defaultOneResultList(this.getEntity());
+        }
         try {
+            e = results.get(FIRST);
             d = (D) this.dataBeanType.newInstance();
-            d.setEntity(results.get(FIRST));
-        } catch (InstantiationException | IllegalAccessException ex) {
+            d.setEntity(e);
+        } catch (InstantiationException | IllegalAccessException | IndexOutOfBoundsException ex) {
+            e = null;
             d = null;
         }
         
@@ -212,15 +224,15 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     
     // Find ONE user with secondary (alternative) PK, note return format
     private D findOneAlternative(final int nary, final Object altKeyVal) {
-        List<E> results = this.findEntityByAlternativeKey(nary, altKeyVal);
-        
-        if ((results != null) && (results.isEmpty() == false) && (results.size() == 1)) {
-            // pass;
-        } else {
-            results = new ArrayList<>();
-        }
+        final List<E> results = this.findEntityByAlternativeKey(nary, altKeyVal);
         
         return (collectOneResult(results));
+    }
+    
+    private static <E> List<E> defaultOneResultList(E e) {
+        List<E> results = new ArrayList<>();
+        results.add(e);
+        return results;
     }
     
     public D findOneSecondary(final Object altKeyVal) {

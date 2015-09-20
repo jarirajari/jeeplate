@@ -25,6 +25,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
+import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.logging.StringLogger;
 
 @Stateful
 public class UserGroupMembershipData extends BusinessBean<UserGroupMembershipData, UserGroupMembershipEntity> implements Serializable {
@@ -34,6 +36,7 @@ public class UserGroupMembershipData extends BusinessBean<UserGroupMembershipDat
     
     public UserGroupMembershipData() {
         super(UserGroupMembershipData.class, UserGroupMembershipEntity.class);
+        this.log = new StringLogger(this.getClass());
     }
     
     @Transactional

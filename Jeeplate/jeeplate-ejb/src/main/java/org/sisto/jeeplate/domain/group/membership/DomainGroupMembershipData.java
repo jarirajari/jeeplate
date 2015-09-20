@@ -27,6 +27,8 @@ import javax.inject.Inject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
+import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.logging.StringLogger;
 
 @Stateful
 public class DomainGroupMembershipData extends BusinessBean<DomainGroupMembershipData, DomainGroupMembershipEntity> implements Serializable {
@@ -39,6 +41,7 @@ public class DomainGroupMembershipData extends BusinessBean<DomainGroupMembershi
     
     public DomainGroupMembershipData() {
         super(DomainGroupMembershipData.class, DomainGroupMembershipEntity.class);
+        this.log = new StringLogger(this.getClass());
     }
     
     public Map<Long, DomainGroupData> findDomainGroups(final Long domainId) {

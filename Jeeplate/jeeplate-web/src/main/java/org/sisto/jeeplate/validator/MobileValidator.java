@@ -37,7 +37,6 @@ public class MobileValidator implements Validator {
                          Object value) throws ValidatorException {
         String msisdn = (value == null) ? "" : (String) value;
         Boolean validates = validator.validateUserPhone(msisdn);
-         
         if (!validates) {
             FacesMessage msg = new FacesMessage("Msisdn Validation Error");
             msg.setSeverity(FacesMessage.SEVERITY_ERROR);
