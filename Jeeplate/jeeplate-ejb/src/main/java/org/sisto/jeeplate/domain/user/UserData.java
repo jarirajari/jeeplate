@@ -19,9 +19,8 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.ejb.Stateful;
+import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
@@ -32,9 +31,8 @@ import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.ApplicationProperty;
 import org.sisto.jeeplate.util.Email;
 import org.sisto.jeeplate.util.EmailMessage;
-import org.sisto.jeeplate.util.EmailSender;
 
-@Stateful
+@SessionScoped @Stateful
 public class UserData extends BusinessBean<UserData, UserEntity> implements Serializable {
     
     @Inject
@@ -63,7 +61,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     
     public UserData() {
         super(UserData.class, UserEntity.class);
-        this.log = new StringLogger(this.getClass());
     }
     
     /*
@@ -82,8 +79,8 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     *
     */
-    public UserData findOneUser(final String emailAddress) {
-        return (this.findOneSecondary(emailAddress));
+    public void findOneUser(final String emailAddress) {
+        this.setEntity(this.findOneSecondary(emailAddress).getEntity());
     }
     
     private void sendEmailToUser(EmailMessage em, String secretKey, String secretVal) {

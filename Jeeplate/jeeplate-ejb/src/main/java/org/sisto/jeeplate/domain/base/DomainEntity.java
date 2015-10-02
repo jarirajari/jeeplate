@@ -18,13 +18,13 @@
  */
 package org.sisto.jeeplate.domain.base;
 
+import org.sisto.jeeplate.domain.user.registration.UserRegistrationEntity;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -34,6 +34,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -42,7 +43,6 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.DomainGroupEntity;
-import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.space.DomainSpaceEntity;
 
 @Entity @Access(AccessType.FIELD) 
@@ -57,8 +57,6 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     protected String description;
     @Enumerated(EnumType.STRING)
     protected DomainType.Type domaintype;
-    @Embedded @SecondaryKeyField(keyname = "registration.partDomainDeliveredSeparately", description = "Embedded domain name part")
-    protected DomainRegistration registration;
     @ManyToOne @JoinColumn(name = "domainspace_fk")
     protected DomainSpaceEntity domainspace;
     @OneToMany(mappedBy = "parentdomain", cascade = {CascadeType.ALL})
@@ -82,7 +80,6 @@ public class DomainEntity extends BusinessEntity implements Serializable {
         this.domainname = "";
         this.description = "";
         this.domaintype = DomainType.Type.UNKNOWN;
-        this.registration = new DomainRegistration();
         this.allDomaingroups = new HashMap<>();
         this.domainspace = null;
     }
@@ -125,16 +122,6 @@ public class DomainEntity extends BusinessEntity implements Serializable {
 
     public DomainEntity setDomaintype(DomainType.Type domaintype) {
         this.domaintype = domaintype;
-        
-        return this;
-    }
-
-    public DomainRegistration getRegistration() {
-        return registration;
-    }
-
-    public DomainEntity setRegistration(DomainRegistration registration) {
-        this.registration = registration;
         
         return this;
     }

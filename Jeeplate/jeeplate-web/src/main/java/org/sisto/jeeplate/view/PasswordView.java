@@ -19,11 +19,8 @@
 package org.sisto.jeeplate.view;
 
 import java.io.Serializable;
-import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.enterprise.inject.New;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -144,8 +141,7 @@ public class PasswordView extends AbstractView implements Serializable {
     
     private void findUserAccount() {
         String em = this.getUsername();
-        
-        this.user = user.findOneUser(em);
+        this.user.findOneUser(em);
         log.info("Lost password recovery for user '%s' ", em);
     }
     

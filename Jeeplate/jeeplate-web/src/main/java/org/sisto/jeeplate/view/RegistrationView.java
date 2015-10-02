@@ -26,8 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
-import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.domain.user.registration.UserRegistrationData;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.EmailMessage;
 import org.sisto.jeeplate.util.Randomness;
@@ -38,7 +38,7 @@ public class RegistrationView extends AbstractView implements Serializable {
     @Inject
     StringLogger log;
     @Inject
-    DomainData domain;
+    UserRegistrationData registration;
     @Inject
     UserData user;
     @Inject
@@ -47,8 +47,8 @@ public class RegistrationView extends AbstractView implements Serializable {
     private String username;
     private String mobile;
     private String password;
-    private String domaincode; // emailed = domain+user part, email address check
-    private String actionsecret;
+    private String domaincode; // domain will be asked after first login...
+    private String actionsecret; // action token
     private Boolean iacceptTermsAndConditions;
     private Boolean registered;
     private Boolean flowing;
@@ -128,22 +128,6 @@ public class RegistrationView extends AbstractView implements Serializable {
         this.iacceptTermsAndConditions = accept;
         log.info("iacceptTermsAndConditions="+accept);
     }
-
-    public UserData getUser() {
-        return user;
-    }
-
-    public void setUser(UserData user) {
-        this.user.bind(user.getDataModel().getId());
-    }
-
-    public DomainData getDomain() {
-        return domain;
-    }
-
-    public void setDomain(DomainData domain) {
-        this.domain.bind(domain.getDataModel().getId());
-    }
     
     public void newActionsecret() {
         if (! this.flowing) {
@@ -176,16 +160,8 @@ public class RegistrationView extends AbstractView implements Serializable {
     
     private void findUserAccount() {
         String em = this.getUsername();
-        
-        this.setUser(user.findOneUser(em));
+        this.user.findOneUser(em);
         log.info("User registration request for user '%s'", em);
-    }
-    
-    private void findDomain() {
-        String dc = this.getDomaincode().substring(0, 8);
-        
-        this.setDomain(domain.findOneDomain(dc));
-        log.info("User registration request for domain '%s'", dc);
     }
     
     public void beginUserRegistrationPhase() {
@@ -193,9 +169,8 @@ public class RegistrationView extends AbstractView implements Serializable {
         final String recipient = this.getUsername();
         EmailMessage newUserMsg = new EmailMessage("Requested user-req NEW", String.format("did you do this, if yes %s",replace), recipient, "Jeeplate corp.");
         EmailMessage oldUserMsg = new EmailMessage("Requested user-req OLD", "somebody tried to register this to our service", recipient, "Jeeplate corp."); 
-        String token = "";
+        String token = this.registration.applyForUserAccount();
         
-        token = this.domain.applyForUserAccount();
         this.findUserAccount();
         this.user.nofityUserForRegistration(oldUserMsg, newUserMsg, hideDomainPartFromCodeToBeEmailed(token));
     }
@@ -205,8 +180,7 @@ public class RegistrationView extends AbstractView implements Serializable {
         Boolean actionSecretOK = userRegistrationCanBeCompleted(this.getActionsecret());
         
         if (actionSecretOK) {
-            this.findDomain();
-            completed = this.domain.grantUserAccount(this.getMobile(), this.getPassword(), this.getDomaincode());
+            completed = this.registration.grantUserAccount(this.getMobile(), this.getPassword(), this.getDomaincode());
         }
         if (completed) {
             this.showFacesMessage(FacesMessage.SEVERITY_INFO, "OK, registered");

@@ -37,7 +37,6 @@ public class DomainGroupData extends BusinessBean<DomainGroupData, DomainGroupEn
     
     public DomainGroupData() {
         super(DomainGroupData.class, DomainGroupEntity.class);
-        this.log = new StringLogger(this.getClass());
     }
     
     public void createNewDomainGroupForDomain() {

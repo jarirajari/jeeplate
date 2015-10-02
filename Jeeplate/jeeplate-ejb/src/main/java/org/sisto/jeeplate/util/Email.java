@@ -27,11 +27,14 @@ import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.annotation.Resource;
+import javax.ejb.Stateless;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import org.sisto.jeeplate.logging.StringLogger;
 
+@Dependent @Stateless
 public class Email implements Serializable {
 
     private transient static final String TEXT_PLAIN = "text/plain";

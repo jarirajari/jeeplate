@@ -45,7 +45,6 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
     
     public DomainSpaceData() {
         super(DomainSpaceData.class, DomainSpaceEntity.class);
-        this.log = new StringLogger(this.getClass());
     }
     
     public DomainSpaceData findSingletonDomainSpace() {

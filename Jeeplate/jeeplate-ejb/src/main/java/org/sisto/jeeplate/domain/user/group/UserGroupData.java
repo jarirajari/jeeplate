@@ -24,7 +24,6 @@ import javax.ejb.Stateful;
 import javax.inject.Inject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
-import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.logging.StringLogger;
 
 @Stateful
@@ -40,7 +39,6 @@ public class UserGroupData extends BusinessBean<UserGroupData, UserGroupEntity> 
     
     public UserGroupData() {
         super(UserGroupData.class, UserGroupEntity.class);
-        this.log = new StringLogger(this.getClass());
     }
     
     public Boolean testHashing() {

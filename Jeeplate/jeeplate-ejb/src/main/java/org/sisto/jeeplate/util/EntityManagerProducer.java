@@ -28,7 +28,7 @@ import javax.persistence.PersistenceContextType;
 @ApplicationScoped
 public class EntityManagerProducer {
 
-    @PersistenceContext(type=PersistenceContextType.TRANSACTION, unitName = "h2PU")
+    @PersistenceContext(type=PersistenceContextType.EXTENDED, unitName = "h2PU")
     private EntityManager h2EntityManager;
     
     // http://docs.jboss.org/ejb3/app-server/tutorial/extended_pc/extended.html

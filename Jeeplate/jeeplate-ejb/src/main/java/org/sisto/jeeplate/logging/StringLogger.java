@@ -29,9 +29,7 @@ public class StringLogger implements Serializable {
     public transient static final String[] EMPTY_ARRAY = new String[0];
     private Logger jbossLogger;
     
-    public StringLogger() {
-        
-    }
+    public StringLogger() {}
     
     public StringLogger(String name) {
         this.jbossLogger = Logger.getLogger(name);

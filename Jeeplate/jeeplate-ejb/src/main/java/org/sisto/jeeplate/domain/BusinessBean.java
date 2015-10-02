@@ -27,12 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.Stateful;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Default;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.pk.TernaryKeyField;
@@ -57,6 +51,14 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     
     protected E entity;
     protected E dataModel;
+
+    public StringLogger getLog() {
+        return log;
+    }
+
+    public void setLog(StringLogger log) {
+        this.log = log;
+    }
     
     protected E getEntity() {
         return (this.entity);
@@ -92,6 +94,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         } catch (InstantiationException | IllegalAccessException ex) {
             this.entity = null;
         }
+        this.log = new StringLogger(dataType.getClass());
     }
     
     public void createTestData(E ... ents) {

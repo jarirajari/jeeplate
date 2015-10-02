@@ -38,7 +38,8 @@ import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 @Table(name = "system_groups_old", uniqueConstraints = {
        @UniqueConstraint(columnNames = "groupname")})
 public class UserGroupEntity extends BusinessEntity implements Serializable {
-    @SecondaryKeyField(description = "For finding certain groups")
+    
+    @SecondaryKeyField(description = "For finding certain groups by 'id'!")
     @Id @SequenceGenerator(name="user_group_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_group_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;

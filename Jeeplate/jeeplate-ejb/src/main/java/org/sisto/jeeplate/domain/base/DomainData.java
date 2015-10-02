@@ -22,13 +22,13 @@ import java.io.Serializable;
 import javax.ejb.Stateful;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
 import org.sisto.jeeplate.domain.group.DomainGroupEntity;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
-import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.logging.StringLogger;
 
 @Stateful 
@@ -55,7 +55,6 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
     
     public DomainData() {
         super(DomainData.class, DomainEntity.class);
-        this.log = new StringLogger(this.getClass());
     }
     
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -69,44 +68,6 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
         //this.create();
     }
     
-    public String applyForUserAccount() {
-        Boolean userNotExist = this.getDataModel().isDefault();
-        DomainRegistration reg  = this.getDataModel().getRegistration();
-        String token;
-        
-        if (userNotExist) {
-            reg.activateRegistrationProtocol();
-        }
-        if (userNotExist) {
-            token = reg.getRegistrationToken();
-            log.debug("User registration requested for a user that has no account!");
-        } else {
-            token = "";
-            log.info("User registration requested for an existing user (id=%s).", String.valueOf(this.getDataModel().getId()));
-        }
-        
-        return token;
-    }
-    
-    public Boolean grantUserAccount(String typedMobile, String typedPassword, String emailedResetToken) {
-        Boolean granted = Boolean.FALSE;
-        DomainRegistration gdr = this.getDataModel().getRegistration();
-        Boolean oneDomainFound = emailedResetToken.startsWith(gdr.getPartDomainDeliveredSeparately());
-        
-        if (oneDomainFound) {
-            log.info("User registration, found application domain"); // application domain
-        } else {
-            boolean systemUserRequestResponseChallengeHash = false;
-            if (systemUserRequestResponseChallengeHash) {
-                log.info("User registration, found system domain"); // system domain
-            } else {
-                log.info("User registration, found unknown domain"); // unknown domain
-            }
-        }
-        
-        return granted;
-    }
-    
     public DomainData findOneDomain(final String domainIdentifier) {
         return (this.findOneSecondary(domainIdentifier));
     }
@@ -115,7 +76,6 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
         DomainEntity gde = new DomainEntity();
         gde.setDomainname("com.example");
         gde.setDomaintype(DomainType.Type.APPLICATION);
-        gde.getRegistration().setPartDomainDeliveredSeparately("01020304");
         gde.setDescription("This is a test company");
         this.entity = gde;
         this.create();
