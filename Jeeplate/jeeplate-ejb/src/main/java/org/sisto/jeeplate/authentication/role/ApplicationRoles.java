@@ -57,9 +57,9 @@ public class ApplicationRoles implements Serializable {
      */
     @Transient
     protected BitSet roleGroup;
-    @Column(name ="application_roles_group")
+    @Column(name ="application_roles_group_hex")
     protected byte[] roleGroupAlias;
-
+    
     public byte[] getRoleGroupAlias() {
         this.roleGroupAlias = this.roleGroup.toByteArray();
         
@@ -81,6 +81,11 @@ public class ApplicationRoles implements Serializable {
      * + elevate allow
      * - demote  deny
      */
+    public void setRoleGroup(BitSet roleGroup) {
+        this.roleGroup = roleGroup;
+        this.roleGroupAlias = this.roleGroup.toByteArray();
+    }
+    
     private void elevateGroup(ApplicationRole newRole) {
         this.roleGroup.set(newRole.bitIndex());
         this.roleGroupAlias = this.roleGroup.toByteArray();

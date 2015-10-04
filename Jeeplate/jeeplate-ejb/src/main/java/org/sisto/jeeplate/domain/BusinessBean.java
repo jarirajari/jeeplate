@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import javax.persistence.PersistenceException;
 import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.pk.TernaryKeyField;
 import org.sisto.jeeplate.domain.pk.TertiaryKeyField;
@@ -193,7 +194,13 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     public Map<Long, D> findAll() {
         final String query = String.format("SELECT e FROM %s e", entityString);
         final Map<String, Object> params = new HashMap<>();
-        final List<E> results = this.store.executeQuery(entityBeanType, query, params);
+        final List<E> results = new ArrayList<>();
+        
+        try {
+            results.addAll(this.store.executeQuery(entityBeanType, query, params));
+        } catch (PersistenceException pe) {
+            this.log.error("FindOne PersistenceException: %s", pe.getMessage());
+        }
         
         return (collectAllResult(results));
     }
@@ -220,7 +227,13 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         final Map<String, Object> params = new HashMap<String, Object>() {{
             put(entityId, withId);
         }};
-        final List<E> results = this.store.executeQuery(entityBeanType, query, params);
+        final List<E> results = new ArrayList<>();
+        
+        try {
+            results.addAll(this.store.executeQuery(entityBeanType, query, params));
+        } catch (PersistenceException pe) {
+            this.log.error("FindOne PersistenceException: %s", pe.getMessage());
+        }
         
         return (collectOneResult(results));
     }
@@ -256,36 +269,61 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         final Map<String, Object> params = new HashMap<String, Object>() {{
             put(entAltKey, altKeyVal);
         }};
-        final List<E> results;
+        final List<E> results = new ArrayList<>();
         
         if (entAltKey.isEmpty()) {
-            results = new ArrayList<>();
+            
         } else {
-            results = this.store.executeQuery(entityBeanType, query, params);
+            try {
+                results.addAll(this.store.executeQuery(entityBeanType, query, params));
+            } catch (PersistenceException pe) {
+                this.log.error("FindEntityByAlternativeKey PersistenceException: %s", pe.getMessage());
+            }
         }
         
         return results;
     }
     
     protected void create() {
-        this.entity = this.store.create(entity);
+        
+        try {
+            this.entity = this.store.create(entity);
+        } catch (PersistenceException pe) {
+            this.log.error("Create PersistenceException: %s", pe.getMessage());
+        }
     }
     
     protected void read() {
-        this.entity = this.store.read(entity);
+        
+        try {
+            this.entity = this.store.read(entity);
+        } catch (PersistenceException pe) {
+            this.log.error("Read PersistenceException: %s", pe.getMessage());
+        }
     }
     
     protected void update() {
-        this.entity = this.store.update(entity);
+        
+        try {
+            this.entity = this.store.update(entity);
+        } catch (PersistenceException pe) {
+            this.log.error("Update PersistenceException: %s", pe.getMessage());
+        }
     }
     
     protected void delete() {
-        this.entity = this.store.delete(entity);
+        
+        try {
+            this.entity = this.store.delete(entity);
+        } catch (PersistenceException pe) {
+            this.log.error("Delete PersistenceException: %s", pe.getMessage());
+        }
     }
     
     // Returns objects id :: getter
     public Long find() {
         return (this.bind(this.entity.getId()));
+        
     }
     
     // Return objects id after binding it to a persisted entity :: setter

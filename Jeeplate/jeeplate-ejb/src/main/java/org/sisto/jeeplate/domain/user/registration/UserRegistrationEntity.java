@@ -131,7 +131,7 @@ public class UserRegistrationEntity extends BusinessEntity implements Serializab
     }
     
     private static String generateRandomNumberToken() {
-        final int length=4;
+        final int length=16; // 16*2=32
         RandomNumberGenerator rng = new SecureRandomNumberGenerator();
         ByteSource bs = rng.nextBytes(length);
         String randomStringHex8 = bs.toHex();

@@ -20,11 +20,17 @@ package org.sisto.jeeplate.domain.user.registration;
 
 import java.io.Serializable;
 import javax.ejb.Stateful;
+import javax.inject.Inject;
 import org.sisto.jeeplate.domain.BusinessBean;
-import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.domain.EntityBuilder;
+import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.domain.user.UserEntity;
 
 @Stateful
 public class UserRegistrationData extends BusinessBean<UserRegistrationData, UserRegistrationEntity> implements Serializable {
+    
+    @Inject
+    UserData user;
     
     public UserRegistrationData() {
         super(UserRegistrationData.class, UserRegistrationEntity.class);
@@ -49,31 +55,17 @@ public class UserRegistrationData extends BusinessBean<UserRegistrationData, Use
         return token;
     }
     
-    public Boolean grantUserAccount(String typedMobile, String typedPassword, String emailedResetToken) {
-        Boolean granted = Boolean.FALSE;
+    public Boolean grantUserAccount(String typedUsername, String typedPassword, String typedMobile, String emailedResetToken) {
         String token = this.getEntity().getRegistrationToken();
-        Boolean oneDomainFound = emailedResetToken.startsWith(token);
+        Boolean granted = emailedResetToken.equals(token);
         
-        // Side-channel (email) process:
-        // a. email is sent to user
-        // b. user replies to it, which activates reg.ent boolean field
-        // c. on TRUE => registration can be completed => grant ok
-        // ?? for testing we can skip to c. directly
-        
-        // Registration ok:
-        // 1. user becomes a member of ALL group in the domain
-        // 2. user is assingned an APPLICATION role and system role is revoked
-        // 3. user gets a account for detailed personal information
-        //
-        if (oneDomainFound) {
-            log.info("User registration, found application domain"); // application domain
-        } else {
-            boolean systemUserRequestResponseChallengeHash = false;
-            if (systemUserRequestResponseChallengeHash) {
-                log.info("User registration, found system domain"); // system domain
-            } else {
-                log.info("User registration, found unknown domain"); // unknown domain
-            }
+        if (granted) {
+            final UserEntity ue = EntityBuilder.of().UserEntity()
+                    .setUsername(typedUsername)
+                    .setPassword(typedPassword)
+                    .setMobile(Long.valueOf(typedMobile))
+                    .asRegisteredUser();
+            user.createNewUser(ue);
         }
         
         return granted;

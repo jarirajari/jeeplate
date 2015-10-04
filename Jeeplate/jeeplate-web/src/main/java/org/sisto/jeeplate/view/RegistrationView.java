@@ -47,7 +47,7 @@ public class RegistrationView extends AbstractView implements Serializable {
     private String username;
     private String mobile;
     private String password;
-    private String domaincode; // domain will be asked after first login...
+    private String emailedregistrationsecret; // domain will be asked later, i.e. after first login...
     private String actionsecret; // action token
     private Boolean iacceptTermsAndConditions;
     private Boolean registered;
@@ -58,7 +58,7 @@ public class RegistrationView extends AbstractView implements Serializable {
         this.username = "";
         this.mobile = "";
         this.password = "";
-        this.domaincode = "";
+        this.emailedregistrationsecret = "";
         this.actionsecret = "";
         this.iacceptTermsAndConditions = Boolean.FALSE;
         this.registered = Boolean.FALSE;
@@ -85,12 +85,12 @@ public class RegistrationView extends AbstractView implements Serializable {
         this.username = username;
     }
 
-    public String getDomaincode() {
-        return domaincode;
+    public String getEmailedregistrationsecret() {
+        return emailedregistrationsecret;
     }
 
-    public void setDomaincode(String domaincode) {
-        this.domaincode = String.format("%s", domaincode.replaceAll("[-|_]",""));
+    public void setEmailedregistrationsecret(String emailedregistrationsecret) {
+        this.emailedregistrationsecret = emailedregistrationsecret;
     }
 
     public String getPassword() {
@@ -132,7 +132,7 @@ public class RegistrationView extends AbstractView implements Serializable {
     public void newActionsecret() {
         if (! this.flowing) {
             if (actionsecret.isEmpty()) {
-                this.actionsecret = this.random.generateRandomString(8);
+                this.actionsecret = this.random.generateRandomString(16);
             }
             this.flowing = true;
         } else {
@@ -172,7 +172,7 @@ public class RegistrationView extends AbstractView implements Serializable {
         String token = this.registration.applyForUserAccount();
         
         this.findUserAccount();
-        this.user.nofityUserForRegistration(oldUserMsg, newUserMsg, hideDomainPartFromCodeToBeEmailed(token));
+        this.user.nofityUserForRegistration(oldUserMsg, newUserMsg, token);
     }
     
     public void endUserRegistrationPhase() {
@@ -180,7 +180,7 @@ public class RegistrationView extends AbstractView implements Serializable {
         Boolean actionSecretOK = userRegistrationCanBeCompleted(this.getActionsecret());
         
         if (actionSecretOK) {
-            completed = this.registration.grantUserAccount(this.getMobile(), this.getPassword(), this.getDomaincode());
+            completed = this.registration.grantUserAccount(this.getUsername(), this.getPassword(), this.getMobile(), this.getEmailedregistrationsecret());
         }
         if (completed) {
             this.showFacesMessage(FacesMessage.SEVERITY_INFO, "OK, registered");
@@ -188,28 +188,6 @@ public class RegistrationView extends AbstractView implements Serializable {
             this.showFacesMessage(FacesMessage.SEVERITY_ERROR, "Failed, not registered. please try again");
         }
         this.registered = completed;
-    }
-    
-    private String hideDomainPartFromCodeToBeEmailed(String code) {
-        final int blockLength = 4;
-        String[] parts = code.split(String.format("(?<=\\G.{%s})", blockLength));
-        int length = parts.length;
-        StringBuilder sb = new StringBuilder();
-        
-        for (int p=0; p<length; p++) {
-            
-            if (p < 2) {
-                sb.append(parts[p]);
-            } else {
-                sb.append("____"); // 4x"_"
-            }
-            if (p < (length-1)) {
-                sb.append("-"); // 1x"-"
-            }
-        }
-        log.error("Add domain and fill random part '%s'", code);
-        
-        return (sb.toString());
     }
     
     private boolean userRegistrationCanBeCompleted(String hiddenActionSecretGenerated) {

@@ -16,20 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.group.member;
+package org.sisto.jeeplate.domain.user.account;
 
-import java.io.Serializable;
-import javax.ejb.Stateful;
-import javax.inject.Inject;
-import org.sisto.jeeplate.domain.BusinessBean;
-
-@Stateful
-public class DomainGroupMemberData extends BusinessBean<DomainGroupMemberData, DomainGroupMemberEntity> implements Serializable {
+public class UserSystemAccount {
     
-    @Inject
-    DomainGroupMember member;
-    
-    public DomainGroupMemberData() {
-        super(DomainGroupMemberData.class, DomainGroupMemberEntity.class);
-    }
 }

@@ -91,7 +91,7 @@
                                 <h:outputLabel for="signupWzdAccept" value="">
                                     <p:commandLink id="signupWzdAccept" value="Terms and Conditions" onclick="PF('termsCondsDialog').show();" oncomplete="PF('signinDlg').hide()"/>
                                 </h:outputLabel>
-                                <p:selectBooleanCheckbox value="#{registrationView.iacceptTermsAndConditions}" required="true"/>
+                                <p:selectBooleanCheckbox value="#{registrationView.iacceptTermsAndConditions}" required="true" requiredMessage="aCCEPT TERMS"/>
                                 
                             </h:panelGrid>                            
                         </p:panel>
@@ -111,8 +111,8 @@
                                 <h:outputText value="Retype Password:" />
                                 <p:password id="signupFormPwRetyped" label="ret pw" required="true" feedback="false"/>
                                 
-                                <h:outputText value="Domain Code:" />
-                                <p:inputMask value="#{registrationView.domaincode}" required="true" mask="****-****-****-****"/>
+                                <h:outputText value="Emailed secret:" />
+                                <p:inputText value="#{registrationView.emailedregistrationsecret}" required="true" requiredMessage="check ur email!"/>
                                 
                                 <h:inputHidden id="signupWzdHidden" value="#{registrationView.actionsecret}" />
                             </h:panelGrid>
@@ -336,7 +336,7 @@
                                 </p:inputText>
                                 
                                 <h:outputText value="I am human:" />
-                                <p:selectBooleanCheckbox value="#{passwordView.iamhuman}" required="true"/>
+                                <p:selectBooleanCheckbox value="#{passwordView.iamhuman}" required="true" requiredMessage="Please check this"/>
                                 <!-- Waiting for new Re-captcha integration from Primefaces -->
                             </h:panelGrid>
                         </p:panel>
@@ -357,7 +357,7 @@
                                 <p:password id="resetFormPwRetyped" label="ret pw" required="true" feedback="false"/>
 
                                 <h:outputText value="Reset Code:" />
-                                <p:inputText id="resetWzdEmailed" value="#{passwordView.emailedsecret}" required="true" />
+                                <p:inputText id="resetWzdEmailed" value="#{passwordView.emailedsecret}" required="true" requiredMessage="Plz check your email!"/>
                                 
                                 <h:inputHidden id="resetWzdHidden" value="#{passwordView.actionsecret}" />
                                 

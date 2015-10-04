@@ -139,7 +139,15 @@ public class UserEntity extends BusinessEntity implements Serializable {
     }
     
     public UserEntity asRoot() {
-        this.getSysRole().setRole(SystemRole.DOMAIN_ADMIN);
+        this.getSysRole().setRole(SystemRole.DOMAIN_SPACE_ADMIN);
+        this.getAppRole().setRoleGroup(ApplicationRoles.EMPTY_GROUP);
+        
+        return this;
+    }
+    
+    public UserEntity asRegisteredUser() {
+        this.getSysRole().setRole(SystemRole.SYSTEM_USER);
+        this.getAppRole().setRoleGroup(ApplicationRoles.NORMAL_GROUP);
         
         return this;
     }

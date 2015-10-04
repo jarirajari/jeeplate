@@ -50,7 +50,10 @@ public class DomainGroupMemberEntity extends BusinessEntity implements Serializa
     protected DomainGroupEntity domaingroup;
     
     public DomainGroupMemberEntity() {
-        
+        this.id = BusinessEntity.DEFAULT_ID;
+        this.memberalias = "";
+        this.ISAUser = null;
+        this.domaingroup = null;
     }
     
     @PostLoad @PostPersist @PostUpdate 
@@ -58,5 +61,30 @@ public class DomainGroupMemberEntity extends BusinessEntity implements Serializa
     protected void updateParentId() {
         super.setId(this.id);
     }
+
+    public String getMemberalias() {
+        return memberalias;
+    }
+
+    public void setMemberalias(String memberalias) {
+        this.memberalias = memberalias;
+    }
+
+    public UserEntity getISAUser() {
+        return ISAUser;
+    }
+
+    public void setISAUser(UserEntity ISAUser) {
+        this.ISAUser = ISAUser;
+    }
+
+    public DomainGroupEntity getDomaingroup() {
+        return domaingroup;
+    }
+
+    public void setDomaingroup(DomainGroupEntity domaingroup) {
+        this.domaingroup = domaingroup;
+    }
+    
     
 }

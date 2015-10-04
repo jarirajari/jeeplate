@@ -54,7 +54,7 @@ public class Configuration implements Serializable {
                 .setPassword(rootPassword)
                 .setMobile(Long.valueOf(rootMsisdn))
                 .asRoot();
-            this.user.createRootUser(root);
+            this.user.createNewUser(root);
             this.domainSpace.originateSingletonDomainSpace();
         }
     }

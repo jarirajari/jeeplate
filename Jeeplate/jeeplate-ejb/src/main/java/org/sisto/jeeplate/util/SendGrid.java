@@ -16,20 +16,30 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.group.member;
+package org.sisto.jeeplate.util;
 
-import java.io.Serializable;
-import javax.ejb.Stateful;
-import javax.inject.Inject;
-import org.sisto.jeeplate.domain.BusinessBean;
+public class SendGrid {
+/*
+    
+// using SendGrid's Java Library - https://github.com/sendgrid/sendgrid-java
+import com.sendgrid.*;
 
-@Stateful
-public class DomainGroupMemberData extends BusinessBean<DomainGroupMemberData, DomainGroupMemberEntity> implements Serializable {
-    
-    @Inject
-    DomainGroupMember member;
-    
-    public DomainGroupMemberData() {
-        super(DomainGroupMemberData.class, DomainGroupMemberEntity.class);
-    }
+public class SendGridExample {
+  public static void main(String[] args) {
+
+    // prefere api (alt. OR SendGrid sendgrid = new SendGrid(api_user, api_password))
+    SendGrid sendgrid = new SendGrid(api_key); // recommended
+
+    SendGrid.Email email = new SendGrid.Email();
+
+    email.addTo("test@sendgrid.com");
+    email.setFrom("you@youremail.com");
+    email.setSubject("Sending with SendGrid is Fun");
+    email.setHtml("and easy to do anywhere, even with Java");
+
+    SendGrid.Response response = sendgrid.send(email);
+  }
+}
+
+*/    
 }

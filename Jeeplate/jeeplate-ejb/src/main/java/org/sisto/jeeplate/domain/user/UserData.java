@@ -174,7 +174,7 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         return noUser;
     }
     
-    public void createRootUser(UserEntity ue) {
+    public void createNewUser(UserEntity ue) {
         this.setEntity(ue);
         this.create();
     }
