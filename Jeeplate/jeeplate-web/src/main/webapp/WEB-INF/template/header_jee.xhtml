@@ -25,7 +25,7 @@
         <!-- Menubar -->
         <h:form id="menubarForm">
             <p:growl id="growlMessages" showDetail="true" life="3000" />
-
+            <p:growl id="messages" showDetail="true" life="3000" />
             <p:menubar>
                 <p:menuitem id="logo">
                     <p:outputLabel>
@@ -35,17 +35,15 @@
                 </p:menuitem>
 
                 <f:facet name="options">
-                    <p:splitButton value="JEE USER2" immediate="true" rendered="#{mgr.authenticated()}" actionListener="#{buttonView.save}" icon="ui-icon-disk">
+                    <p:splitButton value="#{switchRoleMenu.currentUser()}" immediate="true" rendered="#{mgr.authenticated()}" actionListener="#{buttonView.save}" icon="ui-icon-disk">
                         <p:menuitem value="Change credentials..." onclick="PF('credentialsDlg').show();" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
                         <p:menuitem value="Update localisation..." onclick="PF('localisationDlg').show();" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
                         <p:menuitem value="Modify account settings..." action="account" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
                     </p:splitButton>
-
-                    <p:splitButton value="admin" immediate="true" rendered="#{mgr.authenticated()}" actionListener="#{oracle.noop()}" icon="ui-icon-disk">
-                        <p:menuitem value="sysadmin" onclick="JS.handleRoleSwitch('roleDlg','roleForm:roleNewrole','#{mgr.sysadmin()}');" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="user" onclick="JS.handleRoleSwitch('roleDlg','roleForm:roleNewrole','user');" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
-                    </p:splitButton>
-
+                    
+                    <p:commandButton id="dynaButton" value="Sign as" rendered="#{mgr.authenticated()}" icon="ui-icon-extlink"></p:commandButton>
+                    <p:menu id="rolesMenu" overlay="true" my="left top" at="left bottom" trigger="dynaButton" model="#{switchRoleMenu.switchRoleMenuModel}" />
+                    
                     <p:commandButton value="Sign up" rendered="#{not mgr.authenticated()}" icon="ui-icon-disk"
                                      onclick="PF('signupWzd').show();">
                     </p:commandButton>
@@ -79,20 +77,19 @@
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="Email:" />
-                                <p:inputText label="Email" value="#{registrationView.username}" required="true">
-                                    <f:validator validatorId="emailValidator" />
-                                </p:inputText>
+                                <h:inputText id="suemv" label="Email" value="#{registrationView.username}" required="true">
+                                    <f:validator parent="suemv" validatorId="emailValidator" />
+                                </h:inputText>
 
                                 <h:outputText value="Mobile:" />
-                                <p:inputText label="Mobile" value="#{registrationView.mobile}" required="true">
-                                    <f:validator validatorId="mobileValidator" />
-                                </p:inputText>
+                                <h:inputText id="sumev" label="Mobile" value="#{registrationView.mobile}" required="true">
+                                    <f:validator parent="sumev" validatorId="mobileValidator" />
+                                </h:inputText>
 
                                 <h:outputLabel for="signupWzdAccept" value="">
                                     <p:commandLink id="signupWzdAccept" value="Terms and Conditions" onclick="PF('termsCondsDialog').show();" oncomplete="PF('signinDlg').hide()"/>
                                 </h:outputLabel>
                                 <p:selectBooleanCheckbox value="#{registrationView.iacceptTermsAndConditions}" required="true" requiredMessage="aCCEPT TERMS"/>
-                                
                             </h:panelGrid>                            
                         </p:panel>
                     </p:tab>
@@ -278,7 +275,13 @@
                 </h:panelGrid>
             </h:form>
         </p:dialog><!-- /Localisation dialog -->
-        <!-- Role dialog -->
+        <!-- 
+        
+        
+        Role dialog => remove because replaced with menu
+        
+        
+        -->
         <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Sign as" widgetVar="roleDlg" resizable="false">
             <h:form id="roleForm">
                 <h:panelGrid id="role" columns="1" >
@@ -306,11 +309,10 @@
 
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Switch" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
-                                         update="role" action="#{mgr.submit}" />
-
                         <p:commandButton value="Cancel" immediate="true" onclick="PF('signupDlg').hide();" 
                                          update="role,roleResult"/>
+                        <p:commandButton value="Switch" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
+                                         update="role" action="#{mgr.submit}" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
@@ -381,7 +383,33 @@
                 </p:wizard>
                 
             </h:form>
-        </p:dialog><!-- /Reset Wizard -->
+        </p:dialog><!-- /Reset Wizard -->       
+        <!-- 2FA for role change -->
+        <p:dialog modal="true" header="2FA" widgetVar="fa2Dlg" resizable="false" closable="true">
+            <h:form id="fa2Form">
+                <h:panelGrid id="fa2Grid" columns="2" >
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column colspan="2">
+                                <p:outputPanel >
+                                    Change role? 
+                                </p:outputPanel>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+                    
+                    <h:outputLabel rendered="#{switchRoleMenu.requires2FA()}" for="fa2PIN" value="PIN:" />
+                    <p:inputText rendered="#{switchRoleMenu.requires2FA()}" id="fa2PIN" value="#{switchRoleMenu.pin}" required="false" readonly="false" maxlength="8">
+                        <p:ajax event="mouseout" listener="#{switchRoleMenu.flushPIN}" />
+                    </p:inputText>
+                    <p:outputLabel value="" />
+                    <p:outputPanel>
+                        <p:commandButton value="Cancel" onclick="PF('fa2Dlg').hide();"/>
+                        <p:commandButton value="Change" actionListener="#{switchRoleMenu.switchNow()}" update="@all"/>
+                    </p:outputPanel>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog><!-- /2FA for role change -->
         <!-- Terms and conditions dialog -->
         <p:dialog widgetVar="termsCondsDialog" header="legal" modal="true" draggable="false" closable="true" resizable="false" showHeader="true" >
             <p:panel id="basic" header="Terms and conditions" footer="" >
@@ -391,9 +419,15 @@
             </p:panel>
         </p:dialog><!-- /Terms and conditions dialog -->
         <!-- Loading... dialog -->
+        <!--
         <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false"  style="background: white">
             <p:graphicImage value="resources/images/spinning-gear.gif" />
-        </p:dialog><!-- Loading... dialog -->
+        </p:dialog>
+        -->
+        <!-- Loading... dialog -->
+        
+        <!--
         <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+        -->
     </body>
 </html>

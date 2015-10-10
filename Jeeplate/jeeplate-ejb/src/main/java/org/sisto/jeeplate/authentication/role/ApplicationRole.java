@@ -18,23 +18,59 @@
  */
 package org.sisto.jeeplate.authentication.role;
 
-public enum ApplicationRole {
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.BitSet;
 
-    ADMINISTRATOR   ("administrator",   0b0010000),
-    DIRECTOR        ("director",        0b0001000),
-    ACTOR           ("actor",           0b0000100),
-    VISITOR         ("visitor",         0b0000010),
-    NONE            ("unknown",         0b0000001);
+public enum ApplicationRole {
+    // note that first bit is really index=0
+    ADMINISTRATOR   ("administrator", 2, 0b100),
+    DIRECTOR        ("director"     , 1, 0b010),
+    ACTOR           ("actor"        , 0, 0b001),
+    VISITOR         ("visitor"      , 0, 0b000);
 
     String name;
-    int bitIndex;
+    int bindex;
+    int bvalue;
 
-    ApplicationRole(String sname, int ibitIndex) {
+    ApplicationRole(String sname, int bindex, int bvalue) {
         this.name = sname;
-        this.bitIndex = ibitIndex;
+        this.bindex = bindex;
+        this.bvalue = bvalue;
     }
     
     public int bitIndex() {
-        return this.bitIndex;
+        return this.bindex;
+    }
+    
+    public BitSet bitSet() {
+        final BitSet bs = BitSet.valueOf(leIntToByteArray(this.bvalue));
+        
+        return bs;
+    }
+
+    public static int byteArrayToLeInt(byte[] b) {
+        final ByteBuffer bb = ByteBuffer.wrap(b);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        return bb.getInt();
+    }
+
+    public static byte[] leIntToByteArray(int i) {
+        final ByteBuffer bb = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.putInt(i);
+        return bb.array();
+    }
+    
+    public static ApplicationRole convert(String name) {
+        ApplicationRole converted;
+        
+        try {
+            converted = ApplicationRole.valueOf(name);
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            converted = VISITOR;
+        }
+        
+        return converted;
     }
 }

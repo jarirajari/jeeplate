@@ -37,4 +37,16 @@ public enum SystemRole {
     public String toString() {
         return (this.role);
     }
+    
+    public static SystemRole convert(String name) {
+        SystemRole converted;
+        
+        try {
+            converted = SystemRole.valueOf(name);
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            converted = GUEST_USER;
+        }
+        
+        return converted;
+    }
 }

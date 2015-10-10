@@ -20,9 +20,12 @@ package org.sisto.jeeplate.authentication.role;
 
 import java.io.Serializable;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Transient;
+import org.apache.commons.lang3.ArrayUtils;
 
 // The access type for an embedded object is determined by the access type of the entity in which it is embedded.
 @Embeddable
@@ -33,12 +36,22 @@ public class ApplicationRoles implements Serializable {
      */
     @Transient
     public transient static final BitSet EMPTY_GROUP = ApplicationRoles.newGroup()
-            .role(ApplicationRole.NONE)
+            .role(ApplicationRole.VISITOR)
             .group();
     @Transient
     public transient static final BitSet NORMAL_GROUP = ApplicationRoles.newGroup()
-            .role(ApplicationRole.NONE)
             .role(ApplicationRole.ACTOR)
+            .group();
+    @Transient
+    public transient static final BitSet DIRECTOR_GROUP = ApplicationRoles.newGroup()
+            .role(ApplicationRole.ACTOR)
+            .role(ApplicationRole.DIRECTOR)
+            .group();
+    @Transient
+    public transient static final BitSet ADMIN_GROUP = ApplicationRoles.newGroup()
+            .role(ApplicationRole.ACTOR)
+            .role(ApplicationRole.DIRECTOR)
+            .role(ApplicationRole.ADMINISTRATOR)
             .group();
     /*
     
@@ -56,35 +69,83 @@ public class ApplicationRoles implements Serializable {
      * For n roles there will be 2^n groups, where each role has index from enum
      */
     @Transient
+    protected ApplicationRole currentRole;
+    @Transient
     protected BitSet roleGroup;
     @Column(name ="application_roles_group_hex")
     protected byte[] roleGroupAlias;
     
-    public byte[] getRoleGroupAlias() {
+    public ApplicationRoles() {
+        this.roleGroup = (BitSet) ApplicationRoles.EMPTY_GROUP.clone();
         this.roleGroupAlias = this.roleGroup.toByteArray();
+        this.currentRole = ApplicationRole.VISITOR;
+    }
+
+    public ApplicationRole getCurrentRole() {
+        if (currentRole == ApplicationRole.VISITOR) {
+            this.setCurrentRole(ApplicationRole.ACTOR);
+        }
+        
+        return currentRole;
+    }
+
+    public void setCurrentRole(ApplicationRole currentRole) {
+        this.currentRole = currentRole;
+    }
+    
+    public void setRoleGroup(BitSet newRoleGroup) {
+        this.roleGroup = newRoleGroup;
+        this.roleGroupAlias = newRoleGroup.toByteArray();
+    }
+    
+    public BitSet getRoleGroup() {
+        this.roleGroup = BitSet.valueOf(roleGroupAlias);
+        
+        return this.roleGroup;
+    }
+    
+    public byte[] getRoleGroupAlias() {
         
         return roleGroupAlias;
     }
-
+    
     public void setRoleGroupAlias(byte[] roleGroupAlias) {
-        this.roleGroupAlias = roleGroupAlias;
+        this.roleGroupAlias = ArrayUtils.clone(roleGroupAlias);
         
         this.roleGroup = BitSet.valueOf(roleGroupAlias);
     }
     
-    public ApplicationRoles() {
-        this.roleGroup = ApplicationRoles.EMPTY_GROUP;
-        this.roleGroupAlias = this.roleGroup.toByteArray();
+    public Boolean requires2FAwhenRoleChange(ApplicationRole newRole) {
+        final Boolean newLevelHigher = (newRole.bitIndex()) > (this.currentRole.bitIndex());
+        
+        return newLevelHigher;
     }
     
+    public void assignRole(ApplicationRole newRole) {
+        this.currentRole = newRole;
+    }
+    
+    public Map<String, String> assignedRoles() {
+        final ApplicationRole[] allRoles = ApplicationRole.values();
+        HashMap assigned = new HashMap<>();
+        
+        for (ApplicationRole role : allRoles) {
+            if (role == ApplicationRole.VISITOR) {
+                continue; // we don't want visitor user
+            }
+            BitSet test = (BitSet) getRoleGroup().clone();
+            test.and(role.bitSet());
+            if (! test.isEmpty()) {
+                assigned.put(role.toString(), role.name());
+            }
+        }
+        
+        return assigned;
+    }
     /* 
      * + elevate allow
      * - demote  deny
      */
-    public void setRoleGroup(BitSet roleGroup) {
-        this.roleGroup = roleGroup;
-        this.roleGroupAlias = this.roleGroup.toByteArray();
-    }
     
     private void elevateGroup(ApplicationRole newRole) {
         this.roleGroup.set(newRole.bitIndex());
@@ -116,7 +177,8 @@ public class ApplicationRoles implements Serializable {
         private BitSet object;
         
         public ApplicationRoleGroupBuilder() {
-            this.object = new BitSet(ApplicationRole.values().length);
+            final int INT_B = 32;
+            this.object = new BitSet(INT_B);
             this.object.clear();
         }
         

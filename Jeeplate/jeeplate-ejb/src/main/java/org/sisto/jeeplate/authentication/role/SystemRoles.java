@@ -19,6 +19,8 @@
 package org.sisto.jeeplate.authentication.role;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
@@ -63,6 +65,24 @@ public class SystemRoles implements Serializable {
         }
         
         return fact;
+    }
+    
+    public boolean requires2FAwhenRoleChange() {
+        return Boolean.TRUE;
+    }
+    
+    public Map<String, String> assignedRoles() {
+        final SystemRole[] allRoles = SystemRole.values();
+        HashMap assigned = new HashMap<>();
+        
+        for (SystemRole role : allRoles) {
+            if (role == SystemRole.GUEST_USER) {
+                continue; // we don't want guest user
+            }
+            assigned.put(role.toString(), role.name());
+        }
+        
+        return assigned;
     }
     
     @Override

@@ -23,7 +23,9 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
+import org.apache.shiro.SecurityUtils;
 import org.sisto.jeeplate.logging.StringLogger;
+import org.apache.shiro.mgt.SecurityManager;
 
 @Dependent
 public class Resources {

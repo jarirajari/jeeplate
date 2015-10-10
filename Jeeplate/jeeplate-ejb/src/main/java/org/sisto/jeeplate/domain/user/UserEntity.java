@@ -20,7 +20,10 @@ package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Embedded;
@@ -36,6 +39,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Digits;
+import org.sisto.jeeplate.authentication.role.ApplicationRole;
 import org.sisto.jeeplate.authentication.role.ApplicationRoles;
 import org.sisto.jeeplate.authentication.role.SystemRole;
 import org.sisto.jeeplate.authentication.role.SystemRoles;
@@ -174,5 +178,81 @@ public class UserEntity extends BusinessEntity implements Serializable {
         }
         
         return same;
+    }
+    
+    public String currentRoleForUser() {
+        final SystemRole userSysRole = this.sysRole.getRole();
+        final ApplicationRole userAppRole = this.getAppRole().getCurrentRole();
+        String roleName;
+        
+        if (isApplicationUserThereforeNotSystemUser()) {
+            roleName = userAppRole.name();
+        } else {
+            roleName = userSysRole.name();
+        }
+        
+        return roleName;
+    }
+    
+    public Boolean isApplicationUserThereforeNotSystemUser() {
+        final SystemRole userSysRole = this.sysRole.getRole();
+        final BitSet userAssignedGroup = this.getAppRole().getRoleGroup();
+        Boolean isAppUsr;
+        
+        if ((SystemRole.SYSTEM_USER == userSysRole) &&
+            (! ApplicationRoles.EMPTY_GROUP.equals(userAssignedGroup))) {
+            isAppUsr = Boolean.TRUE;
+        } else {
+            isAppUsr = Boolean.FALSE;
+        }
+        
+        return isAppUsr;
+    }
+    
+    public Map<String, String> assignedRolesForUser() {
+        final Map<String, String> usersRoles = new HashMap<>();
+        
+        if (isApplicationUserThereforeNotSystemUser()) {
+            usersRoles.putAll(this.getAppRole().assignedRoles());
+        } else {
+            usersRoles.putAll(this.getSysRole().assignedRoles());
+        }
+        
+        return usersRoles;
+    }
+    
+    public Boolean requiresTwoFactorAuth(ApplicationRole newRole) {
+        Boolean requires;
+        
+        if (isApplicationUserThereforeNotSystemUser()) {
+            requires = this.getAppRole().requires2FAwhenRoleChange(newRole);
+        } else {
+            // Any role change for a system user will require 2FA!
+            requires = Boolean.TRUE;
+        }
+        
+        return requires;
+    }
+    
+    public String twoFactorAuthPIN() {
+        return (this.getCredential().newPIN());
+    }
+    
+    public Boolean swithcRoleTo(ApplicationRole newRole, String pin2FA, Boolean req2FA) {
+        Boolean success = Boolean.FALSE;
+        
+        if (req2FA) {
+            final String pin = this.getCredential().askPIN();
+            Boolean pinsMatch = pin.equals(pin2FA);
+            
+            if (pinsMatch) {
+                this.getAppRole().assignRole(newRole);
+                success = Boolean.TRUE;
+            }
+        } else {
+            this.getAppRole().assignRole(newRole);
+            success = Boolean.TRUE;
+        }
+        return success;
     }
 }

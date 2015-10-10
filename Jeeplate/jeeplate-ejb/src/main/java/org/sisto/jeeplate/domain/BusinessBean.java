@@ -61,11 +61,11 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         this.log = log;
     }
     
-    protected E getEntity() {
+    public E getEntity() {
         return (this.entity);
     }
     
-    protected void setEntity(E e) {
+    public void setEntity(E e) {
         this.entity = e;
     }
     
@@ -152,7 +152,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     }
     
     // N-ary
-    protected String alternativeNaryKeyFieldName(int nary) {
+    private String alternativeNaryKeyFieldName(int nary) {
         String name = "";
         final Field[] fields = entityBeanType.getDeclaredFields();
         Class<? extends Annotation> clazz;
@@ -284,7 +284,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         return results;
     }
     
-    protected void create() {
+    public void create() {
         
         try {
             this.entity = this.store.create(entity);
@@ -293,7 +293,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         }
     }
     
-    protected void read() {
+    public void read() {
         
         try {
             this.entity = this.store.read(entity);
@@ -302,7 +302,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         }
     }
     
-    protected void update() {
+    public void update() {
         
         try {
             this.entity = this.store.update(entity);
@@ -311,7 +311,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         }
     }
     
-    protected void delete() {
+    public void delete() {
         
         try {
             this.entity = this.store.delete(entity);

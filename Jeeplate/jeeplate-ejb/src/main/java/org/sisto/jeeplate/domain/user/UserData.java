@@ -19,11 +19,16 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
+import java.util.Map;
 import javax.ejb.Stateful;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+import org.sisto.jeeplate.authentication.role.ApplicationRole;
+import org.sisto.jeeplate.authentication.role.ApplicationRoles;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.ObjectEntity;
@@ -43,6 +48,8 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     
     @Inject
     Email emailSender;
+    
+    ApplicationRole transientCurrentRole = ApplicationRole.VISITOR;
     
     private transient final UserEntity hashed = EntityBuilder.of().UserEntity()
             .setUsername("hashis")
@@ -80,15 +87,53 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     *
     */
     public void findOneUser(final String emailAddress) {
-        this.setEntity(this.findOneSecondary(emailAddress).getEntity());
+        this.setDataModel(this.findOneSecondary(emailAddress).getDataModel());
     }
     
-    private void sendEmailToUser(EmailMessage em, String secretKey, String secretVal) {
+    public Map<String, String> assignedRolesForUser() {
+        return (this.getDataModel().assignedRolesForUser());
+    }
+    
+    public String currentRoleForUser() {
+        return (this.getDataModel().currentRoleForUser());
+    }
+    
+    public void findLoggedInUser(final String userEmailPrincipal) {
+        final Boolean userAlreadyFound = (this.getDataModel().getUsername().equals(userEmailPrincipal));
+        if (! userAlreadyFound) {
+            findOneUser(userEmailPrincipal);
+        }
+    }
+    
+    public Boolean switchCurrentUserRole(String newRoleName, String typedPIN) {
+        Boolean fa2required = this.requiresTwoFactorAuth(newRoleName);
+        Boolean ok = this.getDataModel().swithcRoleTo(ApplicationRole.convert(newRoleName), typedPIN, fa2required);
+        
+        if (ok) {
+            transientCurrentRole = this.getDataModel().getAppRole().getCurrentRole();
+            this.update();
+            this.getDataModel().getAppRole().setCurrentRole(transientCurrentRole);
+        }
+        
+        return ok;
+    }
+    
+    public Boolean requiresTwoFactorAuth(String newRoleName) {
+        return (this.getDataModel().requiresTwoFactorAuth(ApplicationRole.convert(newRoleName)));
+    }
+    
+    private void sendEmailToUser(EmailMessage em, String key, String val) {
         String subject = em.getSubject();
         // Convention and loose contract that secretKey will be replaced with secretVal
-        String content = em.getContent().replace(secretKey, secretVal);
+        String content = em.getContent().replace(key, val);
         MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress2, em.getContentRecipient());
         emailSender.sendMessage(mm);
+    }
+    
+    public void notifyUserFor2FA(EmailMessage em) {
+        final String replace = "${pin}";
+        final String pin = this.getDataModel().twoFactorAuthPIN();
+        sendEmailToUser(em, replace, pin);
     }
     
     public void nofityUserForRegistration(EmailMessage messageForOldUser, EmailMessage messageForNewUser, String registrationToken) {

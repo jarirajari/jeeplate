@@ -43,12 +43,15 @@ public class UserCredential implements Serializable {
     protected String passwordResetToken;
     @Temporal(TemporalType.TIMESTAMP)
     protected Date passwordResetTimestamp;
+    @Transient
+    protected transient String PIN2FA;
     
     public UserCredential() {
         this.salt = RESET;
         this.password = RESET;
         this.passwordResetToken = RESET;
         this.passwordResetTimestamp = Date.from(Instant.EPOCH);
+        this.PIN2FA = RESET;
     }
     
     private static Date now() {
@@ -119,7 +122,24 @@ public class UserCredential implements Serializable {
         
         return (! invalid);
     }
-
+    
+    public String newPIN() {
+        this.PIN2FA = generateRandomNumberPIN();
+        return (this.PIN2FA);
+    }
+    
+    public String askPIN() {
+        return (this.PIN2FA);
+    }
+    
+    private static String generateRandomNumberPIN() {
+        final int length=6;
+        RandomNumberGenerator rng = new SecureRandomNumberGenerator();
+        ByteSource bs = rng.nextBytes(length);
+        
+        return bs.toString();
+    }
+    
     private static String generateRandomNumberToken() {
         final int length=16;
         RandomNumberGenerator rng = new SecureRandomNumberGenerator();
