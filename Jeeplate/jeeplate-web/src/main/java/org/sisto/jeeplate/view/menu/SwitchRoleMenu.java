@@ -112,6 +112,10 @@ public class SwitchRoleMenu implements Serializable {
         closeConditionally(ok);
     }
     
+    public void clickedRoleSwitchedButton() {
+        
+    }
+    
     public String currentUser() {
         Subject currentUsr = SecurityUtils.getSubject();
         String usr = (currentUsr.getPrincipal() != null) ? currentUsr.getPrincipal().toString() : "";

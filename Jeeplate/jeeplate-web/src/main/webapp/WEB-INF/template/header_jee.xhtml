@@ -35,10 +35,10 @@
                 </p:menuitem>
 
                 <f:facet name="options">
-                    <p:splitButton value="#{switchRoleMenu.currentUser()}" immediate="true" rendered="#{mgr.authenticated()}" actionListener="#{buttonView.save}" icon="ui-icon-disk">
+                    <p:splitButton value="#{switchRoleMenu.currentUser()}" immediate="true" rendered="#{mgr.authenticated()}" actionListener="#{buttonView.clickedRoleSwitchedButton()}" icon="ui-icon-disk">
                         <p:menuitem value="Change credentials..." onclick="PF('credentialsDlg').show();" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="Update localisation..." onclick="PF('localisationDlg').show();" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="Modify account settings..." action="account" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Change localisation..." onclick="PF('localisationDlg').show();" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Account settings..." action="account" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
                     </p:splitButton>
                     
                     <p:commandButton id="dynaButton" value="Sign as" rendered="#{mgr.authenticated()}" icon="ui-icon-extlink"></p:commandButton>
@@ -57,11 +57,12 @@
                     </p:commandButton>
                     
                     <!-- Primefaces' splitbutton cannot process dynamic lists, so we use this -->
-                    <h:outputLabel for="syslang" value=" "/>
-                    <h:selectOneMenu id="syslang" styleClass="selectLang" valueChangeListener="#{language.changeLanguage}">
+
+                    <p:selectOneMenu id="syslang" styleClass="selectLang" valueChangeListener="#{language.changeLanguage}" value="#{language.selectedLocale}">
                         <p:ajax update="@all" />
-                        <f:selectItems value="#{language.availableLanguages}" />
-                    </h:selectOneMenu>
+                        <f:selectItems value="#{language.availableLocales.entrySet()}" var="locales" itemLabel="#{locales.value}" itemValue="#{locales.key}"/>
+                        
+                    </p:selectOneMenu>
                 </f:facet>
             </p:menubar>
         </h:form>
@@ -173,11 +174,9 @@
                     
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Cancel" icon="fa fa-close" 
-                                         immediate="true" onclick="PF('signinDlg').hide();" 
+                        <p:commandButton value="Cancel" icon="fa fa-close" onclick="PF('signinDlg').hide();" 
                                          update="signin,signinResult"/>
-                        <p:commandButton value="Sign in" icon="fa fa-check" 
-                                         oncomplete="JS.handleLoginRequest('signinDlg', xhr, status, args)" 
+                        <p:commandButton value="Sign in" icon="fa fa-check" oncomplete="JS.handleLoginRequest('signinDlg', xhr, status, args)" 
                                          update="signin" action="#{mgr.submit}" />
                     </p:outputPanel>
                 </h:panelGrid>
@@ -191,40 +190,34 @@
                         <p:row>
                             <p:column colspan="2">
                                 <p:outputPanel >
-                                    Change pw by filling out info below <p:commandLink value="link" />. 
+                                    Change password 
                                 </p:outputPanel>
                             </p:column>
                         </p:row>
                     </f:facet>
                     
-                    <h:outputLabel for="credentialsUsername" value="Username:" />
-                    <h:inputText id="credentialsUsername" value="info@sis.to" readonly="true"/>
+                    <p:outputLabel for="credentialsUsername" value="Username:" />
+                    <p:inputText id="credentialsUsername" value="#{changePasswordView.username}" readonly="true"/>
                     
-                    <p:outputLabel for="credentialsPassword" value="Old password:" />
-                    <p:password id="credentialsPassword" value="" required="true" />
+                    <p:outputLabel for="credentialsOldPassword" value="Old password:" />
+                    <p:password id="credentialsOldPassword" value="#{changePasswordView.password}" required="true" />
+                    
+                    <p:outputLabel for="credentialsNewPassword" value="New Password:" />
+                    <p:password id="credentialsNewPassword" label="new pw" value="#{changePasswordView.newPassword}" required="true" 
+                                match="credentialsVerifiedPassword" feedback="true" inline="true" promptLabel="Pw strength" 
+                                weakLabel="weak" goodLabel="good" strongLabel="Strong" maxlength="32" >
+                        <f:validator validatorId="passwordValidator" />
+                    </p:password>
 
-                    <p:outputLabel for="credentialsNewPassword" value="New password:" />
-                    <p:inputText id="credentialsNewPassword" value="***" required="true" >
-                        <f:validateLength minimum="1" />
-                    </p:inputText>
-                    
-                    <p:outputLabel for="credentialsVerifyPassword" value="Verify it:" />
-                    <p:inputText id="credentialsVerifyPassword" value="***" required="true" >
-                        <f:validateLength minimum="1" />
-                    </p:inputText>
-                    
-                    <p:commandLink value="Terms &amp; Conditions" />
-                    <p:outputPanel id="credentialsResult">
-                        <h:message for="credentialsResult" styleClass="ui-outputlabel ui-widget ui-state-error" />
-                    </p:outputPanel>
+                    <p:outputLabel for="credentialsVerifiedPassword" value="Retype Password:" />
+                    <p:password id="credentialsVerifiedPassword" label="ret pw" required="true" feedback="false"/>
                     
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Change" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
-                                         update="credentials" action="#{mgr.submit}" />
-
-                        <p:commandButton value="Cancel" immediate="true" onclick="PF('signupDlg').hide();" 
-                                         update="credentials,credentialsResult"/>
+                        <p:commandButton value="Cancel" onclick="PF('credentialsDlg').hide();" 
+                                         update="credentials"/>
+                        <p:commandButton value="Change" onclick="PF('credentialsDlg').hide();" 
+                                         update="credentials" actionListener="#{changePasswordView.change()}" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
@@ -237,40 +230,37 @@
                         <p:row>
                             <p:column colspan="2">
                                 <p:outputPanel >
-                                    Change pw by filling out info below <p:commandLink value="link" />. 
+                                    Localisation
                                 </p:outputPanel>
                             </p:column>
                         </p:row>
                     </f:facet>
                     
-                    <h:outputLabel for="localisationLanguage" value="Language:" />
-                    <h:inputText id="localisationLanguage" value="Suomi" readonly="true"/>
+                    <p:outputLabel for="localisationLanguage" value="Loc Language:"/>
+                    <p:selectOneMenu id="localisationLanguage" value="#{changeLocalisationView.language}" effect="fade" var="ll" filter="true" filterMatchMode="startsWith">
+                        <f:selectItems value="#{changeLocalisationView.localizedLanguages()}" var="lls" itemValue="#{lls}" />
+                    </p:selectOneMenu>
                     
-                    <p:outputLabel for="localisationTimezone" value="Timezone:" />
-                    <p:inputText id="localisationTimezone" value="UTC" required="true" />
-                    
-                    <p:outputLabel for="localisationCountry" value="Country:" />
-                    <p:inputText id="localisationCountry" value="Finland" required="false" >
-                        <f:validateLength minimum="1" />
-                    </p:inputText>
+                    <p:outputLabel for="localisationCountry" value="Loc Country:"/>
+                    <p:selectOneMenu id="localisationCountry" value="#{changeLocalisationView.country}" effect="fade" var="lc" filter="true" filterMatchMode="startsWith">
+                        <f:selectItems value="#{changeLocalisationView.localizedCountries()}" var="lcs" itemValue="#{lcs}" />
+                    </p:selectOneMenu>
 
                     <p:outputLabel for="localisationCity" value="City:" />
-                    <p:inputText id="localisationCity" value="Helsinki" required="false" >
+                    <p:inputText id="localisationCity" value="#{changeLocalisationView.city}" required="false" >
                         <f:validateLength minimum="1" />
                     </p:inputText>
                     
-                    <p:commandLink value="Terms &amp; Conditions" />
-                    <p:outputPanel id="localisationResult">
-                        <h:message for="localisationResult" styleClass="ui-outputlabel ui-widget ui-state-error" />
-                    </p:outputPanel>
-
+                    <p:outputLabel for="localisationTimezone" value="Timezone:"/>
+                    <p:selectOneMenu id="localisationTimezone" value="#{changeLocalisationView.timezone}" effect="fade" var="t" filter="true" filterMatchMode="startsWith">
+                        <f:selectItems value="#{changeLocalisationView.localizedTimezones()}" var="ts" itemValue="#{ts}" />
+                    </p:selectOneMenu>
+                    
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Update" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
-                                         update="localisation" action="#{mgr.submit}" />
-
-                        <p:commandButton value="Cancel" immediate="true" onclick="PF('signupDlg').hide();" 
-                                         update="localisation,localisationResult"/>
+                        <p:commandButton value="Cancel" immediate="true" onclick="PF('localisationDlg').hide();" />
+                        <p:commandButton value="Update" onclick="PF('localisationDlg').hide();" 
+                                         update="@all" actionListener="#{changeLocalisationView.change()}" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
@@ -282,7 +272,8 @@
         
         
         -->
-        <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Sign as" widgetVar="roleDlg" resizable="false">
+        <!--
+        <p:dialog rendered="{mgr.authenticated()}" modal="true" header="Sign as" widgetVar="roleDlg" resizable="false">
             <h:form id="roleForm">
                 <h:panelGrid id="role" columns="1" >
                     <f:facet name="header">
@@ -312,44 +303,46 @@
                         <p:commandButton value="Cancel" immediate="true" onclick="PF('signupDlg').hide();" 
                                          update="role,roleResult"/>
                         <p:commandButton value="Switch" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
-                                         update="role" action="#{mgr.submit}" />
+                                         update="role" action="{mgr.submit}" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
-        </p:dialog><!-- /Role dialog -->
+        </p:dialog>
+        -->
+        <!-- /Role dialog -->
         <!-- Reset Wizard -->
         <p:dialog widgetVar="resetWzd" closable="true" header="Reset password" modal="true" styleClass="disable-scroll" width="600px">
             <h:form id="resetForm" >
                 <p:growl id="resetFormGrowl" sticky="true" showDetail="true"/>
-                <p:wizard widgetVar="resetWzdWizard" flowListener="#{passwordView.onFlowProcess}" backLabel="Cancel" nextLabel="OK" showNavBar="true">
+                <p:wizard widgetVar="resetWzdWizard" flowListener="#{resetPasswordView.onFlowProcess}" backLabel="Cancel" nextLabel="OK" showNavBar="true">
                     <!-- Send email if information is correct -->
                     <p:tab id="resetWzd0" title="Account Details">
                         <p:panel header="Account Details2">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="Email:" />
-                                <p:inputText id="resetFormEmail" label="Email" value="#{passwordView.username}" required="true">
+                                <p:inputText id="resetFormEmail" label="Email" value="#{resetPasswordView.username}" required="true">
                                     <f:validator validatorId="emailValidator" />
                                 </p:inputText>
 
                                 <h:outputText value="Mobile:" />
-                                <p:inputText id="resetFormMobile" label="Mobile" value="#{passwordView.mobile}" required="true">
+                                <p:inputText id="resetFormMobile" label="Mobile" value="#{resetPasswordView.mobile}" required="true">
                                     <f:validator validatorId="mobileValidator" />
                                 </p:inputText>
                                 
                                 <h:outputText value="I am human:" />
-                                <p:selectBooleanCheckbox value="#{passwordView.iamhuman}" required="true" requiredMessage="Please check this"/>
+                                <p:selectBooleanCheckbox value="#{resetPasswordView.iamhuman}" required="true" requiredMessage="Please check this"/>
                                 <!-- Waiting for new Re-captcha integration from Primefaces -->
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
                     <!-- Input security code from email -->
-                    <p:tab id="resetWzd1" title="Change Password">
-                        <p:panel header="Change Password2">
+                    <p:tab id="resetWzd1" title="Reset Password">
+                        <p:panel header="Reset Password2">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText value="New Password:" />
-                                <p:password id="resetFormPwNew" label="new pw" value="#{passwordView.password}" required="true" 
+                                <p:password id="resetFormPwNew" label="new pw" value="#{resetPasswordView.password}" required="true" 
                                             match="resetFormPwRetyped" feedback="true" inline="true" promptLabel="Pw strength" 
                                             weakLabel="weak" goodLabel="good" strongLabel="Strong" maxlength="32" >
                                     <f:validator validatorId="passwordValidator" />
@@ -359,9 +352,9 @@
                                 <p:password id="resetFormPwRetyped" label="ret pw" required="true" feedback="false"/>
 
                                 <h:outputText value="Reset Code:" />
-                                <p:inputText id="resetWzdEmailed" value="#{passwordView.emailedsecret}" required="true" requiredMessage="Plz check your email!"/>
+                                <p:inputText id="resetWzdEmailed" value="#{resetPasswordView.emailedsecret}" required="true" requiredMessage="Plz check your email!"/>
                                 
-                                <h:inputHidden id="resetWzdHidden" value="#{passwordView.actionsecret}" />
+                                <h:inputHidden id="resetWzdHidden" value="#{resetPasswordView.actionsecret}" />
                                 
                             </h:panelGrid>
                         </p:panel>
@@ -371,10 +364,10 @@
                         <p:panel header="Password now changed">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid rendered="true" columns="2" columnClasses="label, value">
-                                <h:outputText rendered="#{not passwordView.reseted}" value="Password not reseted..." />
-                                <h:outputText rendered="#{passwordView.reseted}" value="Password succesfully reseted..." />
-                                <p:outputLabel rendered="#{not passwordView.reseted}" value="Please register or try reset again."/>
-                                <p:outputLabel rendered="#{passwordView.reseted}" value="Close by choosing next and sign in!"/>
+                                <h:outputText rendered="#{not resetPasswordView.reseted}" value="Password not reseted..." />
+                                <h:outputText rendered="#{resetPasswordView.reseted}" value="Password succesfully reseted..." />
+                                <p:outputLabel rendered="#{not resetPasswordView.reseted}" value="Please register or try reset again."/>
+                                <p:outputLabel rendered="#{resetPasswordView.reseted}" value="Close by choosing next and sign in!"/>
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>

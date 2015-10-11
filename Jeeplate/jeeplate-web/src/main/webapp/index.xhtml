@@ -22,7 +22,7 @@
                         <h:outputText value="#{oracle.saysWho}" />
                         <p>
                             <h:outputText value="Login is #{mgr.authenticated()}"></h:outputText>
-                            <h:outputText value="#{msg['jee.title']}"></h:outputText>
+                            <h:outputText value="MSG multilang = #{msg['jee.title']}"></h:outputText>
                         </p>
                         <p>
                             <h:outputFormat value="#{msg['dynamic.test']}">
@@ -79,20 +79,6 @@
                         <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
                     </p:confirmDialog>
                 </h:form>
-                <h:form>
-                    <br />
-                    <p:commandLink styleClass="changeLang" action="none"  onclick="PF('test').show()"  >
-                        <p:graphicImage value="#{language.flagImageString}" />
-                        <p:inplace widgetVar="test" effect="none" label="">
-
-                            <h:selectOneMenu styleClass="selectLang" valueChangeListener="#{language.changeLanguage}">
-                                <p:ajax update="@all" />
-                                <f:selectItems value="#{language.availableLanguages}" />
-                            </h:selectOneMenu>
-                        </p:inplace>
-                    </p:commandLink>
-                </h:form>
-
             </ui:define>
             <ui:define name="footer" rendered="false" />
         </ui:composition>

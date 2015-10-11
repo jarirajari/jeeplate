@@ -23,7 +23,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
 @Named @ViewScoped
-public class UserAccountView extends AbstractView implements Serializable {
+public class ModifyAccountView extends AbstractView implements Serializable {
 
     /*
     use :

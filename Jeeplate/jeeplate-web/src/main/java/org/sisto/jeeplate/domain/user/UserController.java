@@ -21,8 +21,7 @@ package org.sisto.jeeplate.domain.user;
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
 
-@Named
-@RequestScoped
+@Named @RequestScoped
 public class UserController {
     
 }

@@ -33,7 +33,7 @@ import org.sisto.jeeplate.util.EmailMessage;
 import org.sisto.jeeplate.util.Randomness;
 
 @Named @ViewScoped
-public class PasswordView extends AbstractView implements Serializable {
+public class ResetPasswordView extends AbstractView implements Serializable {
     
     @Inject
     StringLogger log;

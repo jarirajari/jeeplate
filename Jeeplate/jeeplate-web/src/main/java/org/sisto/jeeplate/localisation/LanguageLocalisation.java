@@ -25,23 +25,29 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
-import org.jboss.logging.Logger;
+import org.primefaces.context.RequestContext;
 import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.util.Util;
 
 @SessionScoped @Named("language")
 public class LanguageLocalisation implements Serializable {
-    private transient static final String DEFAULT_LANG = "europeanunion";
-    private transient static final String USA       = "en"; // en_US
-    private transient static final String ENGLISH   = "en"; // en_GB
-    private transient static final String FINNISH   = "fi"; // fi_FI
+    private transient final String DEFAULT_LANG = "en";
+    private transient final Locale USA       = new Locale("en_US"); // en-US
+    private transient final Locale ENGLISH   = new Locale("en_GB"); // en-GB
+    private transient final Locale FINNISH   = new Locale("fi"); // fi-FI
+    
+    final String LOCALE_COOKIE = "jeeplate_locale";
     
     @Inject
-    private StringLogger log;
+    StringLogger log;
+    @Inject
+    Util util;
     
     // Locale from Accept-Language header of users browser
     private Locale browserLocale;
@@ -49,41 +55,54 @@ public class LanguageLocalisation implements Serializable {
     private Locale viewLocale;
     // Locale from server
     private Locale serverLocale;
+    // Locale selected
+    private String selectedLocale;
     // Languages
-    private static Map<String, Object> availableLanguages;
+    private Map<String, Object> availableLocales;
     
     @PostConstruct
     public void init() {
-        availableLanguages = new LinkedHashMap<>();
-        availableLanguages.put("English(US)", USA);
-        availableLanguages.put("English(UK)", ENGLISH);
-        availableLanguages.put("Suomi", FINNISH);
+        final String cookieLocaleString = this.util.getCookie(LOCALE_COOKIE);
+        availableLocales = new LinkedHashMap<>();
+        availableLocales.put(USA.toString(), "English(US)");
+        availableLocales.put(ENGLISH.toString(), "English(UK)");
+        availableLocales.put(FINNISH.toString(), "Suomi");
         
         browserLocale = FacesContext.getCurrentInstance().getExternalContext().getRequestLocale();
         viewLocale = FacesContext.getCurrentInstance().getViewRoot().getLocale();
-        serverLocale = Locale.getDefault();
+        serverLocale = (cookieLocaleString.isEmpty()) ? new Locale(DEFAULT_LANG) : new Locale(cookieLocaleString);
+        FacesContext.getCurrentInstance().getViewRoot().setLocale(serverLocale);
+    }
+
+    public String getSelectedLocale() {
+        selectedLocale = this.util.getCookie(LOCALE_COOKIE);
+        return selectedLocale;
+    }
+
+    public void setSelectedLocale(String selectedLocale) {
+        this.selectedLocale = selectedLocale;
     }
     
-    public Map<String, Object> getAvailableLanguages() {
-        return availableLanguages;
+    public Map<String, Object> getAvailableLocales() {
+        return availableLocales;
     }
 
     public Locale getCurrentLocale() {
-        Locale tmp = FacesContext.getCurrentInstance().getViewRoot().getLocale();
-        
-        return tmp;
+        return (this.serverLocale);
     }
     
     public void changeLanguage(ValueChangeEvent e) {
-        String newLang = e.getNewValue().toString();
-        
-        this.setLanguage(newLang);
-        this.changeLocale();
+        final String changedlocale = e.getNewValue().toString();
+        this.changeLocale(changedlocale);
     }
     
-    public void changeLocale() {
-        FacesContext.getCurrentInstance().getViewRoot().setLocale(this.serverLocale);
-
+    public void changeLocale(String loc) {
+        Locale newLocale = new Locale(loc);
+        FacesContext.getCurrentInstance().getViewRoot().setLocale(newLocale);
+        this.util.setCookie(LOCALE_COOKIE, newLocale.toString(), 365*24*60*60);
+        this.serverLocale = newLocale;
+        FacesContext.getCurrentInstance().getViewRoot().setLocale(serverLocale);
+        System.out.println("-->"+newLocale);
     }
     
     public String getFlagImageString() {
@@ -92,7 +111,7 @@ public class LanguageLocalisation implements Serializable {
         String language = current.getLanguage();
         String country = current.getCountry();
         
-        if (language.equalsIgnoreCase(ENGLISH)) {
+        if (current.equals(Locale.US) || current.equals(Locale.UK)) {
             
             if (country.equalsIgnoreCase("US")) {
                 flag = "us";
@@ -110,18 +129,5 @@ public class LanguageLocalisation implements Serializable {
     
     public String getLocalisedLanguage() {
         return (this.serverLocale.getDisplayLanguage());
-    }
-    
-    public String getLanguage() {
-        return this.serverLocale.getLanguage();
-    }
-
-    public void setLanguage(String language) {
-        boolean isValidLang = availableLanguages.containsValue(language);
-        
-        if (isValidLang) {
-            String country = this.serverLocale.getCountry();
-            this.serverLocale = new Locale(language, country);
-        }
     }
 }

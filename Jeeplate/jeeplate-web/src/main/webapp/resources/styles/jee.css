@@ -1,6 +1,7 @@
 .selectLang {
     width: 150px !important;
     font-family: monospace, "Courier" !important;
+    vertical-align: middle;
 }
 
 .changeLang {
