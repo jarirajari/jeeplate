@@ -25,10 +25,23 @@ import javax.inject.Named;
 @Named @ViewScoped
 public class ModifyAccountView extends AbstractView implements Serializable {
 
-    /*
-    use :
-    usersystemaccount (ejb) to fill in system details
-    
-    */
-    
+    // name
+    private String screenName;
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    // address
+    private String streetAddress;
+    private String postalCode;
+    // account
+    private String mobileNumber;
+    private String emailAddress;
+    // localisation
+    private String language;
+    private String country;
+    private String city;
+    private String timezone;
+    // private String citizenship;
+    // private String gender
+
 }

@@ -24,7 +24,6 @@
     <body>
         <!-- Menubar -->
         <h:form id="menubarForm">
-            <p:growl id="growlMessages" showDetail="true" life="3000" />
             <p:growl id="messages" showDetail="true" life="3000" />
             <p:menubar>
                 <p:menuitem id="logo">
@@ -36,12 +35,13 @@
 
                 <f:facet name="options">
                     <p:splitButton value="#{switchRoleMenu.currentUser()}" immediate="true" rendered="#{mgr.authenticated()}" actionListener="#{buttonView.clickedRoleSwitchedButton()}" icon="ui-icon-disk">
-                        <p:menuitem value="Change credentials..." onclick="PF('credentialsDlg').show();" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="Change localisation..." onclick="PF('localisationDlg').show();" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="Account settings..." action="account" actionListener="#{oracle.noop()}" update="growlMessages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Change credentials..." onclick="PF('credentialsDlg').show();" actionListener="#{oracle.noop()}" update="messages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Change localisation..." onclick="PF('localisationDlg').show();" actionListener="#{oracle.noop()}" update="messages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Account settings..." action="account" actionListener="#{oracle.noop()}" update="messages" icon="ui-icon-arrowrefresh-1-w" />
                     </p:splitButton>
                     
-                    <p:commandButton id="dynaButton" value="Sign as" rendered="#{mgr.authenticated()}" icon="ui-icon-extlink"></p:commandButton>
+                    <p:commandButton id="dynaButton" value="Sign as" rendered="#{mgr.authenticated()}" icon="ui-icon-extlink">
+                    </p:commandButton>
                     <p:menu id="rolesMenu" overlay="true" my="left top" at="left bottom" trigger="dynaButton" model="#{switchRoleMenu.switchRoleMenuModel}" />
                     
                     <p:commandButton value="Sign up" rendered="#{not mgr.authenticated()}" icon="ui-icon-disk"
@@ -175,9 +175,9 @@
                     <p:outputLabel value="" />
                     <p:outputPanel>
                         <p:commandButton value="Cancel" icon="fa fa-close" onclick="PF('signinDlg').hide();" 
-                                         update="signin,signinResult"/>
+                                         update="signin"/>
                         <p:commandButton value="Sign in" icon="fa fa-check" oncomplete="JS.handleLoginRequest('signinDlg', xhr, status, args)" 
-                                         update="signin" action="#{mgr.submit}" />
+                                         update="signin,signinResult" action="#{mgr.submit}" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
@@ -185,6 +185,7 @@
         <!-- Credentials dialog -->
         <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Change Password" widgetVar="credentialsDlg" resizable="false">
             <h:form id="credentialsForm">
+                <p:messages showDetail="false" showIcon="false" closable="true"/>
                 <h:panelGrid id="credentials" columns="2" >
                     <f:facet name="header">
                         <p:row>
@@ -213,11 +214,11 @@
                     <p:password id="credentialsVerifiedPassword" label="ret pw" required="true" feedback="false"/>
                     
                     <p:outputLabel value="" />
+                    
                     <p:outputPanel>
-                        <p:commandButton value="Cancel" onclick="PF('credentialsDlg').hide();" 
-                                         update="credentials"/>
-                        <p:commandButton value="Change" onclick="PF('credentialsDlg').hide();" 
-                                         update="credentials" actionListener="#{changePasswordView.change()}" />
+                        <p:commandButton value="Cancel" onclick="PF('credentialsDlg').hide();" />
+                        <p:commandButton value="Change" actionListener="#{changePasswordView.change()}"
+                                         update="@form" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
@@ -225,6 +226,7 @@
         <!-- Localisation dialog -->
         <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Update Localisation" widgetVar="localisationDlg" resizable="false">
             <h:form id="localisationForm">
+                <p:messages showDetail="false" showIcon="false" closable="true"/>
                 <h:panelGrid id="localisation" columns="2" >
                     <f:facet name="header">
                         <p:row>
@@ -235,24 +237,24 @@
                             </p:column>
                         </p:row>
                     </f:facet>
-                    
+
                     <p:outputLabel for="localisationLanguage" value="Loc Language:"/>
-                    <p:selectOneMenu id="localisationLanguage" value="#{changeLocalisationView.language}" effect="fade" var="ll" filter="true" filterMatchMode="startsWith">
+                    <p:selectOneMenu styleClass="localisationLanguage" id="localisationLanguage" value="#{changeLocalisationView.language}" effect="fade" var="ll" filter="true" filterMatchMode="startsWith">
                         <f:selectItems value="#{changeLocalisationView.localizedLanguages()}" var="lls" itemValue="#{lls}" />
                     </p:selectOneMenu>
                     
                     <p:outputLabel for="localisationCountry" value="Loc Country:"/>
-                    <p:selectOneMenu id="localisationCountry" value="#{changeLocalisationView.country}" effect="fade" var="lc" filter="true" filterMatchMode="startsWith">
+                    <p:selectOneMenu styleClass="localisationLanguage" id="localisationCountry" value="#{changeLocalisationView.country}" effect="fade" var="lc" filter="true" filterMatchMode="startsWith">
                         <f:selectItems value="#{changeLocalisationView.localizedCountries()}" var="lcs" itemValue="#{lcs}" />
                     </p:selectOneMenu>
 
                     <p:outputLabel for="localisationCity" value="City:" />
-                    <p:inputText id="localisationCity" value="#{changeLocalisationView.city}" required="false" >
+                    <p:inputText styleClass="localisationLanguage" id="localisationCity" value="#{changeLocalisationView.city}" required="false" >
                         <f:validateLength minimum="1" />
                     </p:inputText>
                     
                     <p:outputLabel for="localisationTimezone" value="Timezone:"/>
-                    <p:selectOneMenu id="localisationTimezone" value="#{changeLocalisationView.timezone}" effect="fade" var="t" filter="true" filterMatchMode="startsWith">
+                    <p:selectOneMenu styleClass="localisationLanguage" id="localisationTimezone" value="#{changeLocalisationView.timezone}" effect="fade" var="t" filter="true" filterMatchMode="startsWith">
                         <f:selectItems value="#{changeLocalisationView.localizedTimezones()}" var="ts" itemValue="#{ts}" />
                     </p:selectOneMenu>
                     
@@ -265,51 +267,6 @@
                 </h:panelGrid>
             </h:form>
         </p:dialog><!-- /Localisation dialog -->
-        <!-- 
-        
-        
-        Role dialog => remove because replaced with menu
-        
-        
-        -->
-        <!--
-        <p:dialog rendered="{mgr.authenticated()}" modal="true" header="Sign as" widgetVar="roleDlg" resizable="false">
-            <h:form id="roleForm">
-                <h:panelGrid id="role" columns="1" >
-                    <f:facet name="header">
-                        <p:row>
-                            <p:column colspan="2">
-                                <p:outputPanel >
-                                    <h:outputText value="Switch role to"/>
-                                    <h:outputLabel id="roleNewrole" value="" />
-                                </p:outputPanel>
-                            </p:column>
-                        </p:row>
-                    </f:facet>
-                    
-                    <h:outputLabel for="roleUsername" value="Username:" />
-                    <h:inputText id="roleUsername" value="jari" readonly="true"/>
-                    
-                    <p:outputLabel for="rolePassword" value="Password:" />
-                    <p:password id="rolePassword" value="vv" required="true" />
-                    
-                    <p:commandLink value="Terms &amp; Conditions" />
-                    <p:outputPanel id="roleResult">
-                        <h:message for="roleResult" styleClass="ui-outputlabel ui-widget ui-state-error" />
-                    </p:outputPanel>
-
-                    <p:outputLabel value="" />
-                    <p:outputPanel>
-                        <p:commandButton value="Cancel" immediate="true" onclick="PF('signupDlg').hide();" 
-                                         update="role,roleResult"/>
-                        <p:commandButton value="Switch" oncomplete="JS.handleLoginRequest('signupDlg', xhr, status, args)" 
-                                         update="role" action="{mgr.submit}" />
-                    </p:outputPanel>
-                </h:panelGrid>
-            </h:form>
-        </p:dialog>
-        -->
-        <!-- /Role dialog -->
         <!-- Reset Wizard -->
         <p:dialog widgetVar="resetWzd" closable="true" header="Reset password" modal="true" styleClass="disable-scroll" width="600px">
             <h:form id="resetForm" >

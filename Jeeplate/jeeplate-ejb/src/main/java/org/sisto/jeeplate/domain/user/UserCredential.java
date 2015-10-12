@@ -61,7 +61,7 @@ public class UserCredential implements Serializable {
     public void refresh(String newPassword) {
         this.salt = Salt.getSaltString();
         this.password = newPassword;
-        this.password = UserCredential.getSaltedAndHashedPassword(this.salt, this.password);
+        this.password = UserCredential.generateSaltedAndHashedPassword(this.salt, this.password);
     }
     
     public String getSalt() {
@@ -96,7 +96,21 @@ public class UserCredential implements Serializable {
         this.passwordResetTimestamp = passwordResetTimestamp;
     }
     
-    private static String getSaltedAndHashedPassword(String salt, String password) {
+    public Boolean passwordMatchesWhenHashedWithSameSalt(String password) {
+        String sameSalt = this.getSalt();
+        String sameHash = generateSaltedAndHashedPassword(sameSalt, password);
+        Boolean matches; 
+        
+        if (this.getPassword().equals(sameHash)) {
+            matches = Boolean.TRUE;
+        } else {
+            matches = Boolean.FALSE;
+        }
+        
+        return matches;
+    }
+    
+    private static String generateSaltedAndHashedPassword(String salt, String password) {
         final int hashIterations = 101; // must match with shiro.ini
         Sha256Hash hasher = new Sha256Hash(password, salt, hashIterations);
 

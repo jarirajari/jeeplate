@@ -187,16 +187,26 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
             if (resetTokenValid) {
                 uc.deactivateResetProtocol();
                 uc.refresh(typedPassword);
-                changed = Boolean.TRUE; 
-            }
-            if (changed) {
                 this.update();
-            } else {
-                log.info("Did not change password for user '%s'...", this.getDataModel().getUsername());
+                changed = Boolean.TRUE; 
             }
         } else {
             log.error("Changing password for user '%s' failed: %s %s", this.getDataModel().getUsername(),
                       resetRequestValid.toString(), securityQuestionMobileNumberMatches.toString());
+        }
+        
+        return changed;
+    }
+    
+    public Boolean changeUserPassword(String oldPW, String newPW) {
+        UserCredential uc = this.getDataModel().getCredential();
+        String storedPW = uc.getPassword();
+        Boolean changed = Boolean.FALSE;
+        
+        if (uc.passwordMatchesWhenHashedWithSameSalt(oldPW)) {
+            uc.refresh(newPW);
+            this.update();
+            changed = Boolean.TRUE;
         }
         
         return changed;

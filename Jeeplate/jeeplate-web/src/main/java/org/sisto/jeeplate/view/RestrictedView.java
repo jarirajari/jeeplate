@@ -41,7 +41,7 @@ import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.MultiValidator;
 
 @Named @ViewScoped
-public class RestrictedView implements Serializable {
+public class RestrictedView  extends AbstractView simplements Serializable {
     
     // Grouping different model etc objects & instances, models are general
     

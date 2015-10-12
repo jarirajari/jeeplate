@@ -36,3 +36,11 @@
     padding: 0.4em;
     float: left;
 }
+
+localisationLanguage.ui-selectonemenu input, select {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width:200px !important;
+    box-sizing:border-box;
+}
