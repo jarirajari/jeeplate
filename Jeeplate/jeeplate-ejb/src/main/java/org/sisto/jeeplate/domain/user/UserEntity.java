@@ -26,12 +26,14 @@ import java.util.List;
 import java.util.Map;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
@@ -47,6 +49,8 @@ import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipEntity;
 import org.sisto.jeeplate.domain.pk.TernaryKeyField;
+import org.sisto.jeeplate.domain.user.account.UserAccount;
+import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
 
 @Entity @Access(AccessType.FIELD) 
 @Table(name = "system_users", uniqueConstraints = {
@@ -70,7 +74,8 @@ public class UserEntity extends BusinessEntity implements Serializable {
     // User is a member in many groups and each group can contain many members => membership
     @OneToMany(mappedBy = "systemUser")
     protected List<DomainGroupMembershipEntity> domaingroupMemberships;
-    //protected UserAccount account; // User has one account
+    @OneToOne(cascade = CascadeType.ALL)
+    protected UserAccountEntity oneAccount;
     
     public UserEntity() {
         this.id = DEFAULT_ID;
@@ -80,6 +85,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
         this.appRole = new ApplicationRoles();
         this.sysRole = new SystemRoles();
         this.domaingroupMemberships = new ArrayList<>();
+        this.oneAccount = null;
     }
     
     @PostLoad @PostPersist @PostUpdate
@@ -140,6 +146,14 @@ public class UserEntity extends BusinessEntity implements Serializable {
         this.domaingroupMemberships = memberships;
         
         return this;
+    }
+
+    public UserAccountEntity getOneAccount() {
+        return oneAccount;
+    }
+
+    public void setOneAccount(UserAccountEntity oneAccount) {
+        this.oneAccount = oneAccount;
     }
     
     public UserEntity asRoot() {

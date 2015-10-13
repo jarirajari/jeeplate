@@ -19,8 +19,11 @@
 package org.sisto.jeeplate.view;
  
 import java.io.Serializable;
+import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
+import org.sisto.jeeplate.domain.user.UserData;
 
 @Named @ViewScoped
 public class ModifyAccountView extends AbstractView implements Serializable {
@@ -41,7 +44,13 @@ public class ModifyAccountView extends AbstractView implements Serializable {
     private String country;
     private String city;
     private String timezone;
-    // private String citizenship;
-    // private String gender
+    // other
+    
+    @Inject 
+    private UserData user;
 
+    @PostConstruct
+    public void init() {
+        
+    }
 }

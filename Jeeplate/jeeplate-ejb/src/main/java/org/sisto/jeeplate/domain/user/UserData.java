@@ -22,17 +22,15 @@ import java.io.Serializable;
 import java.util.Map;
 import javax.ejb.Stateful;
 import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.sisto.jeeplate.authentication.role.ApplicationRole;
-import org.sisto.jeeplate.authentication.role.ApplicationRoles;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.ObjectEntity;
-import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.domain.user.account.UserAccount;
+import org.sisto.jeeplate.domain.user.account.UserAccountData;
+import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
 import org.sisto.jeeplate.util.ApplicationProperty;
 import org.sisto.jeeplate.util.Email;
 import org.sisto.jeeplate.util.EmailMessage;
@@ -42,6 +40,9 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     
     @Inject
     User user;
+    
+    @Inject
+    UserAccountData account;
     
     @Inject @ApplicationProperty(name = "test.message", defaultValue = "jee@pla.te")
     String systemEmailAddress2;
@@ -200,7 +201,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     
     public Boolean changeUserPassword(String oldPW, String newPW) {
         UserCredential uc = this.getDataModel().getCredential();
-        String storedPW = uc.getPassword();
         Boolean changed = Boolean.FALSE;
         
         if (uc.passwordMatchesWhenHashedWithSameSalt(oldPW)) {
@@ -230,6 +230,10 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     }
     
     public void createNewUser(UserEntity ue) {
+        final UserAccountData createdAccount = this.account.createNewAccountFor(this);
+        final UserAccountEntity uae = createdAccount.getDataModel();
+        
+        ue.setOneAccount(uae);
         this.setEntity(ue);
         this.create();
     }
@@ -241,5 +245,18 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         } else {
             return Boolean.FALSE;
         }
+    }
+    
+    public Boolean updateUserAccountLocalisation(String lang, String country, String city, String timezone) {
+        
+        final UserAccountEntity uae = this.getDataModel().getOneAccount();
+        
+        uae.setLang(lang)
+           .setCity(city)
+           .setCountry(country)
+           .setTimezone(timezone);
+        this.getDataModel().setOneAccount(uae);
+        this.update();
+        return Boolean.TRUE;
     }
 }

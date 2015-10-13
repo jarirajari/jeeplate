@@ -18,6 +18,6 @@
  */
 package org.sisto.jeeplate.domain.user.account;
 
-public class UserSystemAccount {
+public class UserAccount {
     
 }

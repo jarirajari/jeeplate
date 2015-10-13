@@ -23,6 +23,7 @@ import org.sisto.jeeplate.domain.group.DomainGroupEntity;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipEntity;
 import org.sisto.jeeplate.domain.space.DomainSpaceEntity;
 import org.sisto.jeeplate.domain.user.UserEntity;
+import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
 import org.sisto.jeeplate.domain.user.group.UserGroupEntity;
 import org.sisto.jeeplate.domain.user.group.membership.UserGroupMembershipEntity;
 
@@ -55,6 +56,13 @@ public class EntityBuilder<T> {
     public UserEntity UserEntity() {
         Class c = this.init(UserEntity.class);
         UserEntity e = (UserEntity) entity;
+
+        return e;
+    }
+    
+    public UserAccountEntity UserAccountEntity() {
+        Class c = this.init(UserAccountEntity.class);
+        UserAccountEntity e = (UserAccountEntity) entity;
 
         return e;
     }

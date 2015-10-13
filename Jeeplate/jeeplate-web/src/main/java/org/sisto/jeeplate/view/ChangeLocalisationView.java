@@ -26,9 +26,15 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
+import org.primefaces.context.RequestContext;
+import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.domain.user.UserEntity;
+import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
 
 @Named @ViewScoped
 public class ChangeLocalisationView extends AbstractView implements Serializable {
@@ -42,6 +48,8 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
     private String country;
     private String city;
     private String timezone;
+    @Inject
+    UserData user;
     
     @PostConstruct
     public void init() {
@@ -49,26 +57,19 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
         this.populateCountries();
         this.populateLanguages();
         this.populateSupported();
-    }
-
-    public void change() {
-        final Locale newLoc = new Locale(this.language, this.country);
-        Boolean newAvailable = localeIsAvailable(newLoc);
-        System.out.println(String.format("Changing to: %s-%s %s %s. available %s",language,country,city,timezone, String.valueOf(newAvailable)));
+        
+        this.populateData();
     }
     
-    private static Boolean localeIsAvailable(Locale test) {
-        Locale list[] = DateFormat.getAvailableLocales();
-        Boolean available = Boolean.FALSE;
-        
-        for (Locale l : list) {
-            if (l.equals(test)) {
-                available = Boolean.TRUE;
-                break;
-            }
-        }
-        
-        return available;
+    private void populateData() { 
+        // the pattern is always the same: first data is read and populated, 
+        // everything else comes after this...
+        this.user.findLoggedInUser(this.currentUser());
+        UserAccountEntity ue = this.user.getDataModel().getOneAccount();
+        this.setLanguage(ue.getLang());
+        this.setCountry(ue.getCountry());
+        this.setCity(ue.getCity());
+        this.setTimezone(ue.getTimezone());
     }
     
     public String getLanguage() {
@@ -101,6 +102,36 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+    
+    public void change() {
+        final Locale newLoc = new Locale(this.language, this.country);
+        Boolean noLocaleAvailable = ! localeIsAvailable(newLoc);
+        Boolean changed;
+        
+        this.user.findLoggedInUser(this.currentUser());
+        changed = this.user.updateUserAccountLocalisation(language, country, city, timezone);
+        if (noLocaleAvailable) {
+            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, no such locale supported!");
+        } else if (changed) {
+            RequestContext.getCurrentInstance().execute("PF('localisationDlg').hide()");
+        } else {
+            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, no changed password");
+        }
+    }
+    
+    private static Boolean localeIsAvailable(Locale test) {
+        Locale list[] = DateFormat.getAvailableLocales();
+        Boolean available = Boolean.FALSE;
+        
+        for (Locale l : list) {
+            if (l.equals(test)) {
+                available = Boolean.TRUE;
+                break;
+            }
+        }
+        
+        return available;
     }
     
     private void populateSupported() { // refactor away, not needed in this view

@@ -21,12 +21,9 @@ package org.sisto.jeeplate.view;
 import java.io.Serializable;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.primefaces.context.RequestContext;
 import org.sisto.jeeplate.domain.user.UserData;
 
@@ -78,14 +75,6 @@ public class ChangePasswordView extends AbstractView implements Serializable {
             RequestContext.getCurrentInstance().execute("PF('credentialsDlg').hide()");
         } else {
             this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, no changed password");
-
         }
-    }
-    
-    public String currentUser() {
-        Subject currentUsr = SecurityUtils.getSubject();
-        String usr = (currentUsr.getPrincipal() != null) ? currentUsr.getPrincipal().toString() : "";
-        
-        return usr;
     }
 }

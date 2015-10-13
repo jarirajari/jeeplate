@@ -249,7 +249,7 @@
                     </p:selectOneMenu>
 
                     <p:outputLabel for="localisationCity" value="City:" />
-                    <p:inputText styleClass="localisationLanguage" id="localisationCity" value="#{changeLocalisationView.city}" required="false" >
+                    <p:inputText styleClass="localisationLanguage" id="localisationCity" value="#{changeLocalisationView.city}" required="false" validatorMessage="where do you live?" >
                         <f:validateLength minimum="1" />
                     </p:inputText>
                     
@@ -260,9 +260,9 @@
                     
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Cancel" immediate="true" onclick="PF('localisationDlg').hide();" />
-                        <p:commandButton value="Update" onclick="PF('localisationDlg').hide();" 
-                                         update="@all" actionListener="#{changeLocalisationView.change()}" />
+                        <p:commandButton value="Cancel" onclick="PF('localisationDlg').hide();" />
+                        <p:commandButton value="Update" actionListener="#{changeLocalisationView.change()}" 
+                                         update="@form" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>

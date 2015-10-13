@@ -21,6 +21,8 @@ package org.sisto.jeeplate.view;
 import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 
 public abstract class AbstractView {
     
@@ -38,5 +40,12 @@ public abstract class AbstractView {
 	String val = params.get(key);
         
         return val;
+    }
+    
+    protected String currentUser() {
+        Subject currentUsr = SecurityUtils.getSubject();
+        String usr = (currentUsr.getPrincipal() != null) ? currentUsr.getPrincipal().toString() : "";
+        
+        return usr;
     }
 }
