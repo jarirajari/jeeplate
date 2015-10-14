@@ -34,10 +34,10 @@
                 </p:menuitem>
 
                 <f:facet name="options">
-                    <p:splitButton value="#{switchRoleMenu.currentUser()}" immediate="true" rendered="#{mgr.authenticated()}" actionListener="#{buttonView.clickedRoleSwitchedButton()}" icon="ui-icon-disk">
-                        <p:menuitem value="Change credentials..." onclick="PF('credentialsDlg').show();" actionListener="#{oracle.noop()}" update="messages" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="Change localisation..." onclick="PF('localisationDlg').show();" actionListener="#{oracle.noop()}" update="messages" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="Account settings..." action="account" actionListener="#{oracle.noop()}" update="messages" icon="ui-icon-arrowrefresh-1-w" />
+                    <p:splitButton value="#{switchRoleMenu.currentUser()}" immediate="true" rendered="#{mgr.authenticated()}" icon="ui-icon-disk">
+                        <p:menuitem value="Change credentials..." onclick="PF('credentialsDlg').show();" update="messages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Change localisation..." onclick="PF('localisationDlg').show();" update="messages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Account settings..." onclick="PF('accountDlg').show();" update="messages" icon="ui-icon-arrowrefresh-1-w" />
                     </p:splitButton>
                     
                     <p:commandButton id="dynaButton" value="Sign as" rendered="#{mgr.authenticated()}" icon="ui-icon-extlink">
@@ -368,16 +368,53 @@
                 </h:panelGrid>
             </p:panel>
         </p:dialog><!-- /Terms and conditions dialog -->
-        <!-- Loading... dialog -->
-        <!--
-        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false"  style="background: white">
-            <p:graphicImage value="resources/images/spinning-gear.gif" />
-        </p:dialog>
-        -->
-        <!-- Loading... dialog -->
-        
-        <!--
-        <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
-        -->
+        <!-- Account dialog -->
+        <p:dialog widgetVar="accountDlg" closable="true" header="Account settings" modal="true" styleClass="disable-scroll">
+            <h:form id="accountForm">
+                <p:messages showDetail="false" showIcon="false" closable="true"/>
+                <h:panelGrid id="credentials" columns="2" >
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column colspan="2">
+                                <p:outputPanel >
+                                    Account settings
+                                </p:outputPanel>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+                    <p:outputLabel for="accountDomain" value="accountDomain"/>
+                    <p:autoComplete id="accountDomain" forceSelection="true" value="#{modifyAccountView.domain}" completeMethod="#{modifyAccountView.completeDomain}" />
+                    <p:outputLabel for="accountScreenName" value="accountScreenName" />
+                    <p:inputText id="accountScreenName" value="#{modifyAccountView.screenName}" />
+                    <p:outputLabel for="accountFirstName" value="accountFirstName" />
+                    <p:inputText id="accountFirstName" value="#{modifyAccountView.firstName}" />
+                    <p:outputLabel for="accountMiddleName" value="accountMiddleName" />
+                    <p:inputText id="accountMiddleName" value="#{modifyAccountView.middleName}" />
+                    <p:outputLabel for="accountLastName" value="accountLastName" />
+                    <p:inputText id="accountLastName" value="#{modifyAccountView.lastName}" />
+                    <p:outputLabel for="accountStreetAddress" value="accountStreetAddress" />
+                    <p:inputText id="accountStreetAddress" value="#{modifyAccountView.streetAddress}" />
+                    <p:outputLabel for="accountPostalCode" value="accountPostalCode" />
+                    <p:inputText id="accountPostalCode" value="#{modifyAccountView.postalCode}" />
+                    <p:outputLabel for="accountMobileNumber" value="accountMobileNumber" />
+                    <p:inputText id="accountMobileNumber" value="#{modifyAccountView.mobileNumber}" readonly="true" />
+                    <p:outputLabel for="accountEmailAddress" value="accountEmailAddress" />
+                    <p:inputText id="accountEmailAddress" value="#{modifyAccountView.emailAddress}" readonly="true" />
+                    <p:outputLabel for="accountLanguage" value="accountLanguage" />
+                    <p:inputText id="accountLanguage" value="#{modifyAccountView.language}" readonly="true" />
+                    <p:outputLabel for="accountCountry" value="accountCountry" />
+                    <p:inputText id="accountCountry" value="#{modifyAccountView.country}" readonly="true" />
+                    <p:outputLabel for="accountCity" value="accountCity" />
+                    <p:inputText id="accountCity" value="#{modifyAccountView.city}" readonly="true" />
+                    <p:outputLabel for="accountTimezone" value="accountTimezone" />
+                    <p:inputText id="accountTimezone" value="#{modifyAccountView.timezone}" readonly="true" />
+                    <p:outputLabel value="" />
+                    <p:outputPanel>
+                        <p:commandButton value="Cancel" onclick="PF('accountDlg').hide();"/>
+                        <p:commandButton value="Change" actionListener="#{modifyAccountView.modify()}" update="@all"/>
+                    </p:outputPanel>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog><!-- /Account dialog -->
     </body>
 </html>
