@@ -41,11 +41,11 @@ public class LanguageLocalisation implements Serializable {
     private transient final Locale USA       = new Locale("en_US"); // en-US
     private transient final Locale ENGLISH   = new Locale("en_GB"); // en-GB
     private transient final Locale FINNISH   = new Locale("fi"); // fi-FI
-    
     final String LOCALE_COOKIE = "jeeplate_locale";
     
     @Inject
     StringLogger log;
+    
     @Inject
     Util util;
     
@@ -102,7 +102,6 @@ public class LanguageLocalisation implements Serializable {
         this.util.setCookie(LOCALE_COOKIE, newLocale.toString(), 365*24*60*60);
         this.serverLocale = newLocale;
         FacesContext.getCurrentInstance().getViewRoot().setLocale(serverLocale);
-        System.out.println("-->"+newLocale);
     }
     
     public String getFlagImageString() {

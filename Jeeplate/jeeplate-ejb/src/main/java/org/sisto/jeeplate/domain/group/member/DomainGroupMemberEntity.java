@@ -60,6 +60,7 @@ public class DomainGroupMemberEntity extends BusinessEntity implements Serializa
     @Override
     protected void updateParentId() {
         super.setId(this.id);
+        super.setVersion(this.version);
     }
 
     public String getMemberalias() {

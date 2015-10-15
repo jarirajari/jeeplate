@@ -69,6 +69,7 @@ public class DomainGroupEntity extends BusinessEntity implements Serializable {
     @Override
     protected void updateParentId() {
         super.setId(this.id);
+        super.setVersion(this.version);
     }
     
     public String getGroupname() {

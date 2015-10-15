@@ -35,9 +35,9 @@
 
                 <f:facet name="options">
                     <p:splitButton value="#{switchRoleMenu.currentUser()}" immediate="true" rendered="#{mgr.authenticated()}" icon="ui-icon-disk">
-                        <p:menuitem value="Change credentials..." onclick="PF('credentialsDlg').show();" update="messages" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="Change localisation..." onclick="PF('localisationDlg').show();" update="messages" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="Account settings..." onclick="PF('accountDlg').show();" update="messages" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Change credentials..." actionListener="#{changePasswordView.populateData()}" onclick="PF('credentialsDlg').show();" update="messages,credentialsForm" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Change localisation..." actionListener="#{changeLocalisationView.populateData()}" onclick="PF('localisationDlg').show();" update="messages,localisationForm" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Account settings..." actionListener="#{modifyAccountView.populateData()}" onclick="PF('accountDlg').show();" update="messages,accountForm" icon="ui-icon-arrowrefresh-1-w" />
                     </p:splitButton>
                     
                     <p:commandButton id="dynaButton" value="Sign as" rendered="#{mgr.authenticated()}" icon="ui-icon-extlink">
@@ -372,7 +372,7 @@
         <p:dialog widgetVar="accountDlg" closable="true" header="Account settings" modal="true" styleClass="disable-scroll">
             <h:form id="accountForm">
                 <p:messages showDetail="false" showIcon="false" closable="true"/>
-                <h:panelGrid id="credentials" columns="2" >
+                <h:panelGrid id="credentials" columns="2" >  
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">

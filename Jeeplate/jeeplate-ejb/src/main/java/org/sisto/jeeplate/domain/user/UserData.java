@@ -28,7 +28,6 @@ import org.sisto.jeeplate.authentication.role.ApplicationRole;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.ObjectEntity;
-import org.sisto.jeeplate.domain.user.account.UserAccount;
 import org.sisto.jeeplate.domain.user.account.UserAccountData;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
 import org.sisto.jeeplate.util.ApplicationProperty;
@@ -103,6 +102,8 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         final Boolean userAlreadyFound = (this.getDataModel().getUsername().equals(userEmailPrincipal));
         if (! userAlreadyFound) {
             findOneUser(userEmailPrincipal);
+        } else {
+            this.read();
         }
     }
     
@@ -248,7 +249,6 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     }
     
     public Boolean updateUserAccountLocalisation(String lang, String country, String city, String timezone) {
-        
         final UserAccountEntity uae = this.getDataModel().getOneAccount();
         
         uae.setLang(lang)

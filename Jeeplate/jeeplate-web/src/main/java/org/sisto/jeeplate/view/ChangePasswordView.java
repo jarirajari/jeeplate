@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.context.RequestContext;
 import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.domain.user.UserEntity;
 
 @Named @ViewScoped
 public class ChangePasswordView extends AbstractView implements Serializable {
@@ -41,6 +42,10 @@ public class ChangePasswordView extends AbstractView implements Serializable {
         this.username = this.currentUser();
         this.password = "";
         this.newPassword = "";
+    }
+    
+    public void populateData() {
+        
     }
     
     public String getUsername() {
@@ -67,8 +72,16 @@ public class ChangePasswordView extends AbstractView implements Serializable {
         this.newPassword = newPassword;
     }
 
+    private UserEntity user() {
+        UserEntity ue;
+        user.findLoggedInUser(this.currentUser());
+        ue = user.getDataModel();
+        
+        return ue;
+    }
+    
     public void change() {
-        this.user.findLoggedInUser(this.username);
+        user();
         Boolean changed = this.user.changeUserPassword(this.password, this.newPassword);
         
         if (changed) {

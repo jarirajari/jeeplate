@@ -94,6 +94,7 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     @Override
     protected void updateParentId() {
         super.setId(this.id);
+        super.setVersion(this.version);
     }
 
     public String getDomainname() {

@@ -59,6 +59,7 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
     @Override
     protected void updateParentId() {
         super.setId(this.id);
+        super.setVersion(this.version);
     }
     
     public Boolean insertNewDomain(String qualifiedDomainname, DomainData dd) {

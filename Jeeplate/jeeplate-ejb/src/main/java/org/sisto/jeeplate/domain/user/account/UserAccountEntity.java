@@ -66,10 +66,10 @@ public class UserAccountEntity extends BusinessEntity implements Serializable {
         this.postalCode = "";
         this.mobileNumber = ""; // cannot be edited
         this.emailAddress = ""; // cannot be edited
-        this.lang = "";
-        this.country = "";
+        this.lang = "en";
+        this.country = "GB"; // not UK
         this.city = "";
-        this.timezone = "";
+        this.timezone = "UTC";
         this.user = null;
     }
     
@@ -77,6 +77,7 @@ public class UserAccountEntity extends BusinessEntity implements Serializable {
     @Override
     protected void updateParentId() {
         super.setId(this.id);
+        super.setVersion(this.version);
     }
 
     public String getScreenName() {

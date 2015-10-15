@@ -49,8 +49,8 @@ import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipEntity;
 import org.sisto.jeeplate.domain.pk.TernaryKeyField;
-import org.sisto.jeeplate.domain.user.account.UserAccount;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
+import org.hibernate.annotations.Cascade;
 
 @Entity @Access(AccessType.FIELD) 
 @Table(name = "system_users", uniqueConstraints = {
@@ -74,7 +74,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
     // User is a member in many groups and each group can contain many members => membership
     @OneToMany(mappedBy = "systemUser")
     protected List<DomainGroupMembershipEntity> domaingroupMemberships;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne  @Cascade({org.hibernate.annotations.CascadeType.ALL})
     protected UserAccountEntity oneAccount;
     
     public UserEntity() {
@@ -92,6 +92,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
     @Override
     protected void updateParentId() {
         super.setId(this.id);
+        super.setVersion(this.version);
     }
     
     public String getUsername() {

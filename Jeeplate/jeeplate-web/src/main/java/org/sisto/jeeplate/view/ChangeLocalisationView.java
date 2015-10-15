@@ -35,6 +35,7 @@ import org.primefaces.context.RequestContext;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
+import org.sisto.jeeplate.localisation.LanguageLocalisation;
 
 @Named @ViewScoped
 public class ChangeLocalisationView extends AbstractView implements Serializable {
@@ -48,8 +49,12 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
     private String country;
     private String city;
     private String timezone;
+    
     @Inject
     UserData user;
+    
+    @Inject
+    LanguageLocalisation loc;
     
     @PostConstruct
     public void init() {
@@ -61,11 +66,11 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
         this.populateData();
     }
     
-    private void populateData() { 
+    public void populateData() { 
         // the pattern is always the same: first data is read and populated, 
         // everything else comes after this...
-        this.user.findLoggedInUser(this.currentUser());
-        UserAccountEntity ue = this.user.getDataModel().getOneAccount();
+        
+        UserAccountEntity ue = this.user().getOneAccount();
         this.setLanguage(ue.getLang());
         this.setCountry(ue.getCountry());
         this.setCity(ue.getCity());
@@ -104,12 +109,20 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
         this.timezone = timezone;
     }
     
+    private UserEntity user() {
+        UserEntity ue;
+        user.findLoggedInUser(this.currentUser());
+        ue = user.getDataModel();
+        
+        return ue;
+    }
+    
     public void change() {
         final Locale newLoc = new Locale(this.language, this.country);
         Boolean noLocaleAvailable = ! localeIsAvailable(newLoc);
         Boolean changed;
         
-        this.user.findLoggedInUser(this.currentUser());
+        user();
         changed = this.user.updateUserAccountLocalisation(language, country, city, timezone);
         if (noLocaleAvailable) {
             this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, no such locale supported!");

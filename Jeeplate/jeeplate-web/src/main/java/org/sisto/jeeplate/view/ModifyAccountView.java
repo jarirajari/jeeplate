@@ -20,14 +20,21 @@ package org.sisto.jeeplate.view;
  
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.Default;
+import javax.enterprise.inject.Instance;
 import javax.faces.application.FacesMessage;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.context.RequestContext;
 import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.domain.user.UserEntity;
+import org.sisto.jeeplate.domain.user.account.UserAccount;
+import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
+import org.sisto.jeeplate.localisation.LanguageLocalisation;
 
 @Named @ViewScoped
 public class ModifyAccountView extends AbstractView implements Serializable {
@@ -49,23 +56,51 @@ public class ModifyAccountView extends AbstractView implements Serializable {
     private String city;
     private String timezone;
     
-    @Inject 
-    private UserData user;
+    @Inject
+    UserData user;
+    
+    @Inject
+    LanguageLocalisation loc;
 
     @PostConstruct
     public void init() {
+        this.domain = "";
         this.screenName = "";
         this.firstName = "";
         this.middleName = "";
         this.lastName = "";
         this.streetAddress = "";
         this.postalCode = "";
+        //
         this.mobileNumber = "";
         this.emailAddress = "";
         this.language = "";
         this.country = "";
         this.city = "";
         this.timezone = "";
+        this.populateData();
+    }
+    
+    private UserEntity user() {
+        UserEntity ue;
+        user.findLoggedInUser(this.currentUser());
+        ue = user.getDataModel();
+        
+        return ue;
+    }
+    
+    public void populateData() {
+        UserEntity ue = user();
+        UserAccountEntity ua = ue.getOneAccount();
+        Locale dispLoc = this.loc.getCurrentLocale();
+        Locale userLoc = new Locale(ua.getLang(), ua.getCountry());
+
+        this.mobileNumber = ue.getMobile().toString();
+        this.emailAddress = ue.getUsername();
+        this.language = userLoc.getDisplayLanguage(dispLoc);
+        this.country = userLoc.getDisplayCountry(dispLoc);
+        this.city = ua.getCity();
+        this.timezone = ua.getTimezone();
     }
 
     public String getScreenName() {
@@ -177,14 +212,13 @@ public class ModifyAccountView extends AbstractView implements Serializable {
         
         // system must hold a map of domains key=joinCodeHash, value=domainFqdnKey
         // domainFqdnKey is used to find out the "id" of the domain that user joins
-        // domainThatMachesCode = 
+        // domainThatMachesCode = , otherwiser return empty ""
          
         return domainThatMachesCode;
     }
     
     public void modify() {
         System.out.println("modify!");
-        this.user.findLoggedInUser(this.currentUser());
         Boolean changed = Boolean.TRUE;
         
         if (changed) {

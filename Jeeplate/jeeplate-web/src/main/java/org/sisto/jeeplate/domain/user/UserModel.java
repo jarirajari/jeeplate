@@ -23,17 +23,19 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.sisto.jeeplate.logging.StringLogger;
 
 @Named @RequestScoped
 public class UserModel { // model view control are backing beans => BACKING MVC?
     
     @Inject
-    private StringLogger log;
+    StringLogger log;
     
     @Inject
-    private UserData backing;  
-    private Map<Long, UserData> all;
+    UserData backing;  
+    Map<Long, UserData> all;
     
     
     @PostConstruct
@@ -44,5 +46,5 @@ public class UserModel { // model view control are backing beans => BACKING MVC?
     public Map<Long, UserData> allUsers() {
         return (this.backing.findAll());
     }
-
+    
 }

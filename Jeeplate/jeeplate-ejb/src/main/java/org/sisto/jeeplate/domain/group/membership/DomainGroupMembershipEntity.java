@@ -67,6 +67,7 @@ public class DomainGroupMembershipEntity extends BusinessEntity
     @Override
     protected void updateParentId() {
         super.setId(this.id);
+        super.setVersion(this.version);
     }
 
     public Long getGroupReference() {

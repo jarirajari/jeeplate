@@ -58,6 +58,7 @@ public class UserGroupMembershipEntity extends BusinessEntity implements Seriali
     @Override
     protected void updateParentId() {
         super.setId(this.id);
+        super.setVersion(this.version);
     }
 
     public Long getGroupReference() {
