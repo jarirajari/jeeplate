@@ -22,14 +22,12 @@ import java.io.Serializable;
 import javax.ejb.Stateful;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
 import org.sisto.jeeplate.domain.group.DomainGroupEntity;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
-import org.sisto.jeeplate.logging.StringLogger;
 
 @Stateful 
 public class DomainData extends BusinessBean<DomainData, DomainEntity> implements Serializable {
@@ -60,7 +58,7 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void createNewApplicationDomain(String domainName, DomainGroupEntity dge) {
         DomainEntity de = EntityBuilder.of().DomainEntity()
-                .setDomainname(domainName)
+                .setDomainFQDN(domainName)
                 .setDomaintype(DomainType.Type.APPLICATION);
         // domain space key and domain name of entity are same
         de.insertNewGroup(domainName, dge);
@@ -74,7 +72,7 @@ public class DomainData extends BusinessBean<DomainData, DomainEntity> implement
     
     public void testHashing() {
         DomainEntity gde = new DomainEntity();
-        gde.setDomainname("com.example");
+        gde.setDomainFQDN("com.example");
         gde.setDomaintype(DomainType.Type.APPLICATION);
         gde.setDescription("This is a test company");
         this.entity = gde;

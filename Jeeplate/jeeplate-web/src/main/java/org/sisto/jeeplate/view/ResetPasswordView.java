@@ -131,7 +131,7 @@ public class ResetPasswordView extends AbstractView implements Serializable {
     public void newActionsecret() {
         if (! this.flowing) {
             if (actionsecret.isEmpty()) {
-                this.actionsecret = this.random.generateRandomString(8); // 2x
+                this.actionsecret = this.random.generateRandomString(32);
             }
             this.flowing = true;
         } else {

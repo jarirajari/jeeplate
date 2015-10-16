@@ -103,7 +103,7 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         if (! userAlreadyFound) {
             findOneUser(userEmailPrincipal);
         } else {
-            this.read();
+            this.find();
         }
     }
     

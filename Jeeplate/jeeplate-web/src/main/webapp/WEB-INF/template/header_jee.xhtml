@@ -40,8 +40,9 @@
                         <p:menuitem value="Account settings..." actionListener="#{modifyAccountView.populateData()}" onclick="PF('accountDlg').show();" update="messages,accountForm" icon="ui-icon-arrowrefresh-1-w" />
                     </p:splitButton>
                     
-                    <p:commandButton id="dynaButton" value="Sign as" rendered="#{mgr.authenticated()}" icon="ui-icon-extlink">
+                    <p:commandButton id="dynaButton" value="Sign as" rendered="#{mgr.authenticated()}" icon="ui-icon-extlink" actionListener="#{switchRoleMenu.populateData()}">
                     </p:commandButton>
+                    
                     <p:menu id="rolesMenu" overlay="true" my="left top" at="left bottom" trigger="dynaButton" model="#{switchRoleMenu.switchRoleMenuModel}" />
                     
                     <p:commandButton value="Sign up" rendered="#{not mgr.authenticated()}" icon="ui-icon-disk"
@@ -120,7 +121,7 @@
                     <p:tab id="signupWzd2" title="Account registerd" >
                         <p:panel header="Account Registered2">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
-                            <h:panelGrid rendered="true" columns="2" columnClasses="label, value">
+                            <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText rendered="#{not registrationView.registered}" value="Account not created..." />
                                 <h:outputText rendered="#{registrationView.registered}" value="Account succesfully created..." />
                                 <p:outputLabel rendered="#{not registrationView.registered}" value="Please register or try reset again."/>
@@ -136,7 +137,7 @@
         <!-- Signin dialog -->
         <p:dialog rendered="#{not mgr.authenticated()}" modal="true" header="Sign in" widgetVar="signinDlg" resizable="false">
             <h:form id="signinForm">
-                <h:panelGrid id="signin" columns="1">
+                <h:panelGrid columns="1" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
@@ -174,10 +175,9 @@
                     
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Cancel" icon="fa fa-close" onclick="PF('signinDlg').hide();" 
-                                         update="signin"/>
+                        <p:commandButton value="Cancel" icon="fa fa-close" onclick="PF('signinDlg').hide();" />
                         <p:commandButton value="Sign in" icon="fa fa-check" oncomplete="JS.handleLoginRequest('signinDlg', xhr, status, args)" 
-                                         update="signin,signinResult" action="#{mgr.submit}" />
+                                         update="signinResult" action="#{mgr.submit}" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
@@ -186,7 +186,7 @@
         <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Change Password" widgetVar="credentialsDlg" resizable="false">
             <h:form id="credentialsForm">
                 <p:messages showDetail="false" showIcon="false" closable="true"/>
-                <h:panelGrid id="credentials" columns="2" >
+                <h:panelGrid columns="2" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
@@ -227,7 +227,7 @@
         <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Update Localisation" widgetVar="localisationDlg" resizable="false">
             <h:form id="localisationForm">
                 <p:messages showDetail="false" showIcon="false" closable="true"/>
-                <h:panelGrid id="localisation" columns="2" >
+                <h:panelGrid columns="2" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
@@ -320,7 +320,7 @@
                     <p:tab id="resetWzd2" title="Password reseted" >
                         <p:panel header="Password now changed">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
-                            <h:panelGrid rendered="true" columns="2" columnClasses="label, value">
+                            <h:panelGrid columns="2" columnClasses="label, value">
                                 <h:outputText rendered="#{not resetPasswordView.reseted}" value="Password not reseted..." />
                                 <h:outputText rendered="#{resetPasswordView.reseted}" value="Password succesfully reseted..." />
                                 <p:outputLabel rendered="#{not resetPasswordView.reseted}" value="Please register or try reset again."/>
@@ -337,7 +337,7 @@
         <!-- 2FA for role change -->
         <p:dialog modal="true" header="2FA" widgetVar="fa2Dlg" resizable="false" closable="true">
             <h:form id="fa2Form">
-                <h:panelGrid id="fa2Grid" columns="2" >
+                <h:panelGrid columns="2" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
@@ -372,7 +372,7 @@
         <p:dialog widgetVar="accountDlg" closable="true" header="Account settings" modal="true" styleClass="disable-scroll">
             <h:form id="accountForm">
                 <p:messages showDetail="false" showIcon="false" closable="true"/>
-                <h:panelGrid id="credentials" columns="2" >  
+                <h:panelGrid columns="2" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
@@ -416,5 +416,38 @@
                 </h:panelGrid>
             </h:form>
         </p:dialog><!-- /Account dialog -->
+        <!-- First login dialog -->
+        <p:dialog widgetVar="firstDlg" rendered="#{mgr.authenticated()}" visible="#{firstLogin.isFirstLogin()}" closable="false" header="Complete personal info" modal="true" styleClass="disable-scroll">
+            <h:form id="firstForm">
+                <p:messages showDetail="false" showIcon="false" closable="true"/>
+                <h:panelGrid columns="2" columnClasses="label, value">
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column colspan="2">
+                                <p:outputPanel >
+                                    Complete registration
+                                </p:outputPanel>
+                            </p:column>
+                        </p:row>
+                    </f:facet>
+                    <p:outputLabel for="firstEmailAddress" value="accountEmailAddress" />
+                    <p:inputText id="firstEmailAddress" value="#{firstLogin.emailAddress}" readonly="true" />
+                    <p:outputLabel for="firstMobileNumber" value="firstMobileNumber" />
+                    <p:inputText id="firstMobileNumber" value="#{firstLogin.mobileNumber}" readonly="true" />
+                    
+                    <p:outputLabel for="firstDomain" value="firstDomain"/>
+                    <p:autoComplete id="firstDomain" forceSelection="true" value="#{firstLogin.domain}" completeMethod="#{firstLogin.completeDomain}" />
+                    <p:outputLabel for="firstFirstName" value="firstFirstName" />
+                    <p:inputText id="firstFirstName" value="#{firstLogin.firstName}" required="Your fist name?"/>
+                    <p:outputLabel for="firstLastName" value="firstLastName" />
+                    <p:inputText id="firstLastName" value="#{firstLogin.lastName}" required="Your last name?"/>
+                    <p:outputLabel value="" />
+                    <p:outputPanel>
+                        <p:commandButton value="Sign out" ajax="false" action="#{mgr.doLogout}" />
+                        <p:commandButton value="Done" actionListener="#{firstLogin.firstLoginCompleted()}" update="@all"/>
+                    </p:outputPanel>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog><!-- /First login dialog -->
     </body>
 </html>

@@ -19,6 +19,7 @@
 package org.sisto.jeeplate.view.menu;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.PostConstruct;
@@ -35,6 +36,7 @@ import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.DefaultSubMenu;
 import org.primefaces.model.menu.MenuModel;
 import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.util.EmailMessage;
 
 @Named @ViewScoped
@@ -43,6 +45,9 @@ public class SwitchRoleMenu implements Serializable {
     @Inject
     private UserData user;
     private MenuModel switchRoleMenuModel;
+    private DefaultMenuItem item;
+    private Map<String, String> roles;
+    private Set<String> roleKeys;
     private String pin;
     private String role;
     private DefaultSubMenu submenu;
@@ -50,15 +55,28 @@ public class SwitchRoleMenu implements Serializable {
     
     @PostConstruct
     public void init() {
-        DefaultMenuItem item;
-        Map<String, String> roles;
-        Set<String> roleKeys;
+        this.roleKeys = new HashSet<>();
+        submenu = new DefaultSubMenu("");
+        switchRoleMenuModel = new DefaultMenuModel();
+        switchRoleMenuModel.addElement(submenu);
+        req2FA = Boolean.TRUE;
+    }
+    
+    private UserEntity user() {
+        UserEntity ue;
+        user.findLoggedInUser(this.currentUser());
+        ue = user.getDataModel();
         
+        return ue;
+    }
+    
+    public void populateData() {
         user.findLoggedInUser(currentUser());
+        this.setRole(String.format("%s", user.currentRoleForUser()));
         roles = user.assignedRolesForUser();
         roleKeys = roles.keySet();
-        
-        submenu = new DefaultSubMenu(String.format("%s", user.currentRoleForUser()));
+        submenu.setLabel(String.format("%s", role));
+        submenu.getElements().clear();
         for (String key : roleKeys) {
             item = new DefaultMenuItem(roles.get(key));
             item.setIcon("ui-icon-close");
@@ -67,9 +85,6 @@ public class SwitchRoleMenu implements Serializable {
             submenu.addElement(item);
         }
         
-        switchRoleMenuModel = new DefaultMenuModel();
-        switchRoleMenuModel.addElement(submenu);
-        req2FA = Boolean.TRUE;
     }
     
     public void flushPIN(AjaxBehaviorEvent event){

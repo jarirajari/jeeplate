@@ -47,13 +47,13 @@ import org.sisto.jeeplate.domain.space.DomainSpaceEntity;
 
 @Entity @Access(AccessType.FIELD) 
 @Table(name = "system_domains", uniqueConstraints = { 
-       @UniqueConstraint(columnNames = "domainname")})
+       @UniqueConstraint(columnNames = "domainFQDN")})
 public class DomainEntity extends BusinessEntity implements Serializable {
     
     @Id @SequenceGenerator(name = "group_domain_seq", allocationSize = 1)
     @GeneratedValue(generator = "group_domain_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
-    protected String domainname;
+    protected String domainFQDN; // FQDN ends with dot '.', ROOT is only '.'
     protected String description;
     @Enumerated(EnumType.STRING)
     protected DomainType.Type domaintype;
@@ -77,7 +77,7 @@ public class DomainEntity extends BusinessEntity implements Serializable {
     
     public DomainEntity() {
         this.id = DEFAULT_ID;
-        this.domainname = "";
+        this.domainFQDN = "";
         this.description = "";
         this.domaintype = DomainType.Type.UNKNOWN;
         this.allDomaingroups = new HashMap<>();
@@ -97,12 +97,12 @@ public class DomainEntity extends BusinessEntity implements Serializable {
         super.setVersion(this.version);
     }
 
-    public String getDomainname() {
-        return domainname;
+    public String getDomainFQDN() {
+        return domainFQDN;
     }
 
-    public DomainEntity setDomainname(String domainname) {
-        this.domainname = domainname;
+    public DomainEntity setDomainFQDN(String domainFQDN) {
+        this.domainFQDN = domainFQDN;
         
         return this;
     }

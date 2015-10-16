@@ -57,7 +57,6 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
     }
     
     public void originateSingletonDomainSpace() {
-        
         this.create();  
     }
     
@@ -106,10 +105,11 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
         this.update();
     }
     
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void removeOldDomain(String name, DomainData dd) {
         
         // rules of who can do this
-        DomainSpaceEntity dse = this.getEntity();
+        DomainSpaceEntity dse = this.getDataModel();
         dse.removeOldDomain(name, dd);
         this.setEntity(dse);
         this.update();
@@ -117,5 +117,12 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
     
     public Integer size() {
         return (this.getEntity().size());
+    }
+    
+    public String translateSearched(String domainCode) {
+        DomainSpaceEntity dse = this.getDataModel();
+        String translated = dse.translateDomainSearchable(domainCode);
+        
+        return translated;
     }
 }

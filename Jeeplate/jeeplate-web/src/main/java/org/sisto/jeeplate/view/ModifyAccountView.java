@@ -78,7 +78,7 @@ public class ModifyAccountView extends AbstractView implements Serializable {
         this.country = "";
         this.city = "";
         this.timezone = "";
-        this.populateData();
+        //this.populateData();
     }
     
     private UserEntity user() {

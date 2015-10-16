@@ -18,28 +18,38 @@
  */
 package org.sisto.jeeplate.util;
 
+import java.security.SecureRandom;
+import java.util.Random;
 import javax.annotation.PostConstruct;
-import javax.ejb.Stateless;
 import javax.enterprise.context.Dependent;
-import org.apache.shiro.crypto.RandomNumberGenerator;
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.util.ByteSource;
 
 @Dependent
 public class Randomness {
     
-    private RandomNumberGenerator rng;
+    private SecureRandom rng;
     
     @PostConstruct
     public void init() {
-        rng = new SecureRandomNumberGenerator();
+        rng = new SecureRandom();
     }
     
     public String generateRandomString(int length) {
-        ByteSource bs = rng.nextBytes(length);
-        String randomStringHexLenth = bs.toHex();
+        
+        final String randomStringHexLenth = alphanumericRandomString(length);
         
         return randomStringHexLenth;
+    }
+    
+    private String alphanumericRandomString(int length) {
+        // alphabet - { i, l, I, 0 } = 32 = 5 bit
+        final char[] chars = "123456789abcdefghjkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ".toCharArray();
+        final StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            char c = chars[random.nextInt(chars.length)];
+            sb.append(c);
+        }
+        return sb.toString();
     }
     
     public Integer generateRandomInteger() {

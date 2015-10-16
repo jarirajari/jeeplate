@@ -60,6 +60,15 @@ public class MultiValidator implements Serializable {
         return validates;
     }
     
+    public Boolean validateFQDN(String hostname) {
+        final Boolean root = ".".equals(hostname);
+        final Boolean url = validateURL(hostname);
+        final Boolean dot = hostname.endsWith(".");
+        final Boolean valid = (root || (url && dot));
+        
+        return valid;
+    }
+    
     public Boolean validateURL(String hostname) {
         URL url = null;
         URI uri = null;
