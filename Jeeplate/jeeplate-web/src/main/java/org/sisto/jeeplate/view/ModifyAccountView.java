@@ -19,12 +19,8 @@
 package org.sisto.jeeplate.view;
  
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.enterprise.inject.Default;
-import javax.enterprise.inject.Instance;
 import javax.faces.application.FacesMessage;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -32,7 +28,6 @@ import javax.inject.Named;
 import org.primefaces.context.RequestContext;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
-import org.sisto.jeeplate.domain.user.account.UserAccount;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
 import org.sisto.jeeplate.localisation.LanguageLocalisation;
 
@@ -87,6 +82,10 @@ public class ModifyAccountView extends AbstractView implements Serializable {
         ue = user.getDataModel();
         
         return ue;
+    }
+    
+    public void testing(String test) {
+        System.out.println("testing test "+test);
     }
     
     public void populateData() {
@@ -218,7 +217,6 @@ public class ModifyAccountView extends AbstractView implements Serializable {
     }
     
     public void modify() {
-        System.out.println("modify!");
         Boolean changed = Boolean.TRUE;
         
         if (changed) {

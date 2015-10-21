@@ -39,6 +39,10 @@ public enum ApplicationRole {
         this.bvalue = bvalue;
     }
     
+    public int toValue() {
+        return this.bvalue;
+    }
+    
     public int bitIndex() {
         return this.bindex;
     }

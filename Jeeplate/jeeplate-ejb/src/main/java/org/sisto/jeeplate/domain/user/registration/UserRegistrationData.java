@@ -64,7 +64,7 @@ public class UserRegistrationData extends BusinessBean<UserRegistrationData, Use
                     .setUsername(typedUsername)
                     .setPassword(typedPassword)
                     .setMobile(Long.valueOf(typedMobile))
-                    .asRegisteredUser();
+                    .asApplicationUser();
             user.createNewUser(ue);
         }
         

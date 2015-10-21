@@ -69,7 +69,7 @@ public class Application {
         final Boolean validPW = validator.validateUserPassword(password);
         final Boolean validPN = validator.validateUserPhone(msisdn);
         final String response = String.format("Conf exists?=%s. un=%s pw=%s pn=%s", String.valueOf(confCreated),username,password,msisdn);
-        System.out.println(validCMD +","+ validUN +","+ validPW +","+ validPN);
+
         if (confCreated) {
             log.info("Application already initialized!");
         } else if (validCMD && validUN && validPW && validPN) {

@@ -40,6 +40,7 @@ import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.group.DomainGroupEntity;
@@ -49,6 +50,9 @@ import org.sisto.jeeplate.domain.space.DomainSpaceEntity;
 @Table(name = "system_domains", uniqueConstraints = { 
        @UniqueConstraint(columnNames = "domainFQDN")})
 public class DomainEntity extends BusinessEntity implements Serializable {
+    
+    @Transient 
+    public static transient final String ROOT_DOMAIN = ".";
     
     @Id @SequenceGenerator(name = "group_domain_seq", allocationSize = 1)
     @GeneratedValue(generator = "group_domain_seq", strategy = GenerationType.SEQUENCE)
@@ -97,6 +101,10 @@ public class DomainEntity extends BusinessEntity implements Serializable {
         super.setVersion(this.version);
     }
 
+    public static Boolean isRootDomain(String domain) {
+        return (ROOT_DOMAIN.equals(domain));
+    }
+    
     public String getDomainFQDN() {
         return domainFQDN;
     }

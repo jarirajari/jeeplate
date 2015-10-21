@@ -26,11 +26,11 @@ import javax.enterprise.context.Dependent;
 @Dependent
 public class Randomness {
     
-    private SecureRandom rng;
+    private SecureRandom rng = new SecureRandom();
     
     @PostConstruct
     public void init() {
-        rng = new SecureRandom();
+        
     }
     
     public String generateRandomString(int length) {
@@ -41,6 +41,14 @@ public class Randomness {
     }
     
     private String alphanumericRandomString(int length) {
+        return (generateRandomStringStatic(length));
+    }
+    
+    public Integer generateRandomInteger() {
+        return Integer.MAX_VALUE;
+    }
+    
+    public static String generateRandomStringStatic(int length) {
         // alphabet - { i, l, I, 0 } = 32 = 5 bit
         final char[] chars = "123456789abcdefghjkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ".toCharArray();
         final StringBuilder sb = new StringBuilder();
@@ -50,9 +58,5 @@ public class Randomness {
             sb.append(c);
         }
         return sb.toString();
-    }
-    
-    public Integer generateRandomInteger() {
-        return Integer.MAX_VALUE;
     }
 }

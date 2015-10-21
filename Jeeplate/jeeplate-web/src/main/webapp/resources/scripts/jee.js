@@ -32,12 +32,20 @@ var JS = {
     },
     handleRoleSwitch: function (wvid, input, role) {
         var elem = "#{0}".format(input).replace(/:/g, "\\:");
-        console.log("--->"+input,role,elem);
         var pf = PF(wvid);
         var jq = $(elem);
         
         console.log(jq);
         jq.html(role);
+        pf.show();
+    },
+    authenticatedUserSignAsRole: function (role) {
+        var elem = "#{0}".format("fa2Form:fa2role").replace(/:/g, "\\:");
+        var pf = PF("fa2Dlg");
+        var jq = $(elem);
+        
+        jq.val(role);
+        requires2FARemCmd([{name: 'newRole', value: role}]);
         pf.show();
     }
 };

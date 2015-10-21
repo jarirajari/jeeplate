@@ -37,6 +37,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -74,7 +76,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
     // User is a member in many groups and each group can contain many members => membership
     @OneToMany(mappedBy = "systemUser")
     protected List<DomainGroupMembershipEntity> domaingroupMemberships;
-    @OneToOne  @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @OneToOne @Cascade({org.hibernate.annotations.CascadeType.ALL})
     protected UserAccountEntity oneAccount;
     
     public UserEntity() {
@@ -164,7 +166,14 @@ public class UserEntity extends BusinessEntity implements Serializable {
         return this;
     }
     
-    public UserEntity asRegisteredUser() {
+    public UserEntity asSystemUser() {
+        this.getSysRole().setRole(SystemRole.SYSTEM_USER);
+        this.getAppRole().setRoleGroup(ApplicationRoles.EMPTY_GROUP);
+        
+        return this;
+    }
+    
+    public UserEntity asApplicationUser() {
         this.getSysRole().setRole(SystemRole.SYSTEM_USER);
         this.getAppRole().setRoleGroup(ApplicationRoles.NORMAL_GROUP);
         
@@ -196,7 +205,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
     }
     
     public String currentRoleForUser() {
-        final SystemRole userSysRole = this.sysRole.getRole();
+        final SystemRole userSysRole = this.sysRole.getCurrentRole();
         final ApplicationRole userAppRole = this.getAppRole().getCurrentRole();
         String roleName;
         
@@ -210,12 +219,12 @@ public class UserEntity extends BusinessEntity implements Serializable {
     }
     
     public Boolean isApplicationUserThereforeNotSystemUser() {
-        final SystemRole userSysRole = this.sysRole.getRole();
+        final SystemRole userSysRole = this.sysRole.getCurrentRole();
         final BitSet userAssignedGroup = this.getAppRole().getRoleGroup();
+        Boolean notEmptyAppGroup = (! ApplicationRoles.EMPTY_GROUP.equals(userAssignedGroup));
         Boolean isAppUsr;
         
-        if ((SystemRole.SYSTEM_USER == userSysRole) &&
-            (! ApplicationRoles.EMPTY_GROUP.equals(userAssignedGroup))) {
+        if ((SystemRole.SYSTEM_USER == userSysRole) && (notEmptyAppGroup)) {
             isAppUsr = Boolean.TRUE;
         } else {
             isAppUsr = Boolean.FALSE;
@@ -243,7 +252,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
             requires = this.getAppRole().requires2FAwhenRoleChange(newRole);
         } else {
             // Any role change for a system user will require 2FA!
-            requires = Boolean.TRUE;
+            requires = this.getSysRole().requires2FAwhenRoleChange();
         }
         
         return requires;
@@ -253,21 +262,35 @@ public class UserEntity extends BusinessEntity implements Serializable {
         return (this.getCredential().newPIN());
     }
     
-    public Boolean swithcRoleTo(ApplicationRole newRole, String pin2FA, Boolean req2FA) {
+    public Boolean swithcRoleTo(String newRole, String pin2FA, Boolean req2FA) {
         Boolean success = Boolean.FALSE;
+        Boolean appNotSys = isApplicationUserThereforeNotSystemUser();
         
         if (req2FA) {
             final String pin = this.getCredential().askPIN();
             Boolean pinsMatch = pin.equals(pin2FA);
             
             if (pinsMatch) {
-                this.getAppRole().assignRole(newRole);
+                if (appNotSys) {
+                    this.getAppRole().assignRole(ApplicationRole.convert(newRole));
+                } else {
+                    this.getSysRole().assignRole(SystemRole.convert(newRole));
+                }
                 success = Boolean.TRUE;
             }
         } else {
-            this.getAppRole().assignRole(newRole);
+            if (appNotSys) {
+                this.getAppRole().assignRole(ApplicationRole.convert(newRole));
+            } else {
+                this.getSysRole().assignRole(SystemRole.convert(newRole));
+            }
             success = Boolean.TRUE;
         }
+        
         return success;
+    }
+    
+    public Boolean userHasRegistered() {
+        return (this.getOneAccount().getRegistrationCompleted());
     }
 }

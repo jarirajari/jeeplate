@@ -19,11 +19,14 @@
 package org.sisto.jeeplate.view.menu;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.faces.component.UIOutput;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -34,9 +37,11 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.DefaultSubMenu;
+import org.primefaces.model.menu.DynamicMenuModel;
 import org.primefaces.model.menu.MenuModel;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
+import org.sisto.jeeplate.jsf.Navigator;
 import org.sisto.jeeplate.util.EmailMessage;
 
 @Named @ViewScoped
@@ -44,22 +49,16 @@ public class SwitchRoleMenu implements Serializable {
 
     @Inject
     private UserData user;
-    private MenuModel switchRoleMenuModel;
-    private DefaultMenuItem item;
-    private Map<String, String> roles;
-    private Set<String> roleKeys;
     private String pin;
     private String role;
-    private DefaultSubMenu submenu;
-    private Boolean req2FA;
+    private Boolean requiresPIN;
     
     @PostConstruct
     public void init() {
-        this.roleKeys = new HashSet<>();
-        submenu = new DefaultSubMenu("");
-        switchRoleMenuModel = new DefaultMenuModel();
-        switchRoleMenuModel.addElement(submenu);
-        req2FA = Boolean.TRUE;
+        pin = "";
+        role = "";
+        requiresPIN = Boolean.TRUE;
+        
     }
     
     private UserEntity user() {
@@ -70,21 +69,11 @@ public class SwitchRoleMenu implements Serializable {
         return ue;
     }
     
-    public void populateData() {
-        user.findLoggedInUser(currentUser());
-        this.setRole(String.format("%s", user.currentRoleForUser()));
-        roles = user.assignedRolesForUser();
-        roleKeys = roles.keySet();
-        submenu.setLabel(String.format("%s", role));
-        submenu.getElements().clear();
-        for (String key : roleKeys) {
-            item = new DefaultMenuItem(roles.get(key));
-            item.setIcon("ui-icon-close");
-            item.setCommand(String.format("#{switchRoleMenu.switchToRole('%s')}",key));      
-            item.setValue(key);
-            submenu.addElement(item);
-        }
-        
+    public List<String> allUserRoles() {
+        user();
+        Map<String, String> roles = user.assignedRolesForUser();
+        roles.remove(this.currentRole());
+        return (new ArrayList<>(roles.keySet()));
     }
     
     public void flushPIN(AjaxBehaviorEvent event){
@@ -108,27 +97,50 @@ public class SwitchRoleMenu implements Serializable {
         this.role = role;
     }
 
-    public MenuModel getSwitchRoleMenuModel() {
-        return switchRoleMenuModel;
+    public Boolean getRequiresPIN() {
+        return requiresPIN;
+    }
+
+    public void setRequiresPIN(Boolean requiresPIN) {
+        this.requiresPIN = requiresPIN;
     }
     
+    public String generatePIN() {
+        return (this.user.generateNewPinForRoleSwitch());
+    }
+    
+    // external context function called from javascript
     public Boolean requires2FA() {
-        return (this.req2FA);
-    }
-    
-    public void switchNow() {
+        Map<String,String> requestParams = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        String nr = requestParams.get("newRole");
+        final String replace = "${pin}";
+        final Boolean requiresTwoFactorAuth = (user.requiresTwoFactorAuth(nr));
+        final String alwaysPIN = this.generatePIN();
         
-        Boolean ok = user.switchCurrentUserRole(role, pin);
-        if (ok) {
-            submenu.setLabel(String.format("%s", role));
-            this.setRole(role);
-            this.setPin("");
+        if (requiresTwoFactorAuth) {
+            final String recipient = currentUser();
+            final EmailMessage em = new EmailMessage("Your role PIN", String.format("Role switch 2FA PIN is %s",replace), recipient, "Jeeplate corp.");
+            this.user.notifyUserFor2FA(em);   
+        } else {
+            this.setPin(alwaysPIN);
         }
-        closeConditionally(ok);
+        this.setRequiresPIN(requiresTwoFactorAuth);
+        
+        return requiresTwoFactorAuth;
     }
     
-    public void clickedRoleSwitchedButton() {
+    public String submit() {
+        Map<String,String> requestParams = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        String r = requestParams.get("fa2Form:fa2role");
+        String p =  requestParams.get("fa2Form:fa2PIN");
         
+        trySwitchingRoleNow(r, p);
+        
+        return Navigator.Target.HOME.page();
+    }
+    
+    public void trySwitchingRoleNow(String newRole, String pin) {
+        Boolean switched = user.switchCurrentUserRole(newRole, pin);
     }
     
     public String currentUser() {
@@ -138,28 +150,8 @@ public class SwitchRoleMenu implements Serializable {
         return usr;
     }
     
-    public void openConditionally() {
-        final String replace = "${pin}";
-        final boolean cond = user.requiresTwoFactorAuth(role);
-        if (cond) {
-            final String recipient = currentUser();
-            final EmailMessage em = new EmailMessage("Your role PIN", String.format("Role switch 2FA PIN is %s",replace), recipient, "Jeeplate corp.");
-            this.user.notifyUserFor2FA(em);
-        }
-        RequestContext.getCurrentInstance().execute("PF('fa2Dlg').show()");
+    public String currentRole() {
+        return (this.user.currentRoleForUser());
     }
     
-    public void closeConditionally(Boolean ok) {
-        if (ok) {
-            RequestContext.getCurrentInstance().execute("PF('fa2Dlg').hide()");
-        }        
-    }
-    
-    public void switchToRole(String newRole) {
-        
-        this.setRole(newRole);
-        this.req2FA = (user.requiresTwoFactorAuth(newRole));
-        RequestContext.getCurrentInstance().update("fa2Form");
-        openConditionally();
-    }
 }

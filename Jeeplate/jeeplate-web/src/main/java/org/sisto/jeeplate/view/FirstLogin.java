@@ -32,7 +32,7 @@ import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.util.MultiValidator;
 
-@Named
+@Named @ViewScoped
 public class FirstLogin extends AbstractView implements Serializable {
     // account
     private String mobileNumber;
@@ -57,6 +57,7 @@ public class FirstLogin extends AbstractView implements Serializable {
         this.domain = "";
         this.firstName = "";
         this.lastName = "";
+        
     }
     
     private UserEntity user() {
@@ -113,16 +114,20 @@ public class FirstLogin extends AbstractView implements Serializable {
         this.emailAddress = emailAddress;
     }
     
+    public Boolean updateFirstForm() {
+        
+        return Boolean.TRUE;
+    }
+    
     public Boolean isFirstLogin() {
-        Boolean yes=true;
+        Boolean userHasNotRegistered = (! this.user.getDataModel().userHasRegistered());
         
-        if (yes) {
-            this.populateData();
-            RequestContext.getCurrentInstance().update("firstForm");
+        if (userHasNotRegistered) {
+            this.populateData(); // A hack.
+            RequestContext.getCurrentInstance().execute("PF('firstDlg').show()");
         }
-        System.out.println(this.user().getMobile());
         
-        return yes;
+        return userHasNotRegistered;
     }
     
     public List<String> completeDomain(String joinCode) {
@@ -130,21 +135,29 @@ public class FirstLogin extends AbstractView implements Serializable {
         // domainFqdnKey is used to find out the "id" of the domain that user joins
         // domainThatMachesCode = , otherwiser return empty "". Root is "."
         ArrayList<String> domainFQDN = new ArrayList<>();
-        domainFQDN.add(this.space.translateSearched(joinCode));
+        Boolean domainHasBeenCreated = this.space.containsSearched(joinCode);
+        if (domainHasBeenCreated) {
+            domainFQDN.add(this.space.translateSearched(joinCode));
+        } else {
+            domainFQDN.add(joinCode);
+        }
         
         return domainFQDN;
     }
     
     public void firstLoginCompleted() {
-        System.out.println("firstLoginComplete!");
-        Boolean changed = Boolean.TRUE;
         
-        // must also check that domain is ok!
+        Boolean domainHasBeenCreated = (  this.space.domainHasBeenCreated(this.getDomain()));
+        Boolean userHasNotRegistered = (! this.user.getDataModel().userHasRegistered());
+        Boolean userRegistrationCanBeCompleted = (domainHasBeenCreated && userHasNotRegistered);
         
-        if (changed) {
+        if (userRegistrationCanBeCompleted) {
+            this.user.registerToDomain(this.getFirstName(), this.getLastName(), this.getDomain());
             RequestContext.getCurrentInstance().execute("PF('firstDlg').hide()");
+        } else if (! domainHasBeenCreated) {
+            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, no such domain");
         } else {
-            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, not 1st account");
-        }
+            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, else");
+        }        
     }
 }

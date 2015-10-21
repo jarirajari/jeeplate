@@ -33,11 +33,6 @@ public enum SystemRole {
         this.role = s;
     }
     
-    @Override
-    public String toString() {
-        return (this.role);
-    }
-    
     public static SystemRole convert(String name) {
         SystemRole converted;
         

@@ -36,11 +36,14 @@ public class SystemRoles implements Serializable {
      * One group is many single users
      */
     
-    @Enumerated(EnumType.STRING) @Column(name = "system_roles_group")
+    @Column(name = "system_roles_group") @Enumerated(EnumType.STRING) 
     protected SystemRole role;
+    @Column(name = "current_system_role") @Enumerated(EnumType.STRING)
+    protected SystemRole currentRole;
     
     public SystemRoles() {
         this.role = SystemRole.GUEST_USER;
+        this.currentRole = SystemRole.GUEST_USER;
     }
     
     public SystemRole getRole() {
@@ -49,6 +52,17 @@ public class SystemRoles implements Serializable {
     
     public void setRole(SystemRole newRole) {
         this.role = newRole;
+    }
+
+    public SystemRole getCurrentRole() {
+        if (this.currentRole == SystemRole.GUEST_USER) {
+            this.currentRole = SystemRole.SYSTEM_USER;
+        }
+        return currentRole;
+    }
+
+    public void setCurrentRole(SystemRole currentRole) {
+        this.currentRole = currentRole;
     }
     
     public SystemRoles asRoot() {
@@ -71,15 +85,19 @@ public class SystemRoles implements Serializable {
         return Boolean.TRUE;
     }
     
+    public void assignRole(SystemRole newRole) {
+        this.setCurrentRole(newRole);
+    }
+    
     public Map<String, String> assignedRoles() {
         final SystemRole[] allRoles = SystemRole.values();
         HashMap assigned = new HashMap<>();
         
-        for (SystemRole role : allRoles) {
-            if (role == SystemRole.GUEST_USER) {
+        for (SystemRole sysrole : allRoles) {
+            if (sysrole == SystemRole.GUEST_USER) {
                 continue; // we don't want guest user
             }
-            assigned.put(role.toString(), role.name());
+            assigned.put(sysrole.toString(), sysrole.name());
         }
         
         return assigned;

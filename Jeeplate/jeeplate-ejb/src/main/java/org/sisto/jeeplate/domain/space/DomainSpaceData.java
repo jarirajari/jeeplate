@@ -28,8 +28,6 @@ import org.apache.shiro.subject.Subject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
-import org.sisto.jeeplate.domain.user.UserData;
-import org.sisto.jeeplate.logging.StringLogger;
 
 @Stateful 
 public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEntity> implements Serializable {
@@ -117,6 +115,20 @@ public class DomainSpaceData extends BusinessBean<DomainSpaceData, DomainSpaceEn
     
     public Integer size() {
         return (this.getEntity().size());
+    }
+    
+    public Boolean domainHasBeenCreated(String fqdn) {
+        DomainSpaceEntity dse = this.getDataModel();
+        Boolean created = dse.domainHasBeenCreated(fqdn);
+        
+        return created;
+    }
+    
+    public Boolean containsSearched(String domainCode) {
+        DomainSpaceEntity dse = this.getDataModel();
+        Boolean translated = dse.containsDomainSearchable(domainCode);
+        
+        return translated;
     }
     
     public String translateSearched(String domainCode) {

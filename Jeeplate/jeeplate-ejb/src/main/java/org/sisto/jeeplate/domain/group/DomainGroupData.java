@@ -26,8 +26,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
-import org.sisto.jeeplate.domain.user.UserData;
-import org.sisto.jeeplate.logging.StringLogger;
 
 @Stateful 
 public class DomainGroupData extends BusinessBean<DomainGroupData, DomainGroupEntity> implements Serializable {

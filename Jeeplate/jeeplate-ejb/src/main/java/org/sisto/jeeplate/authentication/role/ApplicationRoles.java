@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Transient;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -68,11 +70,11 @@ public class ApplicationRoles implements Serializable {
      * We do not persist roles (enums) but role group: so no @Enumerated!
      * For n roles there will be 2^n groups, where each role has index from enum
      */
-    @Transient
+    @Column(name = "current_application_role") @Enumerated(EnumType.STRING)
     protected ApplicationRole currentRole;
     @Transient
     protected BitSet roleGroup;
-    @Column(name ="application_roles_group_hex")
+    @Column(name = "application_roles_group_hex")
     protected byte[] roleGroupAlias;
     
     public ApplicationRoles() {
@@ -122,7 +124,7 @@ public class ApplicationRoles implements Serializable {
     }
     
     public void assignRole(ApplicationRole newRole) {
-        this.currentRole = newRole;
+        this.setCurrentRole(newRole);
     }
     
     public Map<String, String> assignedRoles() {
@@ -183,7 +185,9 @@ public class ApplicationRoles implements Serializable {
         }
         
         public ApplicationRoleGroupBuilder role(ApplicationRole newRole) {
-            this.object.set(newRole.bitIndex());
+            if (newRole != ApplicationRole.VISITOR) {
+                this.object.set(newRole.bitIndex());
+            }
             
             return this;
         }

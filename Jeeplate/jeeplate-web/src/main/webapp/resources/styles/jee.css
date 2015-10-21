@@ -44,3 +44,7 @@ localisationLanguage.ui-selectonemenu input, select {
     width:200px !important;
     box-sizing:border-box;
 }
+
+.headerMenuItems {
+    font-size: 12px;
+}

@@ -28,6 +28,8 @@ import org.sisto.jeeplate.authentication.role.ApplicationRole;
 import org.sisto.jeeplate.domain.BusinessBean;
 import org.sisto.jeeplate.domain.EntityBuilder;
 import org.sisto.jeeplate.domain.ObjectEntity;
+import org.sisto.jeeplate.domain.base.DomainEntity;
+import org.sisto.jeeplate.domain.space.DomainSpaceData;
 import org.sisto.jeeplate.domain.user.account.UserAccountData;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
 import org.sisto.jeeplate.util.ApplicationProperty;
@@ -43,13 +45,16 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     @Inject
     UserAccountData account;
     
+    @Inject
+    DomainSpaceData space;
+    
     @Inject @ApplicationProperty(name = "test.message", defaultValue = "jee@pla.te")
     String systemEmailAddress2;
     
     @Inject
     Email emailSender;
     
-    ApplicationRole transientCurrentRole = ApplicationRole.VISITOR;
+    
     
     private transient final UserEntity hashed = EntityBuilder.of().UserEntity()
             .setUsername("hashis")
@@ -95,7 +100,9 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     }
     
     public String currentRoleForUser() {
-        return (this.getDataModel().currentRoleForUser());
+        final String role = this.getDataModel().currentRoleForUser();
+        
+        return role;
     }
     
     public void findLoggedInUser(final String userEmailPrincipal) {
@@ -107,14 +114,26 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         }
     }
     
+    /*
+    
+    Subject currentUser = SecurityUtils.getSubject();
+
+    Session session = currentUser.getSession();
+    session.setAttribute( "someKey", someValue);
+    
+    
+    */
+    
+    private void updateRetainTransientCurrentRole() {
+        this.update();
+    }
+    
     public Boolean switchCurrentUserRole(String newRoleName, String typedPIN) {
         Boolean fa2required = this.requiresTwoFactorAuth(newRoleName);
-        Boolean ok = this.getDataModel().swithcRoleTo(ApplicationRole.convert(newRoleName), typedPIN, fa2required);
+        Boolean ok = this.getDataModel().swithcRoleTo(newRoleName, typedPIN, fa2required);
         
         if (ok) {
-            transientCurrentRole = this.getDataModel().getAppRole().getCurrentRole();
-            this.update();
-            this.getDataModel().getAppRole().setCurrentRole(transientCurrentRole);
+            updateRetainTransientCurrentRole();
         }
         
         return ok;
@@ -132,9 +151,16 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         emailSender.sendMessage(mm);
     }
     
+    public String generateNewPinForRoleSwitch() {
+        String pin = this.getDataModel().twoFactorAuthPIN();
+        this.updateRetainTransientCurrentRole();
+        
+        return pin;
+    }
+    
     public void notifyUserFor2FA(EmailMessage em) {
         final String replace = "${pin}";
-        final String pin = this.getDataModel().twoFactorAuthPIN();
+        final String pin = this.getDataModel().getCredential().getPIN2FA();
         sendEmailToUser(em, replace, pin);
     }
     
@@ -258,5 +284,24 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         this.getDataModel().setOneAccount(uae);
         this.update();
         return Boolean.TRUE;
+    }
+    
+    public void registerToDomain(String userFirstName, String userLastName, String domainFQDN) {
+        final UserEntity ue = this.getDataModel();
+        final UserAccountEntity ua = ue.getOneAccount();
+        
+        ua.setRegistrationCompleted(Boolean.TRUE);
+        ua.setFirstName(userFirstName);
+        ua.setLastName(userLastName);
+        if (DomainEntity.isRootDomain(domainFQDN)) {
+            ue.asSystemUser();
+        } else {
+            ue.asApplicationUser();
+        }
+        
+        // add to the all group of the domain of domainFQDN
+        
+        this.update();
+        
     }
 }

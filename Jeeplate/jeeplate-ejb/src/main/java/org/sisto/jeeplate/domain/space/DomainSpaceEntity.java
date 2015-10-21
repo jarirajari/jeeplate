@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
+import javax.persistence.CascadeType; // need hibernate cascade?
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -57,8 +57,7 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
     protected Map<String, DomainEntity> allDomains; // loose if <Long> or tight if <DomainEntity>
     @ElementCollection @CollectionTable(name="system_domain_space_codes")
-    @MapKeyColumn(name="secretMapkey")
-    @Column(name="secret")
+    @MapKeyColumn(name="secretMapkey") @Column(name="secret")
     protected Map<String, String> looseFQDNToSecret;
     
     public DomainSpaceEntity() {
@@ -68,18 +67,26 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
         this.addSystemUserDomain();
     }
     
-    private void addSystemUserDomain() {
-        final String ROOT = ".";
-        this.looseFQDNToSecret.put(ROOT, ROOT);
-        // for testing
-        this.looseFQDNToSecret.put("777", "lucky.gue.es.");
-    }
-    
     @PostLoad @PostPersist @PostUpdate
     @Override
     protected void updateParentId() {
         super.setId(this.id);
         super.setVersion(this.version);
+    }
+
+    public Map<String, DomainEntity> getAllDomains() {
+        return allDomains;
+    }
+    
+    public DomainEntity findOneDomainByName(String domainFQDN) {
+        return (this.getAllDomains().get(domainFQDN));
+    }
+    
+    private void addSystemUserDomain() {
+        final String ROOT = ".";
+        this.looseFQDNToSecret.put(ROOT, ROOT);
+        // for testing
+        this.looseFQDNToSecret.put("777", "lucky.gue.es.");
     }
     
     public Boolean insertNewDomain(String qualifiedDomainname, DomainData dd) {
@@ -117,6 +124,14 @@ public class DomainSpaceEntity extends BusinessEntity implements Serializable {
     
     public Integer size() {
         return (this.allDomains.size());
+    }
+    
+    public Boolean domainHasBeenCreated(String fqdn) {
+        return (this.looseFQDNToSecret.containsValue(fqdn));
+    }
+    
+    public Boolean containsDomainSearchable(String fqdnKey) {
+        return (this.looseFQDNToSecret.containsKey(fqdnKey));
     }
     
     public String translateDomainSearchable(String fqdnKey) {

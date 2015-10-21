@@ -21,6 +21,7 @@ package org.sisto.jeeplate.domain.user;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
+import javax.inject.Inject;
 import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -31,6 +32,7 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.util.ByteSource;
 import org.sisto.jeeplate.security.shiro.Salt;
 import org.sisto.jeeplate.util.DateAndTimeConverter;
+import org.sisto.jeeplate.util.Randomness;
 
 @Embeddable
 public class UserCredential implements Serializable {
@@ -43,8 +45,7 @@ public class UserCredential implements Serializable {
     protected String passwordResetToken;
     @Temporal(TemporalType.TIMESTAMP)
     protected Date passwordResetTimestamp;
-    @Transient
-    protected transient String PIN2FA;
+    protected String PIN2FA; // should be actually "transient"
     
     public UserCredential() {
         this.salt = RESET;
@@ -95,6 +96,14 @@ public class UserCredential implements Serializable {
     public void setPasswordResetTimestamp(Date passwordResetTimestamp) {
         this.passwordResetTimestamp = passwordResetTimestamp;
     }
+
+    public String getPIN2FA() {
+        return PIN2FA;
+    }
+
+    public void setPIN2FA(String PIN2FA) {
+        this.PIN2FA = PIN2FA;
+    }
     
     public Boolean passwordMatchesWhenHashedWithSameSalt(String password) {
         String sameSalt = this.getSalt();
@@ -118,7 +127,7 @@ public class UserCredential implements Serializable {
     }
     
     public void activateResetProtocol() {
-        this.passwordResetToken = UserCredential.generateRandomNumberToken();
+        this.passwordResetToken = this.generateRandomNumberToken();
         this.passwordResetTimestamp = UserCredential.now();
     }
     
@@ -138,28 +147,24 @@ public class UserCredential implements Serializable {
     }
     
     public String newPIN() {
-        this.PIN2FA = generateRandomNumberPIN();
+        this.setPIN2FA(generateRandomNumberPIN());
+        
         return (this.PIN2FA);
     }
     
     public String askPIN() {
-        return (this.PIN2FA);
+        String tmp = this.getPIN2FA();
+        this.setPIN2FA("");
+        return tmp;
     }
     
-    private static String generateRandomNumberPIN() {
-        final int length=6;
-        RandomNumberGenerator rng = new SecureRandomNumberGenerator();
-        ByteSource bs = rng.nextBytes(length);
+    private String generateRandomNumberPIN() {
         
-        return bs.toString();
+        return (Randomness.generateRandomStringStatic(8));
     }
     
-    private static String generateRandomNumberToken() {
-        final int length=16;
-        RandomNumberGenerator rng = new SecureRandomNumberGenerator();
-        ByteSource bs = rng.nextBytes(length);
-        String randomStringHex16 = bs.toHex();
+    private String generateRandomNumberToken() {
         
-        return randomStringHex16;
+        return (Randomness.generateRandomStringStatic(16));
     }
 }

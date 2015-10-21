@@ -20,7 +20,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" 
       xmlns:h="http://xmlns.jcp.org/jsf/html" 
       xmlns:f="http://xmlns.jcp.org/jsf/core" 
-      xmlns:p="http://primefaces.org/ui" >
+      xmlns:p="http://primefaces.org/ui" 
+      xmlns:ui="http://java.sun.com/jsf/facelets" 
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
     <body>
         <!-- Menubar -->
         <h:form id="menubarForm">
@@ -35,15 +38,18 @@
 
                 <f:facet name="options">
                     <p:splitButton value="#{switchRoleMenu.currentUser()}" immediate="true" rendered="#{mgr.authenticated()}" icon="ui-icon-disk">
-                        <p:menuitem value="Change credentials..." actionListener="#{changePasswordView.populateData()}" onclick="PF('credentialsDlg').show();" update="messages,credentialsForm" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="Change localisation..." actionListener="#{changeLocalisationView.populateData()}" onclick="PF('localisationDlg').show();" update="messages,localisationForm" icon="ui-icon-arrowrefresh-1-w" />
-                        <p:menuitem value="Account settings..." actionListener="#{modifyAccountView.populateData()}" onclick="PF('accountDlg').show();" update="messages,accountForm" icon="ui-icon-arrowrefresh-1-w" />
+                        <p:menuitem value="Change credentials..." actionListener="#{changePasswordView.populateData()}" onclick="PF('credentialsDlg').show();" update="messages,credentialsForm" icon="ui-icon-arrowrefresh-1-w"  styleClass="headerMenuItems"/>
+                        <p:menuitem value="Change localisation..." actionListener="#{changeLocalisationView.populateData()}" onclick="PF('localisationDlg').show();" update="messages,localisationForm" icon="ui-icon-arrowrefresh-1-w"  styleClass="headerMenuItems"/>
+                        <p:menuitem value="Account settings..." actionListener="#{modifyAccountView.populateData()}" onclick="PF('accountDlg').show();" update="messages,accountForm" icon="ui-icon-arrowrefresh-1-w"  styleClass="headerMenuItems"/>
                     </p:splitButton>
                     
-                    <p:commandButton id="dynaButton" value="Sign as" rendered="#{mgr.authenticated()}" icon="ui-icon-extlink" actionListener="#{switchRoleMenu.populateData()}">
-                    </p:commandButton>
-                    
-                    <p:menu id="rolesMenu" overlay="true" my="left top" at="left bottom" trigger="dynaButton" model="#{switchRoleMenu.switchRoleMenuModel}" />
+                    <p:splitButton id="roleSP" value="#{switchRoleMenu.currentRole()}" immediate="true" rendered="#{mgr.authenticated()}" icon="ui-icon-disk" actionListener="#{switchRoleMenu.generatePIN()}" update=":fa2Form">
+                        
+                        <c:forEach var="i" items="#{switchRoleMenu.allUserRoles()}">
+                            <!-- user only javascript! mixes threads otherwise! -->
+                            <p:menuitem value="#{i}" onclick="JS.authenticatedUserSignAsRole('#{i}')" icon="ui-icon-arrowrefresh-1-w" styleClass="headerMenuItems"/>
+                        </c:forEach>
+                    </p:splitButton>
                     
                     <p:commandButton value="Sign up" rendered="#{not mgr.authenticated()}" icon="ui-icon-disk"
                                      onclick="PF('signupWzd').show();">
@@ -68,6 +74,7 @@
             </p:menubar>
         </h:form>
         <!-- /Menubar -->
+       
         <!-- Signup dialog -->
         <p:dialog widgetVar="signupWzd" header="Sign up" modal="true" styleClass="disable-scroll" width="600px">
             <h:form id="signupForm">
@@ -336,8 +343,10 @@
         </p:dialog><!-- /Reset Wizard -->       
         <!-- 2FA for role change -->
         <p:dialog modal="true" header="2FA" widgetVar="fa2Dlg" resizable="false" closable="true">
-            <h:form id="fa2Form">
+            <h:form id="fa2Form" >
+                <p:remoteCommand name="requires2FARemCmd" actionListener="#{switchRoleMenu.requires2FA}"/>
                 <h:panelGrid columns="2" columnClasses="label, value">
+                    
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
@@ -348,15 +357,16 @@
                         </p:row>
                     </f:facet>
                     
-                    <h:outputLabel rendered="#{switchRoleMenu.requires2FA()}" for="fa2PIN" value="PIN:" />
-                    <p:inputText rendered="#{switchRoleMenu.requires2FA()}" id="fa2PIN" value="#{switchRoleMenu.pin}" required="false" readonly="false" maxlength="8">
-                        <p:ajax event="mouseout" listener="#{switchRoleMenu.flushPIN}" />
-                    </p:inputText>
+                    <p:outputLabel for="fa2role" value="Role:" />
+                    <p:inputText id="fa2role" readonly="true" value="#{switchRoleMenu.role}" />
+                    <p:outputLabel for="fa2PIN" value="PIN:" />
+                    <p:inputText id="fa2PIN" value="#{switchRoleMenu.pin}" required="false" readonly="false" maxlength="8" disabled="#{not switchRoleMenu.requiresPIN}"/>
                     <p:outputLabel value="" />
                     <p:outputPanel>
                         <p:commandButton value="Cancel" onclick="PF('fa2Dlg').hide();"/>
-                        <p:commandButton value="Change" actionListener="#{switchRoleMenu.switchNow()}" update="@all"/>
+                        <p:commandButton value="Change" action="#{switchRoleMenu.submit()}" update="@all"/>
                     </p:outputPanel>
+                    
                 </h:panelGrid>
             </h:form>
         </p:dialog><!-- /2FA for role change -->
@@ -411,14 +421,16 @@
                     <p:outputLabel value="" />
                     <p:outputPanel>
                         <p:commandButton value="Cancel" onclick="PF('accountDlg').hide();"/>
-                        <p:commandButton value="Change" actionListener="#{modifyAccountView.modify()}" update="@all"/>
+                        <p:commandButton value="Change" actionListener="#{modifyAccountView.modify()}" update="@form"/>
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
         </p:dialog><!-- /Account dialog -->
-        <!-- First login dialog -->
-        <p:dialog widgetVar="firstDlg" rendered="#{mgr.authenticated()}" visible="#{firstLogin.isFirstLogin()}" closable="false" header="Complete personal info" modal="true" styleClass="disable-scroll">
-            <h:form id="firstForm">
+        <!-- First login dialog: lazy load with "dynamic=true" -->
+        <p:dialog widgetVar="firstDlg" rendered="#{mgr.authenticated() and firstLogin.isFirstLogin()}" 
+                  closable="false" dynamic="true" modal="true"  
+                  header="Complete personal info"  styleClass="disable-scroll" >
+            <h:form id="firstForm" prependId="false">
                 <p:messages showDetail="false" showIcon="false" closable="true"/>
                 <h:panelGrid columns="2" columnClasses="label, value">
                     <f:facet name="header">
@@ -430,13 +442,13 @@
                             </p:column>
                         </p:row>
                     </f:facet>
-                    <p:outputLabel for="firstEmailAddress" value="accountEmailAddress" />
+                    <p:outputLabel for="firstEmailAddress" value="firstEmailAddress" />
                     <p:inputText id="firstEmailAddress" value="#{firstLogin.emailAddress}" readonly="true" />
                     <p:outputLabel for="firstMobileNumber" value="firstMobileNumber" />
                     <p:inputText id="firstMobileNumber" value="#{firstLogin.mobileNumber}" readonly="true" />
                     
                     <p:outputLabel for="firstDomain" value="firstDomain"/>
-                    <p:autoComplete id="firstDomain" forceSelection="true" value="#{firstLogin.domain}" completeMethod="#{firstLogin.completeDomain}" />
+                    <p:autoComplete id="firstDomain" queryDelay="2000" forceSelection="false" value="#{firstLogin.domain}" completeMethod="#{firstLogin.completeDomain}" />
                     <p:outputLabel for="firstFirstName" value="firstFirstName" />
                     <p:inputText id="firstFirstName" value="#{firstLogin.firstName}" required="Your fist name?"/>
                     <p:outputLabel for="firstLastName" value="firstLastName" />
@@ -444,7 +456,7 @@
                     <p:outputLabel value="" />
                     <p:outputPanel>
                         <p:commandButton value="Sign out" ajax="false" action="#{mgr.doLogout}" />
-                        <p:commandButton value="Done" actionListener="#{firstLogin.firstLoginCompleted()}" update="@all"/>
+                        <p:commandButton value="Done" actionListener="#{firstLogin.firstLoginCompleted()}" update="@all" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>

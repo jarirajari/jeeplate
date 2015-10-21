@@ -55,6 +55,7 @@ public class UserAccountEntity extends BusinessEntity implements Serializable {
     protected String timezone;
     @OneToOne(mappedBy = "oneAccount")
     protected UserEntity user;
+    protected Boolean registrationCompleted;
     
     public UserAccountEntity() {
         this.id = DEFAULT_ID;
@@ -71,6 +72,7 @@ public class UserAccountEntity extends BusinessEntity implements Serializable {
         this.city = "";
         this.timezone = "UTC";
         this.user = null;
+        this.registrationCompleted = Boolean.FALSE;
     }
     
     @PostLoad @PostPersist @PostUpdate
@@ -195,6 +197,14 @@ public class UserAccountEntity extends BusinessEntity implements Serializable {
     public UserAccountEntity setUser(UserEntity user) {
         this.user = user;
         return this;
+    }
+
+    public Boolean getRegistrationCompleted() {
+        return registrationCompleted;
+    }
+
+    public void setRegistrationCompleted(Boolean registrationCompleted) {
+        this.registrationCompleted = registrationCompleted;
     }
     
 }
