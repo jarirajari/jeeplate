@@ -79,6 +79,11 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>unknown.binary</groupId>
+            <artifactId>javax.ws.rs-api-2.0</artifactId>
+            <version>SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

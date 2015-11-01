@@ -33,106 +33,101 @@
                     <p:outputLabel>
                         <p:graphicImage style="height:25px;width:25px" value="resources/images/football.png" />
                     </p:outputLabel>
-                    <p:outputLabel value="JEE" />
+                    <p:outputLabel value=" 'header.tmpl.logo.text']}" />
                 </p:menuitem>
 
                 <f:facet name="options">
                     <p:splitButton value="#{switchRoleMenu.currentUser()}" immediate="true" rendered="#{mgr.authenticated()}" icon="ui-icon-disk">
-                        <p:menuitem value="Change credentials..." actionListener="#{changePasswordView.populateData()}" onclick="PF('credentialsDlg').show();" update="messages,credentialsForm" icon="ui-icon-arrowrefresh-1-w"  styleClass="headerMenuItems"/>
-                        <p:menuitem value="Change localisation..." actionListener="#{changeLocalisationView.populateData()}" onclick="PF('localisationDlg').show();" update="messages,localisationForm" icon="ui-icon-arrowrefresh-1-w"  styleClass="headerMenuItems"/>
-                        <p:menuitem value="Account settings..." actionListener="#{modifyAccountView.populateData()}" onclick="PF('accountDlg').show();" update="messages,accountForm" icon="ui-icon-arrowrefresh-1-w"  styleClass="headerMenuItems"/>
+                        <p:menuitem value="#{msg['header.tmpl.button.change-credentials']}" actionListener="#{changePasswordView.populateData()}" onclick="PF('credentialsDlg').show();" update="messages,credentialsForm" icon="ui-icon-arrowrefresh-1-w"  styleClass="headerMenuItems"/>
+                        <p:menuitem value="#{msg['header.tmpl.button.change-localization']}" actionListener="#{changeLocalisationView.populateData()}" onclick="PF('localisationDlg').show();" update="messages,localisationForm" icon="ui-icon-arrowrefresh-1-w"  styleClass="headerMenuItems"/>
+                        <p:menuitem value="#{msg['header.tmpl.button.account-settings']}" actionListener="#{modifyAccountView.populateData()}" onclick="PF('accountDlg').show();" update="messages,accountForm" icon="ui-icon-arrowrefresh-1-w"  styleClass="headerMenuItems"/>
                     </p:splitButton>
-                    
+
                     <p:splitButton id="roleSP" value="#{switchRoleMenu.currentRole()}" immediate="true" rendered="#{mgr.authenticated()}" icon="ui-icon-disk" actionListener="#{switchRoleMenu.generatePIN()}" update=":fa2Form">
-                        
+
                         <c:forEach var="i" items="#{switchRoleMenu.allUserRoles()}">
                             <!-- user only javascript! mixes threads otherwise! -->
                             <p:menuitem value="#{i}" onclick="JS.authenticatedUserSignAsRole('#{i}')" icon="ui-icon-arrowrefresh-1-w" styleClass="headerMenuItems"/>
                         </c:forEach>
                     </p:splitButton>
-                    
-                    <p:commandButton value="Sign up" rendered="#{not mgr.authenticated()}" icon="ui-icon-disk"
+
+                    <p:commandButton value="#{msg['header.tmpl.button.sign-up']}" rendered="#{not mgr.authenticated()}" icon="ui-icon-disk"
                                      onclick="PF('signupWzd').show();">
                     </p:commandButton>
 
-                    <p:commandButton value="Sign in" rendered="#{not mgr.authenticated()}" icon="ui-icon-disk"
+                    <p:commandButton value="#{msg['header.tmpl.button.sign-in']}" rendered="#{not mgr.authenticated()}" icon="ui-icon-disk"
                                      onclick="PF('signinDlg').show();">
                     </p:commandButton>
 
-                    <p:commandButton value="Sign out" rendered="#{mgr.authenticated()}" icon="ui-icon-disk"
+                    <p:commandButton value="#{msg['header.tmpl.button.sign-out']}" rendered="#{mgr.authenticated()}" icon="ui-icon-disk"
                                      ajax="false" action="#{mgr.doLogout}">
                     </p:commandButton>
-                    
+
                     <!-- Primefaces' splitbutton cannot process dynamic lists, so we use this -->
 
                     <p:selectOneMenu id="syslang" styleClass="selectLang" valueChangeListener="#{language.changeLanguage}" value="#{language.selectedLocale}">
                         <p:ajax update="@all" />
                         <f:selectItems value="#{language.availableLocales.entrySet()}" var="locales" itemLabel="#{locales.value}" itemValue="#{locales.key}"/>
-                        
+
                     </p:selectOneMenu>
                 </f:facet>
             </p:menubar>
         </h:form>
         <!-- /Menubar -->
-       
+
         <!-- Signup dialog -->
-        <p:dialog widgetVar="signupWzd" header="Sign up" modal="true" styleClass="disable-scroll" width="600px">
+        <p:dialog widgetVar="signupWzd" header="#{msg['header.tmpl.form.signup.dialog.text']}" modal="true" styleClass="disable-scroll" width="600px">
             <h:form id="signupForm">
                 <p:growl id="signupFormGrowl" sticky="true" showDetail="true"/>
-                <p:wizard widgetVar="signupWzdWizard" flowListener="#{registrationView.onFlowProcess}" backLabel="Cancel" nextLabel="OK" showNavBar="true">
+                <p:wizard widgetVar="signupWzdWizard" flowListener="#{registrationView.onFlowProcess}" backlabel="#{msg['header.tmpl.form.wizard.cancel']}" nextlabel="#{msg['header.tmpl.form.wizard.ok']}" showNavBar="true">
                     <!-- Send email if information is correct -->
-                    <p:tab id="signupWzd0" title="Register Account">
-                        <p:panel header="Register Account2">
+                    <p:tab id="signupWzd0" title="#{msg['header.tmpl.form.signup.dialog.step-register']}">
+                        <p:panel header="">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
-                                <h:outputText value="Email:" />
-                                <h:inputText id="suemv" label="Email" value="#{registrationView.username}" required="true">
+                                <h:outputText value="#{msg['header.tmpl.form.signup.text.email']}" />
+                                <h:inputText id="suemv" value="#{registrationView.username}" required="true">
                                     <f:validator parent="suemv" validatorId="emailValidator" />
                                 </h:inputText>
-
-                                <h:outputText value="Mobile:" />
-                                <h:inputText id="sumev" label="Mobile" value="#{registrationView.mobile}" required="true">
+                                <h:outputText value="#{msg['header.tmpl.form.signup.text.mobile']}" />
+                                <h:inputText id="sumev" value="#{registrationView.mobile}" required="true">
                                     <f:validator parent="sumev" validatorId="mobileValidator" />
                                 </h:inputText>
-
                                 <h:outputLabel for="signupWzdAccept" value="">
-                                    <p:commandLink id="signupWzdAccept" value="Terms and Conditions" onclick="PF('termsCondsDialog').show();" oncomplete="PF('signinDlg').hide()"/>
+                                    <p:commandLink id="signupWzdAccept" value="#{msg['header.tmpl.form.signup.text.contract']}" onclick="PF('termsCondsDialog').show();" oncomplete="PF('signinDlg').hide()"/>
                                 </h:outputLabel>
-                                <p:selectBooleanCheckbox value="#{registrationView.iacceptTermsAndConditions}" required="true" requiredMessage="aCCEPT TERMS"/>
+                                <p:selectBooleanCheckbox value="#{registrationView.iacceptTermsAndConditions}" required="true" requiredmessage="#{msg['header.tmpl.form.signup.text.contract.required']}"/>
                             </h:panelGrid>                            
                         </p:panel>
                     </p:tab>
                     <!-- Input security code from email -->
-                    <p:tab id="signupWzd1" title="Account Password">
-                        <p:panel header="Account Password2">
+                    <p:tab id="signupWzd1" title="#{msg['header.tmpl.form.signup.dialog.step-password']}">
+                        <p:panel header="">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
-                                <h:outputText value="New Password:" />
-                                <p:password id="signupFormPwNew" label="new pw" value="#{registrationView.password}" required="true" 
-                                            match="signupFormPwRetyped" feedback="true" inline="true" promptLabel="Pw strength" 
-                                            weakLabel="weak" goodLabel="good" strongLabel="Strong" maxlength="32" >
+                                <h:outputText value="#{msg['header.tmpl.form.signup.text.new-password']}" />
+                                <p:password id="signupFormPwNew" value="#{registrationView.password}" required="true" 
+                                            match="signupFormPwRetyped" feedback="true" inline="true" promptLabel="#{msg['header.tmpl.form.signup.text.new-password.feedback-info']}" 
+                                            weakLabel="#{msg['header.tmpl.form.signup.text.new-password.feedback-weak']}" strongLabel="#{msg['header.tmpl.form.signup.text.new-password.feedback-strong']}" maxlength="32" >
                                     <f:validator validatorId="passwordValidator" />
                                 </p:password>
-
-                                <h:outputText value="Retype Password:" />
-                                <p:password id="signupFormPwRetyped" label="ret pw" required="true" feedback="false"/>
-                                
-                                <h:outputText value="Emailed secret:" />
-                                <p:inputText value="#{registrationView.emailedregistrationsecret}" required="true" requiredMessage="check ur email!"/>
-                                
+                                <h:outputText value="#{msg['header.tmpl.form.signup.text.retype-password']}" />
+                                <p:password id="signupFormPwRetyped" required="true" feedback="false"/>
+                                <h:outputText value="#{msg['header.tmpl.form.signup.text.emailed-code']}" />
+                                <p:inputText value="#{registrationView.emailedregistrationsecret}" required="true" requiredmessage="#{msg['header.tmpl.form.signup.text.emailed-code.required']}"/>
                                 <h:inputHidden id="signupWzdHidden" value="#{registrationView.actionsecret}" />
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
-                    <!--  -->
-                    <p:tab id="signupWzd2" title="Account registerd" >
-                        <p:panel header="Account Registered2">
+                    <!-- Registration feedback -->
+                    <p:tab id="signupWzd2" title="#{msg['header.tmpl.form.signup.text.step-feedback']}" >
+                        <p:panel header="">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
-                                <h:outputText rendered="#{not registrationView.registered}" value="Account not created..." />
-                                <h:outputText rendered="#{registrationView.registered}" value="Account succesfully created..." />
-                                <p:outputLabel rendered="#{not registrationView.registered}" value="Please register or try reset again."/>
-                                <p:outputLabel rendered="#{registrationView.registered}" value="Close by choosing next and sign in!"/>
+                                <h:outputText rendered="#{not registrationView.registered}" value="#{msg['header.tmpl.form.signup.text.feedback-registration.failure']}" />
+                                <h:outputText rendered="#{registrationView.registered}" value="#{msg['header.tmpl.form.signup.text.feedback-registration.success']}" />
+                                <p:outputLabel rendered="#{not registrationView.registered}" value="#{msg['header.tmpl.form.signup.text.feedback-registration.tryagain']}" />
+                                <p:outputLabel rendered="#{registrationView.registered}" value="#{msg['header.tmpl.form.signup.text.feedback-registration.proceed']}" />
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
@@ -142,321 +137,294 @@
             </h:form>
         </p:dialog>
         <!-- Signin dialog -->
-        <p:dialog rendered="#{not mgr.authenticated()}" modal="true" header="Sign in" widgetVar="signinDlg" resizable="false">
+        <p:dialog rendered="#{not mgr.authenticated()}" modal="true" header="#{msg['header.tmpl.form.signin.dialog.text']}" widgetVar="signinDlg" resizable="false">
             <h:form id="signinForm">
                 <h:panelGrid columns="1" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
-                                <p:outputPanel >
-                                    Register by filling out info below <p:commandLink value="link" />. 
+                                <p:outputPanel value="#{msg['header.tmpl.form.signin.header.text']}" >
+                                    
                                 </p:outputPanel>
                             </p:column>
-                            <br />
                         </p:row>
                     </f:facet>
-
-                    <p:outputLabel rendered="false" for="username" value="Username:" />
+                    <p:outputLabel rendered="false" for="username" value="#{msg['header.tmpl.form.signin.text.username']}" />
                     <p:inputText id="username" value="#{mgr.username}" required="true" >
                         <span class="fa fa-envelope-o" style="margin-right: 5px;"/>
                         <f:validateLength minimum="1" />
                     </p:inputText>
-                    <p:watermark for="username" value="usename" />
-
-                    <p:outputLabel rendered="false" for="password" value="Password:" />
+                    <p:watermark for="username" value="#{msg['header.tmpl.form.signin.text.username']}" />
+                    <p:outputLabel rendered="false" for="password" value="#{msg['header.tmpl.form.signin.text.password']}" />
                     <p:password id="password" value="#{mgr.password}" required="true" >
                         <span class="fa fa-key" style="margin-right: 5px;"/>
                     </p:password>
-                    <p:watermark for="password" value="password" />
-
+                    <p:watermark for="password" value="#{msg['header.tmpl.form.signin.text.password']}" />
                     <p:row>
                         <p:column colspan="2">
                             <i class="fa fa-unlock-alt" style="margin-right: 10px;"/>
-                            <p:commandLink id="cmdReset" value="Reset password?" onclick="PF('resetWzd').show();" oncomplete="PF('signinDlg').hide()"/>
+                            <p:commandLink id="cmdReset" value="#{msg['header.tmpl.form.signin.text.reset.link']}" 
+							               onclick="PF('resetWzd').show();" oncomplete="PF('signinDlg').hide()"/>
                         </p:column>
                     </p:row>
-
                     <p:outputPanel id="signinResult">
                         <h:message for="signinResult" styleClass="ui-outputlabel ui-widget ui-state-error" />
                     </p:outputPanel>
-                    
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Cancel" icon="fa fa-close" onclick="PF('signinDlg').hide();" />
-                        <p:commandButton value="Sign in" icon="fa fa-check" oncomplete="JS.handleLoginRequest('signinDlg', xhr, status, args)" 
+                        <p:commandButton value="#{msg['header.tmpl.button.cancel']}" icon="fa fa-close" onclick="PF('signinDlg').hide();" />
+                        <p:commandButton value="#{msg['header.tmpl.button.sign-in']}" icon="fa fa-check" oncomplete="JS.handleLoginRequest('signinDlg', xhr, status, args)" 
                                          update="signinResult" action="#{mgr.submit}" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
         </p:dialog><!-- /Signin dialog -->
         <!-- Credentials dialog -->
-        <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Change Password" widgetVar="credentialsDlg" resizable="false">
+        <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="#{msg['header.tmpl.form.credentials.dialog.text']}" widgetVar="credentialsDlg" resizable="false">
             <h:form id="credentialsForm">
                 <p:messages showDetail="false" showIcon="false" closable="true"/>
                 <h:panelGrid columns="2" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
-                                <p:outputPanel >
-                                    Change password 
+                                <p:outputPanel value="#{msg['header.tmpl.form.credentials.header.text']}>
+                                    
                                 </p:outputPanel>
                             </p:column>
                         </p:row>
                     </f:facet>
-                    
-                    <p:outputLabel for="credentialsUsername" value="Username:" />
+                    <p:outputLabel for="credentialsUsername" value="#{msg['header.tmpl.form.credentials.text.username']}" />
                     <p:inputText id="credentialsUsername" value="#{changePasswordView.username}" readonly="true"/>
-                    
-                    <p:outputLabel for="credentialsOldPassword" value="Old password:" />
+                    <p:outputLabel for="credentialsOldPassword" value="#{msg['header.tmpl.form.credentials.text.password']}" />
                     <p:password id="credentialsOldPassword" value="#{changePasswordView.password}" required="true" />
-                    
-                    <p:outputLabel for="credentialsNewPassword" value="New Password:" />
-                    <p:password id="credentialsNewPassword" label="new pw" value="#{changePasswordView.newPassword}" required="true" 
-                                match="credentialsVerifiedPassword" feedback="true" inline="true" promptLabel="Pw strength" 
-                                weakLabel="weak" goodLabel="good" strongLabel="Strong" maxlength="32" >
+                    <p:outputLabel for="credentialsNewPassword" value="#{msg['header.tmpl.form.credentials.text.new-password']}" />
+                    <p:password id="credentialsNewPassword" value="#{changePasswordView.newPassword}" required="true" 
+                                match="credentialsVerifiedPassword" feedback="true" inline="true" promptlabel="#{msg['header.tmpl.form.credentials.text.new-password.feedback-info']}" 
+                                weaklabel="#{msg['header.tmpl.form.credentials.text.new-password.feedback-weak']}" stronglabel="#{msg['header.tmpl.form.credentials.text.new-password.feedback-strong']}" maxlength="32" >
                         <f:validator validatorId="passwordValidator" />
                     </p:password>
-
-                    <p:outputLabel for="credentialsVerifiedPassword" value="Retype Password:" />
-                    <p:password id="credentialsVerifiedPassword" label="ret pw" required="true" feedback="false"/>
-                    
+                    <p:outputLabel for="credentialsVerifiedPassword" value="#{msg['header.tmpl.form.credentials.text.retype-password']}" />
+                    <p:password id="credentialsVerifiedPassword" required="true" feedback="false"/>
                     <p:outputLabel value="" />
-                    
                     <p:outputPanel>
-                        <p:commandButton value="Cancel" onclick="PF('credentialsDlg').hide();" />
-                        <p:commandButton value="Change" actionListener="#{changePasswordView.change()}"
+                        <p:commandButton value="#{msg['header.tmpl.button.cancel']}" onclick="PF('credentialsDlg').hide();" />
+                        <p:commandButton value="#{msg['header.tmpl.form.credentials.button.change']}" actionListener="#{changePasswordView.change()}"
                                          update="@form" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
         </p:dialog><!-- /Credentials dialog -->
         <!-- Localisation dialog -->
-        <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="Update Localisation" widgetVar="localisationDlg" resizable="false">
+        <p:dialog rendered="#{mgr.authenticated()}" modal="true" header="#{msg['header.tmpl.form.localization.dialog.text']}" widgetVar="localisationDlg" resizable="false">
             <h:form id="localisationForm">
                 <p:messages showDetail="false" showIcon="false" closable="true"/>
                 <h:panelGrid columns="2" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
-                                <p:outputPanel >
-                                    Localisation
+                                <p:outputPanel value="#{msg['header.tmpl.form.localization.header.text']}" >
+                                    
                                 </p:outputPanel>
                             </p:column>
                         </p:row>
                     </f:facet>
-
-                    <p:outputLabel for="localisationLanguage" value="Loc Language:"/>
+                    <p:outputLabel for="localisationLanguage" value="#{msg['header.tmpl.form.localization.text.language']}"/>
                     <p:selectOneMenu styleClass="localisationLanguage" id="localisationLanguage" value="#{changeLocalisationView.language}" effect="fade" var="ll" filter="true" filterMatchMode="startsWith">
                         <f:selectItems value="#{changeLocalisationView.localizedLanguages()}" var="lls" itemValue="#{lls}" />
                     </p:selectOneMenu>
-                    
-                    <p:outputLabel for="localisationCountry" value="Loc Country:"/>
+                    <p:outputLabel for="localisationCountry" value="#{msg['header.tmpl.form.localization.text.country']}"/>
                     <p:selectOneMenu styleClass="localisationLanguage" id="localisationCountry" value="#{changeLocalisationView.country}" effect="fade" var="lc" filter="true" filterMatchMode="startsWith">
                         <f:selectItems value="#{changeLocalisationView.localizedCountries()}" var="lcs" itemValue="#{lcs}" />
                     </p:selectOneMenu>
-
-                    <p:outputLabel for="localisationCity" value="City:" />
-                    <p:inputText styleClass="localisationLanguage" id="localisationCity" value="#{changeLocalisationView.city}" required="false" validatorMessage="where do you live?" >
+                    <p:outputLabel for="localisationCity" value="#{msg['header.tmpl.form.localization.text.city']}" />
+                    <p:inputText styleClass="localisationLanguage" id="localisationCity" value="#{changeLocalisationView.city}" required="false" validatormessage="#{msg['header.tmpl.form.localization.text.city.validator']}where do you live?" >
                         <f:validateLength minimum="1" />
                     </p:inputText>
-                    
-                    <p:outputLabel for="localisationTimezone" value="Timezone:"/>
+                    <p:outputLabel for="localisationTimezone" value="#{msg['header.tmpl.form.localization.text.timezone']}"/>
                     <p:selectOneMenu styleClass="localisationLanguage" id="localisationTimezone" value="#{changeLocalisationView.timezone}" effect="fade" var="t" filter="true" filterMatchMode="startsWith">
                         <f:selectItems value="#{changeLocalisationView.localizedTimezones()}" var="ts" itemValue="#{ts}" />
                     </p:selectOneMenu>
-                    
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Cancel" onclick="PF('localisationDlg').hide();" />
-                        <p:commandButton value="Update" actionListener="#{changeLocalisationView.change()}" 
+                        <p:commandButton value="#{msg['header.tmpl.button.cancel']}" onclick="PF('localisationDlg').hide();" />
+                        <p:commandButton value="#{msg['header.tmpl.form.localization.button.update']}Update" actionListener="#{changeLocalisationView.change()}" 
                                          update="@form" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
         </p:dialog><!-- /Localisation dialog -->
-        <!-- Reset Wizard -->
-        <p:dialog widgetVar="resetWzd" closable="true" header="Reset password" modal="true" styleClass="disable-scroll" width="600px">
+        <!-- Reset Wizard --> 
+        <p:dialog widgetVar="resetWzd" closable="true" header="#{msg['header.tmpl.form.reset.dialog.text']}" modal="true" styleClass="disable-scroll" width="600px">
             <h:form id="resetForm" >
                 <p:growl id="resetFormGrowl" sticky="true" showDetail="true"/>
-                <p:wizard widgetVar="resetWzdWizard" flowListener="#{resetPasswordView.onFlowProcess}" backLabel="Cancel" nextLabel="OK" showNavBar="true">
+                <p:wizard widgetVar="resetWzdWizard" flowListener="#{resetPasswordView.onFlowProcess}" backlabel="#{msg['header.tmpl.form.wizard.backward']}" nextlabel="#{msg['header.tmpl.form.wizard.ok']}" showNavBar="true">
                     <!-- Send email if information is correct -->
-                    <p:tab id="resetWzd0" title="Account Details">
-                        <p:panel header="Account Details2">
+                    <p:tab id="resetWzd0" title="#{msg['header.tmpl.form.reset.text.step-account']}">
+                        <p:panel header="">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
-                                <h:outputText value="Email:" />
-                                <p:inputText id="resetFormEmail" label="Email" value="#{resetPasswordView.username}" required="true">
+                                <h:outputText value="#{msg['header.tmpl.form.reset.text.email']}" />
+                                <p:inputText id="resetFormEmail" value="#{resetPasswordView.username}" required="true">
                                     <f:validator validatorId="emailValidator" />
                                 </p:inputText>
-
-                                <h:outputText value="Mobile:" />
-                                <p:inputText id="resetFormMobile" label="Mobile" value="#{resetPasswordView.mobile}" required="true">
+                                <h:outputText value="#{msg['header.tmpl.form.reset.text.mobile']}" />
+                                <p:inputText id="resetFormMobile" value="#{resetPasswordView.mobile}" required="true">
                                     <f:validator validatorId="mobileValidator" />
                                 </p:inputText>
-                                
-                                <h:outputText value="I am human:" />
-                                <p:selectBooleanCheckbox value="#{resetPasswordView.iamhuman}" required="true" requiredMessage="Please check this"/>
+                                <h:outputText value="#{msg['header.tmpl.form.reset.text.iamhuman']}" />
+                                <p:selectBooleanCheckbox value="#{resetPasswordView.iamhuman}" required="true" requiredmessage="#{msg['header.tmpl.form.reset.text.iamhuman.required']}"/>
                                 <!-- Waiting for new Re-captcha integration from Primefaces -->
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
                     <!-- Input security code from email -->
-                    <p:tab id="resetWzd1" title="Reset Password">
-                        <p:panel header="Reset Password2">
+                    <p:tab id="resetWzd1" title="#{msg['header.tmpl.form.reset.dialog.step-oldnew']}">
+                        <p:panel header="">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
-                                <h:outputText value="New Password:" />
-                                <p:password id="resetFormPwNew" label="new pw" value="#{resetPasswordView.password}" required="true" 
-                                            match="resetFormPwRetyped" feedback="true" inline="true" promptLabel="Pw strength" 
-                                            weakLabel="weak" goodLabel="good" strongLabel="Strong" maxlength="32" >
+                                <h:outputText value="#{msg['header.tmpl.form.reset.text.new-password']}" />
+                                <p:password id="resetFormPwNew" value="#{resetPasswordView.password}" required="true" 
+                                            match="resetFormPwRetyped" feedback="true" inline="true" promptlabel="#{msg['header.tmpl.form.reset.text.new-password.feedback-info']}" 
+                                            weaklabel="#{msg['header.tmpl.form.reset.text.new-password.feedback-weak']}" stronglabel="#{msg['header.tmpl.form.reset.text.new-password.feedback-strong']}" maxlength="32" >
                                     <f:validator validatorId="passwordValidator" />
                                 </p:password>
-
-                                <h:outputText value="Retype Password:" />
-                                <p:password id="resetFormPwRetyped" label="ret pw" required="true" feedback="false"/>
-
-                                <h:outputText value="Reset Code:" />
-                                <p:inputText id="resetWzdEmailed" value="#{resetPasswordView.emailedsecret}" required="true" requiredMessage="Plz check your email!"/>
-                                
+                                <h:outputText value="#{msg['header.tmpl.form.reset.text.retype-password']}" />
+                                <p:password id="resetFormPwRetyped" required="true" feedback="false"/>
+                                <h:outputText value="#{msg['header.tmpl.form.reset.text.reset-code']}" />
+                                <p:inputText id="resetWzdEmailed" value="#{resetPasswordView.emailedsecret}" required="true" requiredmessage="#{msg['header.tmpl.form.reset.text.reset-code.required-email']}"/>
                                 <h:inputHidden id="resetWzdHidden" value="#{resetPasswordView.actionsecret}" />
-                                
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
-                    <!--  -->
-                    <p:tab id="resetWzd2" title="Password reseted" >
-                        <p:panel header="Password now changed">
+                    <!-- Reset result -->
+                    <p:tab id="resetWzd2" title="#{msg['header.tmpl.form.reset.dialog.step-result']}" >
+                        <p:panel header="">
                             <p:messages showDetail="false" showIcon="false" closable="true"/>
                             <h:panelGrid columns="2" columnClasses="label, value">
-                                <h:outputText rendered="#{not resetPasswordView.reseted}" value="Password not reseted..." />
-                                <h:outputText rendered="#{resetPasswordView.reseted}" value="Password succesfully reseted..." />
-                                <p:outputLabel rendered="#{not resetPasswordView.reseted}" value="Please register or try reset again."/>
-                                <p:outputLabel rendered="#{resetPasswordView.reseted}" value="Close by choosing next and sign in!"/>
+                                <h:outputText rendered="#{not resetPasswordView.reseted}" value="#{msg['header.tmpl.form.signup.text.feedback-registration.failure']}" />
+                                <h:outputText rendered="#{resetPasswordView.reseted}" value="#{msg['header.tmpl.form.signup.text.feedback-registration.success']}" />
+                                <p:outputLabel rendered="#{not resetPasswordView.reseted}" value="#{msg['header.tmpl.form.signup.text.feedback-registration.tryagain']}"/>
+                                <p:outputLabel rendered="#{resetPasswordView.reseted}" value="#{msg['header.tmpl.form.signup.text.feedback-registration.proceed']}"/>
                             </h:panelGrid>
                         </p:panel>
                     </p:tab>
                     <p:tab id="resetWzd9"  title="" titleStyleClass="ui-wizard-step-title-custom fa fa-lock fa-2x">
                     </p:tab>
                 </p:wizard>
-                
             </h:form>
         </p:dialog><!-- /Reset Wizard -->       
         <!-- 2FA for role change -->
-        <p:dialog modal="true" header="2FA" widgetVar="fa2Dlg" resizable="false" closable="true">
+        <p:dialog modal="true" header="#{msg['header.tmpl.form.role.dialog.text']}" widgetVar="fa2Dlg" resizable="false" closable="true">
             <h:form id="fa2Form" >
                 <p:remoteCommand name="requires2FARemCmd" actionListener="#{switchRoleMenu.requires2FA}"/>
                 <h:panelGrid columns="2" columnClasses="label, value">
-                    
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
-                                <p:outputPanel >
-                                    Change role? 
+                                <p:outputPanel value="#{msg['header.tmpl.form.role.header.text']}" >
+                                    
                                 </p:outputPanel>
                             </p:column>
                         </p:row>
                     </f:facet>
-                    
-                    <p:outputLabel for="fa2role" value="Role:" />
+                    <p:outputLabel for="fa2role" value="#{msg['header.tmpl.form.role.text.role']}" />
                     <p:inputText id="fa2role" readonly="true" value="#{switchRoleMenu.role}" />
-                    <p:outputLabel for="fa2PIN" value="PIN:" />
+                    <p:outputLabel for="fa2PIN" value="#{msg['header.tmpl.form.role.text.pin']}" />
                     <p:inputText id="fa2PIN" value="#{switchRoleMenu.pin}" required="false" readonly="false" maxlength="8" disabled="#{not switchRoleMenu.requiresPIN}"/>
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Cancel" onclick="PF('fa2Dlg').hide();"/>
-                        <p:commandButton value="Change" action="#{switchRoleMenu.submit()}" update="@all"/>
+                        <p:commandButton value="#{msg['header.tmpl.button.cancel']}" onclick="PF('fa2Dlg').hide();"/>
+                        <p:commandButton value="#{msg['header.tmpl.form.role.button.change']}" action="#{switchRoleMenu.submit()}" update="@all"/>
                     </p:outputPanel>
-                    
                 </h:panelGrid>
             </h:form>
         </p:dialog><!-- /2FA for role change -->
         <!-- Terms and conditions dialog -->
-        <p:dialog widgetVar="termsCondsDialog" header="legal" modal="true" draggable="false" closable="true" resizable="false" showHeader="true" >
-            <p:panel id="basic" header="Terms and conditions" footer="" >
+        <p:dialog widgetVar="termsCondsDialog" header="#{msg['header.tmpl.form.termsconds.dialog.text']}" modal="true" draggable="false" closable="true" resizable="false" showheader="true" >
+            <p:panel id="basic" header="" footer="" >
                 <h:panelGrid columns="2" cellpadding="10">
-                    <h:outputText value="The story begins as Don Vito Corleone..." />
+                    <p><h:outputText value="#{msg['header.tmpl.form.termsconds.legal.terms.text']}" /></p>
+					<p><h:outputText value="#{msg['header.tmpl.form.termsconds.legal.conds.text']}" /></p>
                 </h:panelGrid>
             </p:panel>
         </p:dialog><!-- /Terms and conditions dialog -->
         <!-- Account dialog -->
-        <p:dialog widgetVar="accountDlg" closable="true" header="Account settings" modal="true" styleClass="disable-scroll">
+        <p:dialog widgetVar="accountDlg" closable="true" header="#{msg['header.tmpl.form.account.dialog.text']}" modal="true" styleClass="disable-scroll">
             <h:form id="accountForm">
                 <p:messages showDetail="false" showIcon="false" closable="true"/>
                 <h:panelGrid columns="2" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
-                                <p:outputPanel >
-                                    Account settings
+                                <p:outputPanel value="#{msg['header.tmpl.form.account.header.text']}" >
+                                    
                                 </p:outputPanel>
                             </p:column>
                         </p:row>
                     </f:facet>
-                    <p:outputLabel for="accountDomain" value="accountDomain"/>
+                    <p:outputLabel for="accountDomain" value="#{msg['header.tmpl.form.account.text.domain-name']}"/>
                     <p:autoComplete id="accountDomain" forceSelection="true" value="#{modifyAccountView.domain}" completeMethod="#{modifyAccountView.completeDomain}" />
-                    <p:outputLabel for="accountScreenName" value="accountScreenName" />
+                    <p:outputLabel for="accountScreenName" value="#{msg['header.tmpl.form.account.text.screen-name']}" />
                     <p:inputText id="accountScreenName" value="#{modifyAccountView.screenName}" />
-                    <p:outputLabel for="accountFirstName" value="accountFirstName" />
+                    <p:outputLabel for="accountFirstName" value="#{msg['header.tmpl.form.account.text.first-name']}" />
                     <p:inputText id="accountFirstName" value="#{modifyAccountView.firstName}" />
-                    <p:outputLabel for="accountMiddleName" value="accountMiddleName" />
+                    <p:outputLabel for="accountMiddleName" value="#{msg['header.tmpl.form.account.text.middle-name']}" />
                     <p:inputText id="accountMiddleName" value="#{modifyAccountView.middleName}" />
-                    <p:outputLabel for="accountLastName" value="accountLastName" />
+                    <p:outputLabel for="accountLastName" value="#{msg['header.tmpl.form.account.text.last-name']}" />
                     <p:inputText id="accountLastName" value="#{modifyAccountView.lastName}" />
-                    <p:outputLabel for="accountStreetAddress" value="accountStreetAddress" />
+                    <p:outputLabel for="accountStreetAddress" value="#{msg['header.tmpl.form.account.text.street-address']}" />
                     <p:inputText id="accountStreetAddress" value="#{modifyAccountView.streetAddress}" />
-                    <p:outputLabel for="accountPostalCode" value="accountPostalCode" />
+                    <p:outputLabel for="accountPostalCode" value="#{msg['header.tmpl.form.account.text.postal-code']}" />
                     <p:inputText id="accountPostalCode" value="#{modifyAccountView.postalCode}" />
-                    <p:outputLabel for="accountMobileNumber" value="accountMobileNumber" />
+                    <p:outputLabel for="accountMobileNumber" value="#{msg['header.tmpl.form.account.text.mobile-number']}" />
                     <p:inputText id="accountMobileNumber" value="#{modifyAccountView.mobileNumber}" readonly="true" />
-                    <p:outputLabel for="accountEmailAddress" value="accountEmailAddress" />
+                    <p:outputLabel for="accountEmailAddress" value="#{msg['header.tmpl.form.account.text.email-address']}" />
                     <p:inputText id="accountEmailAddress" value="#{modifyAccountView.emailAddress}" readonly="true" />
-                    <p:outputLabel for="accountLanguage" value="accountLanguage" />
+                    <p:outputLabel for="accountLanguage" value="#{msg['header.tmpl.form.account.text.language']}" />
                     <p:inputText id="accountLanguage" value="#{modifyAccountView.language}" readonly="true" />
-                    <p:outputLabel for="accountCountry" value="accountCountry" />
+                    <p:outputLabel for="accountCountry" value="#{msg['header.tmpl.form.account.text.country']}" />
                     <p:inputText id="accountCountry" value="#{modifyAccountView.country}" readonly="true" />
-                    <p:outputLabel for="accountCity" value="accountCity" />
+                    <p:outputLabel for="accountCity" value="#{msg['header.tmpl.form.account.text.city']}" />
                     <p:inputText id="accountCity" value="#{modifyAccountView.city}" readonly="true" />
-                    <p:outputLabel for="accountTimezone" value="accountTimezone" />
+                    <p:outputLabel for="accountTimezone" value="#{msg['header.tmpl.form.account.text.timezone']}" />
                     <p:inputText id="accountTimezone" value="#{modifyAccountView.timezone}" readonly="true" />
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Cancel" onclick="PF('accountDlg').hide();"/>
-                        <p:commandButton value="Change" actionListener="#{modifyAccountView.modify()}" update="@form"/>
+                        <p:commandButton value="#{msg['header.tmpl.button.cancel']}" onclick="PF('accountDlg').hide();"/>
+                        <p:commandButton value="#{msg['header.tmpl.form.account.button.save']}" actionListener="#{modifyAccountView.modify()}" update="@form"/>
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>
         </p:dialog><!-- /Account dialog -->
         <!-- First login dialog: lazy load with "dynamic=true" -->
-        <p:dialog widgetVar="firstDlg" rendered="#{mgr.authenticated() and firstLogin.isFirstLogin()}" 
-                  closable="false" dynamic="true" modal="true"  
-                  header="Complete personal info"  styleClass="disable-scroll" >
+        <p:dialog widgetVar="firstDlg" rendered="#{mgr.authenticated() and firstLogin.isFirstLogin()}" closable="false" 
+		          dynamic="true" modal="true" header="#{msg['header.tmpl.form.first.dialog.text']}"  styleClass="disable-scroll" >
             <h:form id="firstForm" prependId="false">
                 <p:messages showDetail="false" showIcon="false" closable="true"/>
                 <h:panelGrid columns="2" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
                             <p:column colspan="2">
-                                <p:outputPanel >
-                                    Complete registration
+                                <p:outputPanel value="#{msg['header.tmpl.form.first.header.text']}" >
+                                    
                                 </p:outputPanel>
                             </p:column>
                         </p:row>
                     </f:facet>
-                    <p:outputLabel for="firstEmailAddress" value="firstEmailAddress" />
+                    <p:outputLabel for="firstEmailAddress" value="#{msg['header.tmpl.form.first.text.email-address']}" />
                     <p:inputText id="firstEmailAddress" value="#{firstLogin.emailAddress}" readonly="true" />
-                    <p:outputLabel for="firstMobileNumber" value="firstMobileNumber" />
+                    <p:outputLabel for="firstMobileNumber" value="#{msg['header.tmpl.form.first.text.mobile-number']}" />
                     <p:inputText id="firstMobileNumber" value="#{firstLogin.mobileNumber}" readonly="true" />
-                    
-                    <p:outputLabel for="firstDomain" value="firstDomain"/>
+                    <p:outputLabel for="firstDomain" value="#{msg['header.tmpl.form.first.text.domain-name']}"/>
                     <p:autoComplete id="firstDomain" queryDelay="2000" forceSelection="false" value="#{firstLogin.domain}" completeMethod="#{firstLogin.completeDomain}" />
-                    <p:outputLabel for="firstFirstName" value="firstFirstName" />
-                    <p:inputText id="firstFirstName" value="#{firstLogin.firstName}" required="Your fist name?"/>
-                    <p:outputLabel for="firstLastName" value="firstLastName" />
-                    <p:inputText id="firstLastName" value="#{firstLogin.lastName}" required="Your last name?"/>
+                    <p:outputLabel for="firstFirstName" value="#{msg['header.tmpl.form.first.text.first-name']}" />
+                    <p:inputText id="firstFirstName" value="#{firstLogin.firstName}" required="true" requiredmessage="#{msg['header.tmpl.form.first.text.first-name.required']}"/>
+                    <p:outputLabel for="firstLastName" value="#{msg['header.tmpl.form.first.text.last-name']}" />
+                    <p:inputText id="firstLastName" value="#{firstLogin.lastName}" required="true" requiredmessage="#{msg['header.tmpl.form.first.text.last-name.required']}"/>
                     <p:outputLabel value="" />
                     <p:outputPanel>
-                        <p:commandButton value="Sign out" ajax="false" action="#{mgr.doLogout}" />
-                        <p:commandButton value="Done" actionListener="#{firstLogin.firstLoginCompleted()}" update="@all" />
+                        <p:commandButton value="#{msg['header.tmpl.form.account.button.complete.pause']}" ajax="false" action="#{mgr.doLogout}" />
+                        <p:commandButton value="#{msg['header.tmpl.form.account.button.complete']}" actionListener="#{firstLogin.firstLoginCompleted()}" update="@all" />
                     </p:outputPanel>
                 </h:panelGrid>
             </h:form>

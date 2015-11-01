@@ -25,11 +25,8 @@
       xmlns:p="http://primefaces.org/ui" 
       xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
     <f:view contentType="text/html" locale="#{language.currentLocale}">
-        <h:head>
-            <title></title>
-            
+        <h:head>      
             <h:outputScript name="jee.js" library="scripts" target="head" />
-            
         </h:head>
         <h:body>
             <h:outputStylesheet name="jee.css" library="styles" />
@@ -40,18 +37,19 @@
                     <ui:include src="header_jee.xhtml" />
                 </ui:insert>
             </div>
-	    
-	    <div id="content">
-	  	<ui:insert name="content" >
-	 	  <ui:include src="content_jee.xhtml" />
-	   	</ui:insert>
-	    </div>
-            
-	    <div id="footer">
-	    	<ui:insert name="footer" >
-	    	  <ui:include src="footer_jee.xhtml" />
-	    	</ui:insert>
-    	    </div>
+
+            <div id="content">
+                <ui:insert name="content" >
+                    <ui:include src="content_jee.xhtml" />
+                </ui:insert>
+            </div>
+
+            <div id="footer">
+                <ui:insert name="footer" >
+                    <ui:include src="footer_jee.xhtml" />
+                </ui:insert>
+            </div>
+
         </h:body>
     </f:view>
 </html>

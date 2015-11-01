@@ -18,16 +18,22 @@
  ! 
  !-->
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title>Session expired</title>
-        <meta http-equiv="refresh" content="0;url=#{request.contextPath}/index.xhtml" />
-    </head>
-    <body>
-        <h1>Session expired</h1>
-        <h3>You will be redirected to default page...</h3>
-        <p>
-            <a href="#{request.contextPath}/index.xhtml">Redirect</a>.
-        </p>
-    </body>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:h="http://xmlns.jcp.org/jsf/html" 
+      xmlns:f="http://xmlns.jcp.org/jsf/core" >
+    <f:view contentType="text/html" locale="#{language.currentLocale}">
+        <h:head>
+            <f:loadBundle basename="org.sisto.jeeplate.i18n.Messages" var="msg"/>
+
+            <meta http-equiv="refresh" content="0;url=#{request.contextPath}/index.xhtml" />
+            <title>#{msg['expired.page.title']}</title>
+        </h:head>
+        <h:body>
+            <h1>#{msg['expired.page.message.title']}</h1>
+            <h3>#{msg['expired.page.message.directions']}</h3>
+            <p>
+                <a href="#{request.contextPath}/index.xhtml">#{msg['expired.page.redirect.link']}</a>.
+            </p>
+        </h:body>
+    </f:view>
 </html>
