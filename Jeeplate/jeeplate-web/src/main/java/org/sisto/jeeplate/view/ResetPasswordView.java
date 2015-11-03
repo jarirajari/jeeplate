@@ -31,6 +31,7 @@ import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.Email;
 import org.sisto.jeeplate.util.EmailMessage;
 import org.sisto.jeeplate.util.Randomness;
+import org.sisto.jeeplate.util.Util;
 
 @Named @ViewScoped
 public class ResetPasswordView extends AbstractView implements Serializable {
@@ -43,6 +44,8 @@ public class ResetPasswordView extends AbstractView implements Serializable {
     UserData user;
     @Inject
     transient Randomness random;
+    @Inject
+    Util util;
     
     private String mobile;
     private String username;
@@ -154,13 +157,10 @@ public class ResetPasswordView extends AbstractView implements Serializable {
     }
     
     public void beginPasswordResetPhase() {
-        final String replace = "${secret}";
-        final String recipient = this.getUsername();
-        EmailMessage newUserMsg = new EmailMessage("Requested pw reset NEW", "secret is ", recipient, "Jeeplate corp.");
-        EmailMessage oldUserMsg = new EmailMessage("Requested pw reset OLD", String.format("did you do this, if yes %s",replace), recipient, "Jeeplate corp."); 
+        final String recipient = this.getUsername();    
         
         this.findUserAccount();
-        this.user.initializePasswordReset(oldUserMsg, newUserMsg);
+        this.user.initializePasswordReset(recipient, this.currentLocale());
     }
     
     public void endPasswordResetPhase() {
@@ -175,9 +175,9 @@ public class ResetPasswordView extends AbstractView implements Serializable {
             completed = this.user.finalizePasswordReset(typedMobile, typedPassword, emailedResetToken);
         }
         if (completed) {
-            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "OK, changed password");
+            this.showFacesMessage(FacesMessage.SEVERITY_INFO, util.getResourceBundleValue("view.reset.password.info.success"));
         } else {
-            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, "Failed, not changing password");
+            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, util.getResourceBundleValue("view.reset.password.error.failure"));
         }
         this.reseted = completed;
     }

@@ -25,13 +25,16 @@ import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 import javax.inject.Inject;
+import org.sisto.jeeplate.util.Util;
 
 @FacesValidator("passwordValidator")
 public class PasswordValidator implements Validator {
     
     @Inject
     private org.sisto.jeeplate.util.MultiValidator validator;
-    
+    @Inject
+    private Util util;
+        
     @Override
     public void validate(FacesContext context, UIComponent component,
             Object value) throws ValidatorException {
@@ -39,7 +42,7 @@ public class PasswordValidator implements Validator {
         Boolean validates = validator.validateUserPassword(password);
         
         if (!validates) {
-            FacesMessage fm = new FacesMessage("Password quality!");
+            FacesMessage fm = new FacesMessage(util.getResourceBundleValue("validator.password.quality"));
             fm.setSeverity(FacesMessage.SEVERITY_ERROR);
             throw new ValidatorException(fm);
         }

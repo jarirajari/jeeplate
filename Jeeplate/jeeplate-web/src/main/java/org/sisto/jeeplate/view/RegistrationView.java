@@ -29,8 +29,8 @@ import org.primefaces.event.FlowEvent;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.registration.UserRegistrationData;
 import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.util.EmailMessage;
 import org.sisto.jeeplate.util.Randomness;
+import org.sisto.jeeplate.util.Util;
 
 @Named @ViewScoped
 public class RegistrationView extends AbstractView implements Serializable {
@@ -43,6 +43,8 @@ public class RegistrationView extends AbstractView implements Serializable {
     UserData user;
     @Inject
     transient Randomness random;
+    @Inject
+    Util util;
     
     private String username;
     private String mobile;
@@ -126,7 +128,6 @@ public class RegistrationView extends AbstractView implements Serializable {
             this.newActionsecret();
         }
         this.iacceptTermsAndConditions = accept;
-        log.info("iacceptTermsAndConditions="+accept);
     }
     
     public void newActionsecret() {
@@ -152,7 +153,7 @@ public class RegistrationView extends AbstractView implements Serializable {
         Boolean userAgreement = getIacceptTermsAndConditions();
         
         if (! userAgreement) {
-            this.showFacesMessage(FacesMessage.SEVERITY_WARN, "Please accept terms and conds!");
+            this.showFacesMessage(FacesMessage.SEVERITY_WARN, util.getResourceBundleValue("view.register.account.warn.termsconds.accept"));
         }
         
         return userAgreement;
@@ -165,14 +166,11 @@ public class RegistrationView extends AbstractView implements Serializable {
     }
     
     public void beginUserRegistrationPhase() {
-        final String replace = "${domain}";
         final String recipient = this.getUsername();
-        EmailMessage newUserMsg = new EmailMessage("Requested user-req NEW", String.format("did you do this, if yes %s",replace), recipient, "Jeeplate corp.");
-        EmailMessage oldUserMsg = new EmailMessage("Requested user-req OLD", "somebody tried to register this to our service", recipient, "Jeeplate corp."); 
-        String token = this.registration.applyForUserAccount();
+        final String token = this.registration.applyForUserAccount();
         
         this.findUserAccount();
-        this.user.nofityUserForRegistration(oldUserMsg, newUserMsg, token);
+        this.user.nofityUserForRegistration(recipient, this.currentLocale(), token);
     }
     
     public void endUserRegistrationPhase() {
@@ -183,9 +181,9 @@ public class RegistrationView extends AbstractView implements Serializable {
             completed = this.registration.grantUserAccount(this.getUsername(), this.getPassword(), this.getMobile(), this.getEmailedregistrationsecret());
         }
         if (completed) {
-            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "OK, registered");
+            this.showFacesMessage(FacesMessage.SEVERITY_INFO, util.getResourceBundleValue("view.register.account.info.success.created"));
         } else {
-            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, "Failed, not registered. please try again");
+            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, util.getResourceBundleValue("view.register.account.error.failure.created"));
         }
         this.registered = completed;
     }

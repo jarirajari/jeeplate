@@ -24,9 +24,11 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.ViewHandler;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.component.UIOutput;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
@@ -63,17 +65,24 @@ public class Util implements Serializable {
     }
     
     // Get resource bundle value by key, also ...i18n.Messages.java
-    String getResourceBundleValue(String key) {
-        FacesContext fc = FacesContext.getCurrentInstance();
-        String msgBundleName = fc.getApplication().getMessageBundle();
-        Locale loc = fc.getViewRoot().getLocale();
-        ResourceBundle bundle = ResourceBundle.getBundle(msgBundleName, loc);
+    public String getResourceBundleValue(String key) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Locale locale = context.getViewRoot().getLocale();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        ResourceBundle bundle = ResourceBundle.getBundle("org.sisto.jeeplate.i18n.messages", locale, loader);
+        String val;
+        ResourceBundle.clearCache();
+        try {
+            val = bundle.getString(key);
+        } catch (MissingResourceException | NullPointerException e) {
+            val = String.format("%s: %s", locale.getLanguage(), key);
+        }
         
-        return bundle.getString(key);
+        return val;
     }
     
     // Example for page refresh
-    void refreshPage() {
+    public void refreshPage() {
         FacesContext fc = FacesContext.getCurrentInstance();
         String refreshpage = fc.getViewRoot().getViewId();
         ViewHandler ViewH = fc.getApplication().getViewHandler();

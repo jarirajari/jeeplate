@@ -18,6 +18,7 @@
  */
 package org.sisto.jeeplate.view;
 
+import java.util.Locale;
 import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -47,5 +48,12 @@ public abstract class AbstractView {
         String usr = (currentUsr.getPrincipal() != null) ? currentUsr.getPrincipal().toString() : "";
         
         return usr;
+    }
+    
+    protected String currentLocale() {
+        FacesContext fc = FacesContext.getCurrentInstance();
+        Locale currentLoc = fc.getViewRoot().getLocale();
+        
+        return (currentLoc.getLanguage());
     }
 }

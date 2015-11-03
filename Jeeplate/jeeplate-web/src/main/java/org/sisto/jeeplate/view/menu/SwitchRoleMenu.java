@@ -20,10 +20,8 @@ package org.sisto.jeeplate.view.menu;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
@@ -33,19 +31,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.primefaces.context.RequestContext;
-import org.primefaces.model.menu.DefaultMenuItem;
-import org.primefaces.model.menu.DefaultMenuModel;
-import org.primefaces.model.menu.DefaultSubMenu;
-import org.primefaces.model.menu.DynamicMenuModel;
-import org.primefaces.model.menu.MenuModel;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.jsf.Navigator;
-import org.sisto.jeeplate.util.EmailMessage;
+import org.sisto.jeeplate.view.AbstractView;
 
 @Named @ViewScoped
-public class SwitchRoleMenu implements Serializable {
+public class SwitchRoleMenu extends AbstractView implements Serializable {
 
     @Inject
     private UserData user;
@@ -113,14 +105,12 @@ public class SwitchRoleMenu implements Serializable {
     public Boolean requires2FA() {
         Map<String,String> requestParams = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
         String nr = requestParams.get("newRole");
-        final String replace = "${pin}";
         final Boolean requiresTwoFactorAuth = (user.requiresTwoFactorAuth(nr));
         final String alwaysPIN = this.generatePIN();
         
         if (requiresTwoFactorAuth) {
             final String recipient = currentUser();
-            final EmailMessage em = new EmailMessage("Your role PIN", String.format("Role switch 2FA PIN is %s",replace), recipient, "Jeeplate corp.");
-            this.user.notifyUserFor2FA(em);   
+            this.user.notifyUserFor2FA(recipient, this.currentLocale());
         } else {
             this.setPin(alwaysPIN);
         }

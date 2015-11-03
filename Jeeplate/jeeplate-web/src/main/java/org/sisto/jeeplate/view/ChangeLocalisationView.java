@@ -36,6 +36,7 @@ import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
 import org.sisto.jeeplate.localisation.LanguageLocalisation;
+import org.sisto.jeeplate.util.Util;
 
 @Named @ViewScoped
 public class ChangeLocalisationView extends AbstractView implements Serializable {
@@ -55,6 +56,9 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
     
     @Inject
     LanguageLocalisation loc;
+    
+    @Inject
+    Util util;
     
     @PostConstruct
     public void init() {
@@ -125,11 +129,11 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
         user();
         changed = this.user.updateUserAccountLocalisation(language, country, city, timezone);
         if (noLocaleAvailable) {
-            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, no such locale supported!");
+            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, util.getResourceBundleValue("view.change.localization.error.specific.change"));
         } else if (changed) {
             RequestContext.getCurrentInstance().execute("PF('localisationDlg').hide()");
         } else {
-            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, no changed password");
+            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, util.getResourceBundleValue("view.change.localization.error.generic.change"));
         }
     }
     

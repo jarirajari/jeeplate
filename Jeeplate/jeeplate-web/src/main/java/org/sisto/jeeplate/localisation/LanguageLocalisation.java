@@ -31,15 +31,13 @@ import javax.inject.Named;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
-import org.primefaces.context.RequestContext;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.Util;
 
 @SessionScoped @Named("language")
 public class LanguageLocalisation implements Serializable {
     private transient final String DEFAULT_LANG = "en";
-    private transient final Locale USA       = new Locale("en_US"); // en-US
-    private transient final Locale ENGLISH   = new Locale("en_GB"); // en-GB
+    private transient final Locale ENGLISH   = new Locale("en"); // en-GB
     private transient final Locale FINNISH   = new Locale("fi"); // fi-FI
     final String LOCALE_COOKIE = "jeeplate_locale";
     
@@ -64,8 +62,7 @@ public class LanguageLocalisation implements Serializable {
     public void init() {
         final String cookieLocaleString = this.util.getCookie(LOCALE_COOKIE);
         availableLocales = new LinkedHashMap<>();
-        availableLocales.put(USA.toString(), "English(US)");
-        availableLocales.put(ENGLISH.toString(), "English(UK)");
+        availableLocales.put(ENGLISH.toString(), "English");
         availableLocales.put(FINNISH.toString(), "Suomi");
         
         browserLocale = FacesContext.getCurrentInstance().getExternalContext().getRequestLocale();
@@ -91,6 +88,10 @@ public class LanguageLocalisation implements Serializable {
         return (this.serverLocale);
     }
     
+    private void setCurrentLocale(Locale l) {
+        this.serverLocale = l;
+    }
+    
     public void changeLanguage(ValueChangeEvent e) {
         final String changedlocale = e.getNewValue().toString();
         this.changeLocale(changedlocale);
@@ -98,10 +99,9 @@ public class LanguageLocalisation implements Serializable {
     
     public void changeLocale(String loc) {
         Locale newLocale = new Locale(loc);
-        FacesContext.getCurrentInstance().getViewRoot().setLocale(newLocale);
         this.util.setCookie(LOCALE_COOKIE, newLocale.toString(), 365*24*60*60);
-        this.serverLocale = newLocale;
-        FacesContext.getCurrentInstance().getViewRoot().setLocale(serverLocale);
+        this.setCurrentLocale(newLocale);
+        FacesContext.getCurrentInstance().getViewRoot().setLocale(newLocale);
     }
     
     public String getFlagImageString() {

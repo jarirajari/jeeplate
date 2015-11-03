@@ -12,7 +12,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <deltaspike.version>1.0.4-SNAPSHOT</deltaspike.version>
+        <deltaspike.version>1.5.0</deltaspike.version>
     </properties>
     
     <modules>
@@ -39,16 +39,9 @@
             <dependency>
                 <groupId>org.wildfly.bom</groupId>
                 <artifactId>jboss-javaee-7.0-with-all</artifactId>
-                <version>8.2.1.Final</version>
+                <version>8.2.2.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <!-- Unit testing -->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.11</version>
-                <scope>test</scope>
             </dependency>
             <!-- Database -->
             <dependency>
@@ -56,31 +49,6 @@
                 <artifactId>h2</artifactId>
                 <version>1.4.181</version>
                 <scope>compile</scope>
-            </dependency>
-            <!-- Hibernate ORM and JPA API, Validator -->
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-entitymanager</artifactId>
-                <version>4.3.6.Final</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <version>4.3.6.Final</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.javax.persistence</groupId>
-                <artifactId>hibernate-jpa-2.1-api</artifactId>
-                <version>1.0.0.Final</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>5.1.2.Final</version>
-                <scope>provided</scope>
             </dependency>
             <!-- Embedded webserver -->
             <dependency>
@@ -101,12 +69,6 @@
                 <version>4.3.5</version>
                 <scope>compile</scope>
             </dependency>
-            <dependency>
-                <groupId>org.jboss.logging</groupId>
-                <artifactId>jboss-logging</artifactId>
-                <version>3.1.4.GA</version>
-                <scope>provided</scope>
-            </dependency>
             <!-- Other -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -114,7 +76,7 @@
                 <version>3.0</version>
                 <scope>compile</scope>
             </dependency>
-            <!-- Deltaspike with JPA module -->
+            <!-- Deltaspike -->
             <dependency>
                 <groupId>org.apache.deltaspike.core</groupId>
                 <artifactId>deltaspike-core-api</artifactId>
@@ -125,19 +87,9 @@
                 <groupId>org.apache.deltaspike.core</groupId>
                 <artifactId>deltaspike-core-impl</artifactId>
                 <version>${deltaspike.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.deltaspike.modules</groupId>
-                <artifactId>deltaspike-jpa-module-api</artifactId>
-                <version>${deltaspike.version}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.deltaspike.modules</groupId>
-                <artifactId>deltaspike-jpa-module-impl</artifactId>
-                <version>${deltaspike.version}</version>
-                <scope>runtime</scope>
+                <!-- scope is provide instead of runtime because of bom -->
+                <scope>provided</scope>
+                <!--<scope>runtime</scope>-->
             </dependency>
             <!-- Primefaces -->
             <dependency>
@@ -163,32 +115,6 @@
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-web</artifactId>
                 <version>1.2.3</version>
-                <scope>compile</scope>
-            </dependency>
-            <!-- Rest -->
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jaxrs</artifactId>
-                <version>3.0.11.Final</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jaxb-provider</artifactId>
-                <version>3.0.11.Final</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jackson2-provider</artifactId>
-                <version>3.0.11.Final</version>
-                <scope>provided</scope>
-            </dependency>
-            <!-- Mail -->
-            <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>1.4.7</version>
                 <scope>compile</scope>
             </dependency>
         </dependencies>

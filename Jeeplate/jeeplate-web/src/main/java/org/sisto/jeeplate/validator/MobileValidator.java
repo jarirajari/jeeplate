@@ -25,20 +25,23 @@ import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 import javax.inject.Inject;
+import org.sisto.jeeplate.util.Util;
 
 @FacesValidator("mobileValidator")
 public class MobileValidator implements Validator {
     
     @Inject
     private org.sisto.jeeplate.util.MultiValidator validator;
-    
+    @Inject
+    private Util util;
+        
     @Override
     public void validate(FacesContext fc, UIComponent c, 
                          Object value) throws ValidatorException {
         String msisdn = (value == null) ? "" : (String) value;
         Boolean validates = validator.validateUserPhone(msisdn);
         if (!validates) {
-            FacesMessage msg = new FacesMessage("Msisdn Validation Error");
+            FacesMessage msg = new FacesMessage(util.getResourceBundleValue("validator.mobile.required"));
             msg.setSeverity(FacesMessage.SEVERITY_ERROR);
             throw new ValidatorException(msg);
         }

@@ -30,6 +30,7 @@ import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
 import org.sisto.jeeplate.localisation.LanguageLocalisation;
+import org.sisto.jeeplate.util.Util;
 
 @Named @ViewScoped
 public class ModifyAccountView extends AbstractView implements Serializable {
@@ -56,6 +57,9 @@ public class ModifyAccountView extends AbstractView implements Serializable {
     
     @Inject
     LanguageLocalisation loc;
+    
+    @Inject
+    Util util;
 
     @PostConstruct
     public void init() {
@@ -222,7 +226,7 @@ public class ModifyAccountView extends AbstractView implements Serializable {
         if (changed) {
             RequestContext.getCurrentInstance().execute("PF('accountDlg').hide()");
         } else {
-            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, not modify account");
+            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, util.getResourceBundleValue("view.modify.account.error.generic.save"));
         }
     }
 }

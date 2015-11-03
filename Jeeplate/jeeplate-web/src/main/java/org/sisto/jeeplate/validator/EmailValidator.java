@@ -25,13 +25,16 @@ import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 import javax.inject.Inject;
+import org.sisto.jeeplate.util.Util;
 
 @FacesValidator("emailValidator")
 public class EmailValidator implements Validator {
     
     @Inject
     private org.sisto.jeeplate.util.MultiValidator validator;
-     
+    @Inject
+    private Util util;
+    
     @Override
     public void validate(FacesContext fc, UIComponent c, 
                          Object value) throws ValidatorException {
@@ -39,7 +42,7 @@ public class EmailValidator implements Validator {
         Boolean validates = validator.validateUserEmail(email);
 
         if (!validates) {
-            FacesMessage msg = new FacesMessage("Email Validation Error");
+            FacesMessage msg = new FacesMessage(util.getResourceBundleValue("validator.email.required"));
             msg.setSeverity(FacesMessage.SEVERITY_ERROR);
             throw new ValidatorException(msg);
         }

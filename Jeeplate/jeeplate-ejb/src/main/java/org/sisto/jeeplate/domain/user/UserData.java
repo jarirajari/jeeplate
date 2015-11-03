@@ -19,9 +19,11 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.Map;
 import javax.ejb.Stateful;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 import org.sisto.jeeplate.authentication.role.ApplicationRole;
@@ -32,6 +34,7 @@ import org.sisto.jeeplate.domain.base.DomainEntity;
 import org.sisto.jeeplate.domain.space.DomainSpaceData;
 import org.sisto.jeeplate.domain.user.account.UserAccountData;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
+import org.sisto.jeeplate.i18n.Messages;
 import org.sisto.jeeplate.util.ApplicationProperty;
 import org.sisto.jeeplate.util.Email;
 import org.sisto.jeeplate.util.EmailMessage;
@@ -54,7 +57,8 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     @Inject
     Email emailSender;
     
-    
+    @Inject
+    Messages messages;
     
     private transient final UserEntity hashed = EntityBuilder.of().UserEntity()
             .setUsername("hashis")
@@ -143,11 +147,10 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         return (this.getDataModel().requiresTwoFactorAuth(ApplicationRole.convert(newRoleName)));
     }
     
-    private void sendEmailToUser(EmailMessage em, String key, String val) {
-        String subject = em.getSubject();
-        // Convention and loose contract that secretKey will be replaced with secretVal
-        String content = em.getContent().replace(key, val);
-        MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress2, em.getContentRecipient());
+    private void sendEmailToUser(EmailMessage em) {
+        final String subject = em.getSubject();
+        final String content = em.getContent();
+        final MimeMessage mm = emailSender.constructEmail(subject, content, this.systemEmailAddress2, em.getContentRecipient());
         emailSender.sendMessage(mm);
     }
     
@@ -158,48 +161,80 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         return pin;
     }
     
-    public void notifyUserFor2FA(EmailMessage em) {
-        final String replace = "${pin}";
+    public void notifyUserFor2FA(String recipient, String locale) {
+        final Locale userLangLocale = new Locale(locale);
         final String pin = this.getDataModel().getCredential().getPIN2FA();
-        sendEmailToUser(em, replace, pin);
+        String subject = messages.getLocalizedString("email.switch.role.subject");
+        String content = messages.getLocalizedString("email.switch.role.content", pin);
+        String contentRecipient = recipient;
+        String contentSender = messages.getLocalizedString("email.reply.address");
+        
+        messages.switchLanguage(userLangLocale);
+        EmailMessage message = new EmailMessage(subject, content, contentRecipient, contentSender);
+            
+        sendEmailToUser(message);
     }
     
-    public void nofityUserForRegistration(EmailMessage messageForOldUser, EmailMessage messageForNewUser, String registrationToken) {
-        final String replace = "${domain}";
+    public void nofityUserForRegistration(String recipient, String locale, String registrationToken) {
+        final Locale userLangLocale = new Locale(locale);
         boolean userNotExist = this.getDataModel().isDefault();
         EmailMessage message;
         
+        messages.switchLanguage(userLangLocale);
         if (userNotExist) {
-            message = messageForNewUser;
+            String subject = messages.getLocalizedString("email.register.account.new.subject");
+            String content = messages.getLocalizedString("email.register.account.new.content", registrationToken);
+            String contentRecipient = recipient;
+            String contentSender = messages.getLocalizedString("email.reply.address");
+            
+            message = new EmailMessage(subject, content, contentRecipient, contentSender);
             log.debug("User registration requested for a user that has no account!");
         } else {
-            message = messageForOldUser;
+            String subject = messages.getLocalizedString("email.register.account.old.subject");
+            String content = messages.getLocalizedString("email.register.account.old.content");
+            String contentRecipient = recipient;
+            String contentSender = messages.getLocalizedString("email.reply.address");
+            
+            message = new EmailMessage(subject, content, contentRecipient, contentSender);
             log.info("User registration requested for an existing user (id=%s).", String.valueOf(this.getDataModel().getId()));
         }
-        sendEmailToUser(message, replace, registrationToken);
+        sendEmailToUser(message);
     }
     
-    public String initializePasswordReset(EmailMessage messageForOldUser, EmailMessage messageForNewUser) {
-        final String replace = "${secret}";
+    public String initializePasswordReset(String recipient, String locale) {
+        final Locale userLangLocale = new Locale(locale);
         boolean userExists =! this.getDataModel().isDefault();
         String resetToken;
         EmailMessage message;
         UserCredential uc  = this.getDataModel().getCredential();
         
+        messages.switchLanguage(userLangLocale);
         if (userExists) {
             uc.activateResetProtocol();
             this.update();
         }
         if (userExists) {
-            message = messageForOldUser;
             resetToken = uc.getPasswordResetToken();
+            String subject = messages.getLocalizedString("email.reset.password.old.subject");
+            String content = messages.getLocalizedString("email.reset.password.old.content", resetToken);
+            String contentRecipient = recipient;
+            String contentSender = messages.getLocalizedString("email.reply.address");
+            
+            message = new EmailMessage(subject, content, contentRecipient, contentSender);
+            
             log.debug("Password reset requested for an existing user.");
         } else {
-            message = messageForNewUser;
             resetToken = "";
+            String subject = messages.getLocalizedString("email.reset.password.new.subject");
+            String content = messages.getLocalizedString("email.reset.password.new.content");
+            String contentRecipient = recipient;
+            String contentSender = messages.getLocalizedString("email.reply.address");
+            
+            message = new EmailMessage(subject, content, contentRecipient, contentSender);
+            
             log.error("Password reset requested for a user that has no account!");
         }
-        sendEmailToUser(message, replace, resetToken);
+        sendEmailToUser(message);
         
         return resetToken;
     }

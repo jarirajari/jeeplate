@@ -27,6 +27,7 @@ import javax.inject.Named;
 import org.primefaces.context.RequestContext;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
+import org.sisto.jeeplate.util.Util;
 
 @Named @ViewScoped
 public class ChangePasswordView extends AbstractView implements Serializable {
@@ -36,6 +37,8 @@ public class ChangePasswordView extends AbstractView implements Serializable {
     private String newPassword;
     @Inject 
     private UserData user;
+    @Inject
+    Util util;
 
     @PostConstruct
     public void init() {
@@ -87,7 +90,7 @@ public class ChangePasswordView extends AbstractView implements Serializable {
         if (changed) {
             RequestContext.getCurrentInstance().execute("PF('credentialsDlg').hide()");
         } else {
-            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, no changed password");
+            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, util.getResourceBundleValue("view.change.password.error.generic.change"));
         }
     }
 }

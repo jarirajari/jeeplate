@@ -31,6 +31,7 @@ import org.sisto.jeeplate.domain.space.DomainSpaceData;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.util.MultiValidator;
+import org.sisto.jeeplate.util.Util;
 
 @Named @ViewScoped
 public class FirstLogin extends AbstractView implements Serializable {
@@ -48,6 +49,8 @@ public class FirstLogin extends AbstractView implements Serializable {
     DomainSpaceData space;
     @Inject
     MultiValidator validator;
+    @Inject
+    Util util;
 
     @PostConstruct
     public void init() {
@@ -155,9 +158,9 @@ public class FirstLogin extends AbstractView implements Serializable {
             this.user.registerToDomain(this.getFirstName(), this.getLastName(), this.getDomain());
             RequestContext.getCurrentInstance().execute("PF('firstDlg').hide()");
         } else if (! domainHasBeenCreated) {
-            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, no such domain");
+            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, util.getResourceBundleValue("view.login.first.error.specific.complete.domain"));
         } else {
-            this.showFacesMessage(FacesMessage.SEVERITY_INFO, "NOT OK, else");
+            this.showFacesMessage(FacesMessage.SEVERITY_ERROR, util.getResourceBundleValue("view.login.first.error.generic.complete"));
         }        
     }
 }

@@ -18,21 +18,15 @@
  */
 package org.sisto.jeeplate.jsf;
 
-import java.beans.Transient;
 import java.io.IOException;
-import java.util.Locale;
-import javax.ejb.AccessTimeout;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -40,7 +34,6 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.SavedRequest;
 import org.apache.shiro.web.util.WebUtils;
-import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.sisto.jeeplate.logging.StringLogger;
 
@@ -50,10 +43,6 @@ public class SystemManager {
     @Inject
     private transient StringLogger log;
     
-    private transient FacesContext facesContext = FacesContext.getCurrentInstance();
-    private transient String messageBundleName = facesContext.getApplication().getMessageBundle();
-    private transient Locale viewLocale = facesContext.getViewRoot().getLocale();
-    // private transient ResourceBundle viewBundle = ResourceBundle.getBundle(messageBundleName, viewLocale);
     private String username = "";
     private String password = "";
     private boolean remember = false;
@@ -82,21 +71,12 @@ public class SystemManager {
         this.remember = remember;
     }
     
-    /*
-     * EL named bean method that is not a propery is called with()
-     * For example prop #{bean.prop} but method #{bean.method()}
-     */
     public boolean authenticated() {
         return SecurityUtils.getSubject().isAuthenticated();
     }
     
-    /*
-     * Needs to be action="..." in JSF and JEE:
-     * public String doIt() and return String is view (without .xhtml)
-     * or we can do redir also with externalContext
-     */
     public void doLogout() {
-        // shiro logout
+        // shiro logout action
         // invalidate jsf session
         // redirect to home
         SecurityUtils.getSubject().logout();
@@ -128,13 +108,12 @@ public class SystemManager {
             subject.login(new UsernamePasswordToken(username, password, remember));
             HttpServletRequest hreq = (HttpServletRequest)econtext.getRequest();
             SavedRequest savedRequest = WebUtils.getAndClearSavedRequest(hreq);
-            log.error("Jee submit to : "+hreq.getContextPath()+"/restricted.xhtml");
             econtext.redirect(savedRequest != null ? savedRequest.getRequestUrl() : hreq.getContextPath()+"/restricted.xhtml");
         }
         catch (AuthenticationException e) {
-            FacesMessage fmessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "shiro err!", "shiro err!");
+            FacesMessage fmessage = new FacesMessage(null);
+            fmessage.setSeverity(FacesMessage.SEVERITY_ERROR);
             fcontext.addMessage("signinForm:signinResult", fmessage);
-            fcontext.addMessage("signupForm:signupResult", fmessage);
             rcontext.addCallbackParam("invalid", "true");
             log.error("Jee auth excp: "+e.getMessage());
         }
@@ -143,10 +122,9 @@ public class SystemManager {
     /* not needed anymore !!! */
     public void doRedirect() {
         try {
-
             FacesContext fcontext = FacesContext.getCurrentInstance();
             ExternalContext context = fcontext.getExternalContext();
-            HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+            HttpSession session = (HttpSession) fcontext.getExternalContext().getSession(false);
             
             if (session == null) {
 
@@ -163,17 +141,6 @@ public class SystemManager {
     }
     
     public void doLogin(ActionEvent event) {
-        /*
-        FacesContext fcontext = FacesContext.getCurrentInstance();
-        RequestContext rcontext = RequestContext.getCurrentInstance();
         
-        boolean loggedIn = true;
-
-        FacesMessage fmessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Incorrect pw or un!", "Incorrect pw or un!");
-        fmessage.rendered();
-        fcontext.addMessage("menuBarForm:result", fmessage);
-        fcontext.addMessage(null, fmessage);
-                
-                */
     }
 }
