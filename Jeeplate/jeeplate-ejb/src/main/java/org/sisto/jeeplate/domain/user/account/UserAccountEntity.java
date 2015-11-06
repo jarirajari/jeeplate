@@ -19,6 +19,7 @@
 package org.sisto.jeeplate.domain.user.account;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Entity;
@@ -31,6 +32,8 @@ import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import org.sisto.jeeplate.domain.BusinessEntity;
 import org.sisto.jeeplate.domain.user.UserEntity;
 
@@ -56,6 +59,8 @@ public class UserAccountEntity extends BusinessEntity implements Serializable {
     @OneToOne(mappedBy = "oneAccount")
     protected UserEntity user;
     protected Boolean registrationCompleted;
+    @Temporal(TemporalType.TIMESTAMP)
+    protected Date created;
     
     public UserAccountEntity() {
         this.id = DEFAULT_ID;

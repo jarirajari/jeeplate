@@ -19,6 +19,7 @@
 package org.sisto.jeeplate.view;
 
 import java.io.Serializable;
+import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
@@ -168,9 +169,10 @@ public class RegistrationView extends AbstractView implements Serializable {
     public void beginUserRegistrationPhase() {
         final String recipient = this.getUsername();
         final String token = this.registration.applyForUserAccount();
+        final String sloc = this.currentLocale();
         
         this.findUserAccount();
-        this.user.nofityUserForRegistration(recipient, this.currentLocale(), token);
+        this.user.nofityUserForRegistration(recipient, sloc, token);
     }
     
     public void endUserRegistrationPhase() {

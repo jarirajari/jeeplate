@@ -106,7 +106,7 @@ public class SystemManager {
         try {
             Subject subject = SecurityUtils.getSubject();
             subject.login(new UsernamePasswordToken(username, password, remember));
-            HttpServletRequest hreq = (HttpServletRequest)econtext.getRequest();
+            HttpServletRequest hreq = (HttpServletRequest) econtext.getRequest();
             SavedRequest savedRequest = WebUtils.getAndClearSavedRequest(hreq);
             econtext.redirect(savedRequest != null ? savedRequest.getRequestUrl() : hreq.getContextPath()+"/restricted.xhtml");
         }
