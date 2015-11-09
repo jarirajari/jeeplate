@@ -25,20 +25,25 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.context.RequestContext;
-import org.sisto.jeeplate.domain.user.UserData;
-import org.sisto.jeeplate.domain.user.UserEntity;
+import org.sisto.jeeplate.domain.flow.UserFlows;
+import org.sisto.jeeplate.domain.user.User;
 import org.sisto.jeeplate.util.Util;
 
 @Named @ViewScoped
 public class ChangePasswordView extends AbstractView implements Serializable {
     
+    @Inject 
+    private User user;
+    
+    @Inject
+    Util util;
+    
+    @Inject 
+    UserFlows registrationFlow;
+    
     private String username;
     private String password;
     private String newPassword;
-    @Inject 
-    private UserData user;
-    @Inject
-    Util util;
 
     @PostConstruct
     public void init() {
@@ -74,18 +79,9 @@ public class ChangePasswordView extends AbstractView implements Serializable {
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
     }
-
-    private UserEntity user() {
-        UserEntity ue;
-        user.findLoggedInUser(this.currentUser());
-        ue = user.getDataModel();
-        
-        return ue;
-    }
     
     public void change() {
-        user();
-        Boolean changed = this.user.changeUserPassword(this.password, this.newPassword);
+        Boolean changed = this.registrationFlow.changeUserPassword(this.password, this.newPassword);
         
         if (changed) {
             RequestContext.getCurrentInstance().execute("PF('credentialsDlg').hide()");

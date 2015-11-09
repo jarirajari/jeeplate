@@ -31,16 +31,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.sisto.jeeplate.domain.user.UserData;
-import org.sisto.jeeplate.domain.user.UserEntity;
+import org.sisto.jeeplate.domain.flow.UserFlows;
 import org.sisto.jeeplate.jsf.Navigator;
 import org.sisto.jeeplate.view.AbstractView;
 
 @Named @ViewScoped
 public class SwitchRoleMenu extends AbstractView implements Serializable {
-
-    @Inject
-    private UserData user;
+    
+    @Inject 
+    UserFlows registrationFlow;
+    
     private String pin;
     private String role;
     private Boolean requiresPIN;
@@ -49,28 +49,7 @@ public class SwitchRoleMenu extends AbstractView implements Serializable {
     public void init() {
         pin = "";
         role = "";
-        requiresPIN = Boolean.TRUE;
-        
-    }
-    
-    private UserEntity user() {
-        UserEntity ue;
-        user.findLoggedInUser(this.currentUser());
-        ue = user.getDataModel();
-        
-        return ue;
-    }
-    
-    public List<String> allUserRoles() {
-        user();
-        Map<String, String> roles = user.assignedRolesForUser();
-        roles.remove(this.currentRole());
-        return (new ArrayList<>(roles.keySet()));
-    }
-    
-    public void flushPIN(AjaxBehaviorEvent event){
-        final String userTypedPin = (String) ((UIOutput)event.getSource()).getValue();
-	this.setPin(userTypedPin);
+        requiresPIN = Boolean.TRUE;      
     }
     
     public String getPin() {
@@ -97,20 +76,31 @@ public class SwitchRoleMenu extends AbstractView implements Serializable {
         this.requiresPIN = requiresPIN;
     }
     
+    public List<String> allUserRoles() {
+        Map<String, String> roles = this.registrationFlow.findUser().assignedRolesForUser();
+        roles.remove(this.currentRole());
+        
+        return (new ArrayList<>(roles.keySet()));
+    }
+    
+    public void flushPIN(AjaxBehaviorEvent event){
+        final String userTypedPin = (String) ((UIOutput)event.getSource()).getValue();
+	this.setPin(userTypedPin);
+    }
+    
     public String generatePIN() {
-        return (this.user.generateNewPinForRoleSwitch());
+        return (this.registrationFlow.generateNewPinForRoleSwitch());
     }
     
     // external context function called from javascript
     public Boolean requires2FA() {
         Map<String,String> requestParams = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
         String nr = requestParams.get("newRole");
-        final Boolean requiresTwoFactorAuth = (user.requiresTwoFactorAuth(nr));
+        final Boolean requiresTwoFactorAuth = (this.registrationFlow.findUser().requiresTwoFactorAuth(nr));
         final String alwaysPIN = this.generatePIN();
         
         if (requiresTwoFactorAuth) {
-            final String recipient = currentUser();
-            this.user.notifyUserFor2FA(recipient, this.currentLocale());
+            this.registrationFlow.userForRoleSwitch(this.currentUser(), this.currentLocale());
         } else {
             this.setPin(alwaysPIN);
         }
@@ -130,7 +120,7 @@ public class SwitchRoleMenu extends AbstractView implements Serializable {
     }
     
     public void trySwitchingRoleNow(String newRole, String pin) {
-        Boolean switched = user.switchCurrentUserRole(newRole, pin);
+        Boolean switched = this.registrationFlow.switchCurrentUserRole(newRole, pin);
     }
     
     public String currentUser() {
@@ -141,7 +131,6 @@ public class SwitchRoleMenu extends AbstractView implements Serializable {
     }
     
     public String currentRole() {
-        return (this.user.currentRoleForUser());
+        return (this.registrationFlow.findUser().currentRoleForUser());
     }
-    
 }

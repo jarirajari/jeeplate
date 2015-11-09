@@ -29,44 +29,45 @@ import org.sisto.jeeplate.domain.user.UserEntity;
 @Stateful
 public class UserRegistrationData extends BusinessBean<UserRegistrationData, UserRegistrationEntity> implements Serializable {
     
-    @Inject
-    UserData user;
-    
     public UserRegistrationData() {
         super(UserRegistrationData.class, UserRegistrationEntity.class);
     }
     
-    public String applyForUserAccount() {
-        Boolean userNotExist = this.getDataModel().isDefault();
-        UserRegistrationEntity reg  = this.getDataModel();
+    private void removeIfExists(final String emailAddress) {
+        this.setDataModel(this.findOneSecondary(emailAddress).getDataModel());
+        this.delete();
+    }
+    
+    private void createWithoutUpdate(final String emailAddress) {
+        final UserRegistrationEntity ure = EntityBuilder.of().UserRegistrationEntity()
+                .setRegistrationEmail(emailAddress);
+        
+        this.setEntity(ure);
+        this.create();
+    }
+        
+    private String updateCreated(String emailAddress) {    
+        UserRegistrationEntity ure = this.getEntity();
         String token;
         
-        if (userNotExist) {
-            reg.activateRegistrationProtocol();
-        }
-        if (userNotExist) {
-            token = reg.getRegistrationToken();
-            log.debug("User registration requested for a user that has no account!");
-        } else {
-            token = "";
-            log.info("User registration requested for an existing user (id=%s).", String.valueOf(this.getDataModel().getId()));
-        }
+        ure.activateRegistrationProtocol(emailAddress);
+        this.update();
+        token = ure.getRegistrationToken();
+        
+        log.info("Registration attempt: %s is applying for account", emailAddress);
         
         return token;
+    }
+    
+    public String applyForUserAccount(String emailAddress) {
+        this.removeIfExists(emailAddress);
+        this.createWithoutUpdate(emailAddress);
+        return (this.updateCreated(emailAddress));
     }
     
     public Boolean grantUserAccount(String typedUsername, String typedPassword, String typedMobile, String emailedResetToken) {
         String token = this.getEntity().getRegistrationToken();
         Boolean granted = emailedResetToken.equals(token);
-        
-        if (granted) {
-            final UserEntity ue = EntityBuilder.of().UserEntity()
-                    .setUsername(typedUsername)
-                    .setPassword(typedPassword)
-                    .setMobile(Long.valueOf(typedMobile))
-                    .asApplicationUser();
-            user.createNewUser(ue);
-        }
         
         return granted;
     }

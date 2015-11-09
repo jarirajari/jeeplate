@@ -26,10 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
-import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.domain.flow.UserFlows;
+import org.sisto.jeeplate.domain.user.User;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.Email;
-import org.sisto.jeeplate.util.EmailMessage;
 import org.sisto.jeeplate.util.Randomness;
 import org.sisto.jeeplate.util.Util;
 
@@ -41,11 +41,13 @@ public class ResetPasswordView extends AbstractView implements Serializable {
     @Inject
     Email emailSender;
     @Inject
-    UserData user;
+    User user;
     @Inject
     transient Randomness random;
     @Inject
     Util util;
+    @Inject 
+    UserFlows registrationFlow;
     
     private String mobile;
     private String username;
@@ -142,12 +144,6 @@ public class ResetPasswordView extends AbstractView implements Serializable {
         }
     }
     
-    private void findUserAccount() {
-        String em = this.getUsername();
-        this.user.findOneUser(em);
-        log.info("Lost password recovery for user '%s' ", em);
-    }
-    
     private boolean passwordResetCanBeCompleted(String hiddenActionSecretGenerated) {
         String hiddenActionSecretCarried = findRequestStringParamValue("resetForm:resetWzdHidden");
         boolean secretsAreSame = hiddenActionSecretGenerated.equals(hiddenActionSecretCarried);
@@ -159,8 +155,7 @@ public class ResetPasswordView extends AbstractView implements Serializable {
     public void beginPasswordResetPhase() {
         final String recipient = this.getUsername();    
         
-        this.findUserAccount();
-        this.user.initializePasswordReset(recipient, this.currentLocale());
+        this.registrationFlow.initializePasswordReset(recipient, this.currentLocale());
     }
     
     public void endPasswordResetPhase() {
@@ -171,8 +166,7 @@ public class ResetPasswordView extends AbstractView implements Serializable {
         Boolean completed = Boolean.FALSE;
         
         if (passwordResetCanBeCompleted(hiddenActionSecretGenerated)) {
-            this.findUserAccount();
-            completed = this.user.finalizePasswordReset(typedMobile, typedPassword, emailedResetToken);
+            completed = this.registrationFlow.finalizePasswordReset(typedMobile, typedPassword, emailedResetToken);
         }
         if (completed) {
             this.showFacesMessage(FacesMessage.SEVERITY_INFO, util.getResourceBundleValue("view.reset.password.info.success"));

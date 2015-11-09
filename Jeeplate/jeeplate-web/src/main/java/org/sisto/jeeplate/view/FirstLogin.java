@@ -27,7 +27,9 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.context.RequestContext;
+import org.sisto.jeeplate.domain.flow.UserFlows;
 import org.sisto.jeeplate.domain.space.DomainSpaceData;
+import org.sisto.jeeplate.domain.user.User;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.util.MultiValidator;
@@ -35,6 +37,22 @@ import org.sisto.jeeplate.util.Util;
 
 @Named @ViewScoped
 public class FirstLogin extends AbstractView implements Serializable {
+    
+    @Inject
+    User user;
+    
+    @Inject
+    DomainSpaceData space;
+    
+    @Inject
+    MultiValidator validator;
+    
+    @Inject
+    Util util;
+    
+    @Inject 
+    UserFlows registrationFlow;
+    
     // account
     private String mobileNumber;
     private String emailAddress;
@@ -42,15 +60,6 @@ public class FirstLogin extends AbstractView implements Serializable {
     private String domain;
     private String firstName;
     private String lastName;
-    
-    @Inject
-    UserData user;
-    @Inject
-    DomainSpaceData space;
-    @Inject
-    MultiValidator validator;
-    @Inject
-    Util util;
 
     @PostConstruct
     public void init() {
@@ -63,16 +72,7 @@ public class FirstLogin extends AbstractView implements Serializable {
         
     }
     
-    private UserEntity user() {
-        UserEntity ue;
-        user.findLoggedInUser(this.currentUser());
-        ue = user.getDataModel();
-        
-        return ue;
-    }
-    
-    public void populateData() {
-        UserEntity ue = user();
+    public void populateData(UserEntity ue) {
         this.setMobileNumber(ue.getMobile().toString());
         this.setEmailAddress(ue.getUsername());
     }
@@ -117,16 +117,12 @@ public class FirstLogin extends AbstractView implements Serializable {
         this.emailAddress = emailAddress;
     }
     
-    public Boolean updateFirstForm() {
-        
-        return Boolean.TRUE;
-    }
-    
     public Boolean isFirstLogin() {
-        Boolean userHasNotRegistered = (! this.user.getDataModel().userHasRegistered());
+        final UserEntity ue = this.registrationFlow.findUser().getDataModel();
+        final Boolean userHasNotRegistered = (! ue.userHasRegistered());
         
         if (userHasNotRegistered) {
-            this.populateData(); // A hack.
+            this.populateData(ue); // A hack.
             RequestContext.getCurrentInstance().execute("PF('firstDlg').show()");
         }
         
@@ -149,13 +145,13 @@ public class FirstLogin extends AbstractView implements Serializable {
     }
     
     public void firstLoginCompleted() {
-        
+        final UserData ud = this.registrationFlow.findUser();
         Boolean domainHasBeenCreated = (  this.space.domainHasBeenCreated(this.getDomain()));
-        Boolean userHasNotRegistered = (! this.user.getDataModel().userHasRegistered());
+        Boolean userHasNotRegistered = (! ud.getDataModel().userHasRegistered());
         Boolean userRegistrationCanBeCompleted = (domainHasBeenCreated && userHasNotRegistered);
         
         if (userRegistrationCanBeCompleted) {
-            this.user.registerToDomain(this.getFirstName(), this.getLastName(), this.getDomain());
+            ud.registerToDomain(this.getFirstName(), this.getLastName(), this.getDomain());
             RequestContext.getCurrentInstance().execute("PF('firstDlg').hide()");
         } else if (! domainHasBeenCreated) {
             this.showFacesMessage(FacesMessage.SEVERITY_ERROR, util.getResourceBundleValue("view.login.first.error.specific.complete.domain"));

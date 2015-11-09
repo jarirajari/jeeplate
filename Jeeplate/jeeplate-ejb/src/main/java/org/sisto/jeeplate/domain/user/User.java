@@ -19,36 +19,37 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
-import javax.enterprise.context.Dependent;
+import javax.ejb.Stateful;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
-import org.sisto.jeeplate.logging.StringLogger;
-import org.sisto.jeeplate.rules.GenericRule;
 
+@SessionScoped @Stateful
 public class User implements Serializable {
-
-    @Inject
-    StringLogger log;
+    
+    UserData data;
+    UserRule rules;
+    UserLogic logic;
     
     @Inject 
-    GenericRule rule;
-    
-    @Inject
-    UserLogic logic; // or requirements
-    
-    /*
-     * User is a domain group member. Note that here we use inner/
-     * inline relationship
-    */
-    
-    public Boolean updateUserName() {
-        Boolean updated = Boolean.FALSE;
-        
-        if (this.rule.isAllowedToDoIt() && this.logic.businessReq()) {
-            updated = Boolean.TRUE;
-        } else {
-            updated = Boolean.FALSE;
-        }
-        
-        return updated;
-    }   
+    public void setRule(UserRule rules) {
+        this.rules = rules;
+    }
+
+    public UserData getData() {
+        return data;
+    }
+
+    @Inject 
+    public void setData(UserData data) {
+        this.data = data;
+    }
+
+    public UserLogic getLogic() {
+        return logic;
+    }
+
+    @Inject 
+    public void setLogic(UserLogic logic) {
+        this.logic = logic;
+    }
 }

@@ -26,6 +26,8 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.context.RequestContext;
+import org.sisto.jeeplate.domain.flow.UserFlows;
+import org.sisto.jeeplate.domain.user.User;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
@@ -34,6 +36,19 @@ import org.sisto.jeeplate.util.Util;
 
 @Named @ViewScoped
 public class ModifyAccountView extends AbstractView implements Serializable {
+    
+    @Inject
+    User user;
+    
+    @Inject
+    LanguageLocalisation loc;
+    
+    @Inject
+    Util util;
+    
+    @Inject 
+    UserFlows registrationFlow;
+    
     private String domain;
     // name
     private String screenName;
@@ -51,15 +66,6 @@ public class ModifyAccountView extends AbstractView implements Serializable {
     private String country;
     private String city;
     private String timezone;
-    
-    @Inject
-    UserData user;
-    
-    @Inject
-    LanguageLocalisation loc;
-    
-    @Inject
-    Util util;
 
     @PostConstruct
     public void init() {
@@ -77,27 +83,15 @@ public class ModifyAccountView extends AbstractView implements Serializable {
         this.country = "";
         this.city = "";
         this.timezone = "";
-        //this.populateData();
-    }
-    
-    private UserEntity user() {
-        UserEntity ue;
-        user.findLoggedInUser(this.currentUser());
-        ue = user.getDataModel();
-        
-        return ue;
-    }
-    
-    public void testing(String test) {
-        System.out.println("testing test "+test);
     }
     
     public void populateData() {
-        UserEntity ue = user();
+        UserEntity ue = this.registrationFlow.findUser().getDataModel();
         UserAccountEntity ua = ue.getOneAccount();
         Locale dispLoc = this.loc.getCurrentLocale();
         Locale userLoc = new Locale(ua.getLang(), ua.getCountry());
 
+        this.domain = ue.get
         this.mobileNumber = ue.getMobile().toString();
         this.emailAddress = ue.getUsername();
         this.language = userLoc.getDisplayLanguage(dispLoc);

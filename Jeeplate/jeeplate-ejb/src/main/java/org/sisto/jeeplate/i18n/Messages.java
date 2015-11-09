@@ -43,9 +43,11 @@ public class Messages extends ResourceBundle {
 
     }
     
-    public void switchLanguage(Locale loc) {
+    public Locale switchLanguage(Locale loc) {
         ResourceBundle.clearCache();
         setParent(ResourceBundle.getBundle(BUNDLE_NAME, loc, UTF8_CONTROL));
+        
+        return (this.getLocale());
     }
 
     public String getLocalizedString(String key) {

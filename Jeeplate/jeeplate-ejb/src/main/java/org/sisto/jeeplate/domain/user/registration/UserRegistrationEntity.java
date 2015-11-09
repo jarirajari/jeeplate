@@ -40,6 +40,7 @@ import org.apache.shiro.crypto.RandomNumberGenerator;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.util.ByteSource;
 import org.sisto.jeeplate.domain.BusinessEntity;
+import org.sisto.jeeplate.domain.pk.SecondaryKeyField;
 import org.sisto.jeeplate.util.DateAndTimeConverter;
 
 @Entity @Access(AccessType.FIELD) 
@@ -53,6 +54,7 @@ public class UserRegistrationEntity extends BusinessEntity implements Serializab
     @Id @SequenceGenerator(name="user_registration_seq", allocationSize = 1)
     @GeneratedValue(generator = "user_registration_seq", strategy = GenerationType.SEQUENCE)
     protected Long id;
+    @SecondaryKeyField(keyname="registrationEmail", description = "Email address")
     protected String registrationEmail;
     protected String registrationToken;
     @Temporal(TemporalType.TIMESTAMP)
@@ -78,44 +80,54 @@ public class UserRegistrationEntity extends BusinessEntity implements Serializab
         return registrationEmail;
     }
 
-    public void setRegistrationEmail(String registrationEmail) {
+    public UserRegistrationEntity setRegistrationEmail(String registrationEmail) {
         this.registrationEmail = registrationEmail;
+        
+        return this;
     }
     
     public String getRegistrationToken() {
         return registrationToken;
     }
     
-    public void setRegistrationToken(String token) {
+    public UserRegistrationEntity setRegistrationToken(String token) {
         registrationToken = token;
+        
+        return this;
     }
 
     public Date getRegistrationTimestamp() {
         return registrationTimestamp;
     }
 
-    public void setRegistrationTimestamp(Date registrationTimestamp) {
+    public UserRegistrationEntity setRegistrationTimestamp(Date registrationTimestamp) {
         this.registrationTimestamp = registrationTimestamp;
+        
+        return this;
     }
 
     public Boolean getRegistrationEmailVerified() {
         return registrationEmailVerified;
     }
 
-    public void setRegistrationEmailVerified(Boolean registrationEmailVerified) {
+    public UserRegistrationEntity setRegistrationEmailVerified(Boolean registrationEmailVerified) {
         this.registrationEmailVerified = registrationEmailVerified;
+        
+        return this;
     }
     
     private static Date now() {
         return (Date.from(Instant.now()));
     }
     
-    public void activateRegistrationProtocol() {
+    public void activateRegistrationProtocol(String email) {
+        this.setRegistrationEmail(email);
         this.registrationToken = UserRegistrationEntity.generateRandomNumberToken();
         this.registrationTimestamp = UserRegistrationEntity.now();
     }
     
     public void deactivateRegistrationProtocol() {
+        // registrationEmail stays the same
         this.registrationToken = RESET;
         this.registrationTimestamp = Date.from(Instant.EPOCH);
     }
