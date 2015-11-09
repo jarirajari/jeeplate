@@ -369,7 +369,7 @@
                         </p:row>
                     </f:facet>
                     <p:outputLabel for="accountDomain" value="#{msg['header.tmpl.form.account.text.domain-name']}"/>
-                    <p:autoComplete id="accountDomain" forceSelection="true" value="#{modifyAccountView.domain}" completeMethod="#{modifyAccountView.completeDomain}" />
+                    <p:inputText id="accountDomain" value="..." readonly="true" />
                     <p:outputLabel for="accountScreenName" value="#{msg['header.tmpl.form.account.text.screen-name']}" />
                     <p:inputText id="accountScreenName" value="#{modifyAccountView.screenName}" />
                     <p:outputLabel for="accountFirstName" value="#{msg['header.tmpl.form.account.text.first-name']}" />
@@ -386,13 +386,13 @@
                     <p:inputText id="accountMobileNumber" value="#{modifyAccountView.mobileNumber}" readonly="true" />
                     <p:outputLabel for="accountEmailAddress" value="#{msg['header.tmpl.form.account.text.email-address']}" />
                     <p:inputText id="accountEmailAddress" value="#{modifyAccountView.emailAddress}" readonly="true" />
-                    <p:outputLabel for="accountLanguage" value="#{msg['header.tmpl.form.account.text.language']}" />
+                    <p:outputLabel for="accountLanguage" value="#{msg['header.tmpl.form.account.text.account-language']}" />
                     <p:inputText id="accountLanguage" value="#{modifyAccountView.language}" readonly="true" />
-                    <p:outputLabel for="accountCountry" value="#{msg['header.tmpl.form.account.text.country']}" />
+                    <p:outputLabel for="accountCountry" value="#{msg['header.tmpl.form.account.text.account-country']}" />
                     <p:inputText id="accountCountry" value="#{modifyAccountView.country}" readonly="true" />
-                    <p:outputLabel for="accountCity" value="#{msg['header.tmpl.form.account.text.city']}" />
+                    <p:outputLabel for="accountCity" value="#{msg['header.tmpl.form.account.text.account-city']}" />
                     <p:inputText id="accountCity" value="#{modifyAccountView.city}" readonly="true" />
-                    <p:outputLabel for="accountTimezone" value="#{msg['header.tmpl.form.account.text.timezone']}" />
+                    <p:outputLabel for="accountTimezone" value="#{msg['header.tmpl.form.account.text.account-timezone']}" />
                     <p:inputText id="accountTimezone" value="#{modifyAccountView.timezone}" readonly="true" />
                     <p:outputLabel value="" />
                     <p:outputPanel>

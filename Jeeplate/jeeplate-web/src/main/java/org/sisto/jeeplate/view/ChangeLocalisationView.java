@@ -32,7 +32,8 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.context.RequestContext;
-import org.sisto.jeeplate.domain.user.UserData;
+import org.sisto.jeeplate.domain.flow.UserFlows;
+import org.sisto.jeeplate.domain.user.User;
 import org.sisto.jeeplate.domain.user.UserEntity;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
 import org.sisto.jeeplate.localisation.LanguageLocalisation;
@@ -46,19 +47,22 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
     private final Map<String,String> systemLanguages = new LinkedHashMap<>();   // ISO 639-2
     private final String[] supportedLanguages = {"fi", "en"};                   // ISO 639-2
     
-    private String language;
-    private String country;
-    private String city;
-    private String timezone;
-    
     @Inject
-    UserData user;
+    User user;
     
     @Inject
     LanguageLocalisation loc;
     
     @Inject
     Util util;
+    
+    @Inject 
+    UserFlows registrationFlow;
+    
+    private String language;
+    private String country;
+    private String city;
+    private String timezone;
     
     @PostConstruct
     public void init() {
@@ -74,7 +78,7 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
         // the pattern is always the same: first data is read and populated, 
         // everything else comes after this...
         
-        UserAccountEntity ue = this.user().getOneAccount();
+        UserAccountEntity ue = this.registrationFlow.findUser().getDataModel().getOneAccount();
         this.setLanguage(ue.getLang());
         this.setCountry(ue.getCountry());
         this.setCity(ue.getCity());
@@ -113,21 +117,11 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
         this.timezone = timezone;
     }
     
-    private UserEntity user() {
-        UserEntity ue;
-        user.findLoggedInUser(this.currentUser());
-        ue = user.getDataModel();
-        
-        return ue;
-    }
-    
     public void change() {
         final Locale newLoc = new Locale(this.language, this.country);
-        Boolean noLocaleAvailable = ! localeIsAvailable(newLoc);
-        Boolean changed;
+        final Boolean noLocaleAvailable = ! localeIsAvailable(newLoc);
+        final Boolean changed = this.registrationFlow.updateUserAccountLocalisation(language, country, city, timezone);
         
-        user();
-        changed = this.user.updateUserAccountLocalisation(language, country, city, timezone);
         if (noLocaleAvailable) {
             this.showFacesMessage(FacesMessage.SEVERITY_ERROR, util.getResourceBundleValue("view.change.localization.error.specific.change"));
         } else if (changed) {

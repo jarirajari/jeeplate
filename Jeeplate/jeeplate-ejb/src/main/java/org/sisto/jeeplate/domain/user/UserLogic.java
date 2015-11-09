@@ -18,12 +18,47 @@
  */
 package org.sisto.jeeplate.domain.user;
 
-import javax.ejb.Stateless;
+import java.io.Serializable;
+import java.util.Locale;
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+import org.sisto.jeeplate.logging.StringLogger;
+import org.sisto.jeeplate.util.EmailMessage;
 
-@Stateless
-public class UserLogic {
-    // contains business requirements!
-    public Boolean businessReq() {
-        return Boolean.TRUE;
+@Dependent
+public class UserLogic implements Serializable {
+    
+    @Inject
+    StringLogger log;
+    
+    @Inject
+    UserMessageEngine messages;
+    
+    public void userForRoleSwitch(UserData data, String recipient, String locale) {
+        final Locale userLangLocale = new Locale(locale);
+        final String pin = data.notifyUserFor2FA();
+        final EmailMessage em = messages.buildRoleSwitchMessage(userLangLocale, recipient, pin);
+        
+        messages.sendEmailToUser(em);
+    }
+    
+    public void userRegistrationAttempt(String recipient, String locale, String pin) {
+        final Locale userLangLocale = new Locale(locale);
+        final EmailMessage em = messages.buildRegistrationUserNotExistsMessage(userLangLocale, recipient, pin);
+        
+        messages.sendEmailToUser(em);
+    }
+    
+    public void userPasswordReset(String recipient, String locale, String token, boolean userExists) {
+        final Locale userLangLocale = new Locale(locale);
+        final EmailMessage em;
+        
+        if (userExists) {
+            em = messages.buildPasswordResetUserExistsMessage(userLangLocale, recipient, token);
+        } else {
+            em = messages.buildPasswordResetUserNotExistsMessage(userLangLocale, recipient);
+        }
+        
+        messages.sendEmailToUser(em);
     }
 }

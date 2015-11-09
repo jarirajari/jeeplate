@@ -77,6 +77,10 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         this.setEntity(e);
     }
     
+    public Boolean isLoaded() {
+        return (! this.getEntity().getId().equals(ObjectEntity.DEFAULT_ID));
+    }
+    
     public BusinessBean() {
         this.entityBeanType = null;
         this.dataBeanType   = null;
@@ -216,6 +220,10 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         return (findAllAlternative(2, altKeyVal));
     }
     
+    public Boolean checkAnySecondaryExists(final Object altKeyVal) {
+        return ((findAllAlternative(2, altKeyVal)).size() > 0);
+    }
+    
     public Map<Long, D> findAllTertiary(final Object altKeyVal) {
         return (findAllAlternative(3, altKeyVal));
     }
@@ -272,7 +280,7 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         final List<E> results = new ArrayList<>();
         
         if (entAltKey.isEmpty()) {
-            
+            // pass;
         } else {
             try {
                 results.addAll(this.store.executeQuery(entityBeanType, query, params));

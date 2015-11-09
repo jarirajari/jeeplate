@@ -19,7 +19,6 @@
 package org.sisto.jeeplate.view;
 
 import java.io.Serializable;
-import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.view.ViewScoped; // Do NOT confuse with  @javax.faces.bean.ViewScoped
@@ -27,8 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FlowEvent;
-import org.sisto.jeeplate.domain.user.UserData;
-import org.sisto.jeeplate.domain.user.registration.UserRegistrationData;
+import org.sisto.jeeplate.domain.flow.UserFlows;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.Randomness;
 import org.sisto.jeeplate.util.Util;
@@ -39,13 +37,11 @@ public class RegistrationView extends AbstractView implements Serializable {
     @Inject
     StringLogger log;
     @Inject
-    UserRegistrationData registration;
-    @Inject
-    UserData user;
-    @Inject
     transient Randomness random;
     @Inject
     Util util;
+    @Inject 
+    UserFlows registrationFlow;
     
     private String username;
     private String mobile;
@@ -142,14 +138,6 @@ public class RegistrationView extends AbstractView implements Serializable {
         }
     }
     
-    public Boolean accountForEmailExists(String enteredUserEmailAddress) {
-        log.info("accountForEmailExists="+enteredUserEmailAddress);
-        boolean exists = user.noUserWithEmail(enteredUserEmailAddress, "Greeting from Jeeplate!",
-                                              "Account already exists!", "jee@pla.te", enteredUserEmailAddress);
-        
-        return exists;
-    }
-    
     public Boolean checkUserAgreement() {
         Boolean userAgreement = getIacceptTermsAndConditions();
         
@@ -160,19 +148,12 @@ public class RegistrationView extends AbstractView implements Serializable {
         return userAgreement;
     }
     
-    private void findUserAccount() {
-        String em = this.getUsername();
-        this.user.findOneUser(em);
-        log.info("User registration request for user '%s'", em);
-    }
-    
     public void beginUserRegistrationPhase() {
-        final String recipient = this.getUsername();
-        final String token = this.registration.applyForUserAccount();
-        final String sloc = this.currentLocale();
+        final String userLoc = this.currentLocale();
+        final String mailRecipient = this.getUsername();
         
-        this.findUserAccount();
-        this.user.nofityUserForRegistration(recipient, sloc, token);
+        this.registrationFlow.forUser(this.currentUser())
+                .userRegistrationStart(userLoc, mailRecipient);
     }
     
     public void endUserRegistrationPhase() {
@@ -180,7 +161,7 @@ public class RegistrationView extends AbstractView implements Serializable {
         Boolean actionSecretOK = userRegistrationCanBeCompleted(this.getActionsecret());
         
         if (actionSecretOK) {
-            completed = this.registration.grantUserAccount(this.getUsername(), this.getPassword(), this.getMobile(), this.getEmailedregistrationsecret());
+            completed = this.registrationFlow.userRegistrationStop(this.getUsername(), this.getPassword(), this.getMobile(), this.getEmailedregistrationsecret());
         }
         if (completed) {
             this.showFacesMessage(FacesMessage.SEVERITY_INFO, util.getResourceBundleValue("view.register.account.info.success.created"));

@@ -18,6 +18,22 @@
  */
 package org.sisto.jeeplate.domain.user.registration;
 
-public class UserRegistration {
+import java.io.Serializable;
+import javax.ejb.Stateful;
+import javax.enterprise.context.SessionScoped;
+import javax.inject.Inject;
+
+@SessionScoped @Stateful
+public class UserRegistration implements Serializable {
     
+    UserRegistrationData data;
+
+    public UserRegistrationData getData() {
+        return data;
+    }
+
+    @Inject
+    public void setData(UserRegistrationData data) {
+        this.data = data;
+    }
 }

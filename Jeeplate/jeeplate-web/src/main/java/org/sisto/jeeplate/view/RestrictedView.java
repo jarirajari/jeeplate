@@ -120,21 +120,9 @@ public class RestrictedView extends AbstractView implements Serializable {
     }
     
     public void createNewDomain() {
-        /*
-        
-        move into domain, get string from user only
-        
-        */
         final String newDomainFQDN = this.getIODomain();
-        /*
-        log.info("createNewDomain="+newAppDom);
-        group.createDefaultALLDomainGroupForNewDomain();
-        log.info("group ="+group.getDataModel().getId());
-        domain.createNewApplicationDomain(newAppDom, group.getDataModel().getId());
-        log.info("domain="+domain.getDataModel().getId());
-        */
         space.insertNewDomain(newDomainFQDN);
-        log.info("domaine="+newDomainFQDN+", valid="+validator.validateFQDN(newDomainFQDN));
+        log.info("domain="+newDomainFQDN+", valid="+validator.validateFQDN(newDomainFQDN));
     }
     
     public Boolean addToGroup() {
