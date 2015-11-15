@@ -90,7 +90,7 @@ public class ModifyAccountView extends AbstractView implements Serializable {
         UserAccountEntity ua = ue.getOneAccount();
         Locale dispLoc = this.loc.getCurrentLocale();
         Locale userLoc = new Locale(ua.getLang(), ua.getCountry());
-
+        
         this.domain = "N/A";
         this.mobileNumber = ue.getMobile().toString();
         this.emailAddress = ue.getUsername();
