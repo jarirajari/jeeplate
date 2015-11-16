@@ -295,6 +295,9 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     public void create() {
         
         try {
+            if (this.entity.getId().equals(ObjectEntity.DEFAULT_ID)) {
+                throw new PersistenceException("Error: id is zero!");
+            }
             this.entity = this.store.create(entity);
         } catch (PersistenceException pe) {
             this.log.error("Create PersistenceException: %s", pe.getMessage());
@@ -304,6 +307,9 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     public void read() {
         
         try {
+            if (this.entity.getId().equals(ObjectEntity.DEFAULT_ID)) {
+                throw new PersistenceException("Error: id is zero!");
+            }
             this.entity = this.store.read(entity);
         } catch (PersistenceException pe) {
             this.log.error("Read PersistenceException: %s", pe.getMessage());
@@ -313,6 +319,9 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     public void update() {
         
         try {
+            if (this.entity.getId().equals(ObjectEntity.DEFAULT_ID)) {
+                throw new PersistenceException("Error: id is zero!");
+            }
             this.entity = this.store.update(entity);
         } catch (PersistenceException pe) {
             this.log.error("Update PersistenceException: %s", pe.getMessage());
@@ -322,6 +331,9 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     public void delete() {
         
         try {
+            if (this.entity.getId().equals(ObjectEntity.DEFAULT_ID)) {
+                throw new PersistenceException("Error: id is zero!");
+            }
             this.entity = this.store.delete(entity);
         } catch (PersistenceException pe) {
             this.log.error("Delete PersistenceException: %s", pe.getMessage());
@@ -341,6 +353,9 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
         Optional<E> bound;
         
         try {
+            if (id.equals(ObjectEntity.DEFAULT_ID)) {
+                throw new PersistenceException("Error: id is zero!");
+            }
             tmp = (E) entityBeanType.newInstance();
             tmp.setId(id); // renovate without pattern!
             bound = Optional.ofNullable(tmp);
@@ -348,7 +363,8 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
                 this.setEntity(this.store.bind(tmp));
             }
             lid = id;
-        } catch (InstantiationException | IllegalAccessException | NullPointerException ex) {
+        } catch (PersistenceException | InstantiationException | 
+                 IllegalAccessException | NullPointerException ex) {
             lid = 0L;
         }
         
