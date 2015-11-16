@@ -295,10 +295,11 @@ public abstract class BusinessBean<D extends BusinessBean, E extends BusinessEnt
     public void create() {
         
         try {
+            this.entity = this.store.create(entity);
             if (this.entity.getId().equals(ObjectEntity.DEFAULT_ID)) {
                 throw new PersistenceException("Error: id is zero!");
             }
-            this.entity = this.store.create(entity);
+            
         } catch (PersistenceException pe) {
             this.log.error("Create PersistenceException: %s", pe.getMessage());
         }
