@@ -173,6 +173,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
     }
     
     public UserEntity asRoot() {
+        this.setType(UserType.SYSTEM);
         this.getSysRole().setRole(SystemRole.DOMAIN_SPACE_ADMIN);
         this.getAppRole().setRoleGroup(ApplicationRoles.EMPTY_GROUP);
         
@@ -180,6 +181,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
     }
     
     public UserEntity asSystemUser() {
+        this.setType(UserType.SYSTEM);
         this.getSysRole().setRole(SystemRole.SYSTEM_USER);
         this.getAppRole().setRoleGroup(ApplicationRoles.EMPTY_GROUP);
         
@@ -187,6 +189,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
     }
     
     public UserEntity asApplicationUser() {
+        this.setType(UserType.APPLICATION);
         this.getSysRole().setRole(SystemRole.SYSTEM_USER);
         this.getAppRole().setRoleGroup(ApplicationRoles.NORMAL_GROUP);
         

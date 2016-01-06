@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import org.sisto.jeeplate.authentication.role.SystemRole;
 import org.sisto.jeeplate.domain.EntityBuilder;
+import org.sisto.jeeplate.domain.ObjectEntity;
 import org.sisto.jeeplate.domain.space.DomainSpaceData;
 import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserEntity;
@@ -76,6 +77,7 @@ public class Configuration implements Serializable {
             pc = new PersistedConfiguration(Boolean.TRUE);
         }
         this.createOrUpdate(pc);
+        
         return exists;
     }
     

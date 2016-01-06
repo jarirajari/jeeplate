@@ -30,6 +30,9 @@ public abstract class ObjectEntity {
     @Transient
     public transient static Long DEFAULT_VN = 0L;
     
+    @Transient
+    public transient static Long SINGLETON_ID = 1L;
+    
     public abstract Object identity();
     
     public abstract void reset();

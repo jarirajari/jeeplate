@@ -63,6 +63,7 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
     private String country;
     private String city;
     private String timezone;
+    private Boolean notPopulatedHack = true;
     
     @PostConstruct
     public void init() {
@@ -70,8 +71,10 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
         this.populateCountries();
         this.populateLanguages();
         this.populateSupported();
-        
-        this.populateData();
+        if (notPopulatedHack) {
+            this.populateData();
+            this.notPopulatedHack = false;
+        }
     }
     
     public void populateData() { 
