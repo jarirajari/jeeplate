@@ -16,10 +16,11 @@
     </properties>
     
     <modules>
+        <module>jeeplate-app</module>
         <module>jeeplate-ejb</module>
         <module>jeeplate-web</module>
         <module>jeeplate-ear</module>
-    </modules>
+  </modules>
     
     <repositories>
         <repository>

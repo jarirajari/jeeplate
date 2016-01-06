@@ -37,6 +37,8 @@ import org.sisto.jeeplate.domain.base.DomainData;
 import org.sisto.jeeplate.domain.group.DomainGroupData;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
 import org.sisto.jeeplate.domain.space.DomainSpaceData;
+import org.sisto.jeeplate.domain.user.User;
+import org.sisto.jeeplate.domain.user.UserLogic;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.MultiValidator;
 
@@ -57,6 +59,8 @@ public class RestrictedView extends AbstractView implements Serializable {
     DomainData domain;
     @Inject
     DomainGroupData group;
+    @Inject
+    User user;
     @Inject
     DomainGroupMembershipData membership;
     Long selectedUser;
@@ -131,6 +135,10 @@ public class RestrictedView extends AbstractView implements Serializable {
             // old: membership.addNewMember(selectedUser, selectedGroup);
         }
         return Boolean.FALSE;
+    }
+    
+    public String testAppBean() {
+        return (user.getLogic().testAppBean());
     }
     
     public Boolean showConfigureApplication() {

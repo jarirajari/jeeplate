@@ -115,7 +115,7 @@ public class SystemManager {
             fmessage.setSeverity(FacesMessage.SEVERITY_ERROR);
             fcontext.addMessage("signinForm:signinResult", fmessage);
             rcontext.addCallbackParam("invalid", "true");
-            log.error("Jee auth excp: "+e.getMessage());
+            log.error(e.getMessage());
         }
     }
     

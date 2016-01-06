@@ -8,15 +8,30 @@
     </parent>
 
     <groupId>org.sisto</groupId>
-    <artifactId>jeeplate-ear</artifactId>
+    <artifactId>jeeplate-app</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>ear</packaging>
-    <name>jeeplate-ear</name>
-
+    <packaging>ejb</packaging>
+    <name>jeeplate-app</name>
+	
     <properties>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    
+
+    <dependencies>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Shiro -->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -25,34 +40,13 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-ear-plugin</artifactId>
-                <version>2.8</version>
+                <artifactId>maven-ejb-plugin</artifactId>
+                <version>2.3</version>
                 <configuration>
-                    <version>6</version>
-                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <ejbVersion>3.1</ejbVersion>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    
-    <dependencies>
-        <dependency>
-            <groupId>org.sisto</groupId>
-            <artifactId>jeeplate-web</artifactId>
-            <version>${project.version}</version>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.sisto</groupId>
-            <artifactId>jeeplate-ejb</artifactId>
-            <version>${project.version}</version>
-            <type>ejb</type>
-        </dependency>
-        <dependency>
-            <groupId>org.sisto</groupId>
-            <artifactId>jeeplate-app</artifactId>
-            <version>${project.version}</version>
-            <type>ejb</type>
-        </dependency>
-    </dependencies>
+
 </project>

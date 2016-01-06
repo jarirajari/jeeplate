@@ -20,8 +20,15 @@ package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
 import java.util.Locale;
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.config.IniSecurityManagerFactory;
+import org.apache.shiro.subject.Subject;
+import org.sisto.jeeplate.jeeplate.AppBean;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.EmailMessage;
 
@@ -33,6 +40,38 @@ public class UserLogic implements Serializable {
     
     @Inject
     UserMessageEngine messages;
+    
+    @EJB /* @EJB instead of @Inject for Accessing Local no-interface EJBs */
+    AppBean app;
+    
+    @PostConstruct
+    private void initSecurityManager() {
+        final String SHIRO_CONFIG = "classpath:META-INF/shiro.ini";
+        IniSecurityManagerFactory factory = new IniSecurityManagerFactory(SHIRO_CONFIG);
+        org.apache.shiro.mgt.SecurityManager securityManager = factory.getInstance();
+        SecurityUtils.setSecurityManager(securityManager);
+        log.info("initSecurityManager="+(SecurityUtils.getSecurityManager()==null));
+    }
+    
+    public String authenticatedAndAuthorizedUser() {
+        Subject s = SecurityUtils.getSubject();
+        String ret = "";
+        if (s != null) {
+            s.login(new UsernamePasswordToken("tortoise", "shell", false));
+            ret = ""+s.getPrincipal().toString()+" is authenticated "+s.isAuthenticated();
+            ret = ret + " is permitted to walk="+s.isPermitted("swim");
+            ret = ret + " is permitted to fly ="+s.isPermitted("fly");
+        } else {
+            ret = "error";
+        }
+        
+        return ret;
+    }
+    
+    public String testAppBean() {
+        this.app.callMe();
+        return (this.authenticatedAndAuthorizedUser());
+    }
     
     public void userForRoleSwitch(UserData data, String recipient, String locale) {
         final Locale userLangLocale = new Locale(locale);

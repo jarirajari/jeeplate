@@ -17,6 +17,7 @@
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.jboss.spec</groupId>
@@ -78,7 +79,12 @@
             <groupId>org.apache.deltaspike.core</groupId>
             <artifactId>deltaspike-core-impl</artifactId>
         </dependency>
-        
+        <!-- Core business logic i.e. App -->
+        <dependency>
+            <groupId>org.sisto</groupId>
+            <artifactId>jeeplate-app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

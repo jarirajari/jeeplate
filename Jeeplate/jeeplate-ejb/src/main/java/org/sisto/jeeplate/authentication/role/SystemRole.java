@@ -20,17 +20,38 @@ package org.sisto.jeeplate.authentication.role;
 
 public enum SystemRole {
 
-    DOMAIN_SPACE_ADMIN("system-root"),
-    DOMAIN_ADMIN("domain-admin"),
-    DOMAIN_GROUP_ADMIN("group-admin"),
-    DOMAIN_GROUP_MEMBER("group-member"),
-    SYSTEM_USER("registered-user"),
-    GUEST_USER("unregistered-user");
+    DOMAIN_SPACE_ADMIN("system-root", 5),
+    DOMAIN_ADMIN("domain-admin", 4),
+    DOMAIN_GROUP_ADMIN("group-admin", 3),
+    DOMAIN_GROUP_MEMBER("group-member", 2),
+    SYSTEM_USER("registered-user", 1),
+    GUEST_USER("unregistered-user", 0);
 
-    private final String role;
+    private String role = "";
+    private int level = 0;
 
-    SystemRole(String s) {
-        this.role = s;
+    SystemRole(String newRole, int newLevel) {
+        this.role = newRole;
+        this.level = newLevel;
+    }
+    
+    public String getRole() {
+        return (this.role);
+    }
+    
+    public Integer getLevel() {
+        return (this.level);
+    }
+    
+    public Boolean comparedRequiresElevation(SystemRole compared) {
+        final int compareLevel = compared.getLevel();
+        boolean requires = false;
+        
+        if (this.level < compareLevel) {
+            requires = true;
+        }
+        
+        return requires;
     }
     
     public static SystemRole convert(String name) {

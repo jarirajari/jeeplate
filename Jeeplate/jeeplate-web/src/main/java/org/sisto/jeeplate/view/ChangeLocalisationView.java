@@ -156,13 +156,13 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
         String[] allTimezones = TimeZone.getAvailableIDs();
         
         this.timezones.put("UTC", "UTC");
-        for (String timezone : allTimezones) {
-            if (timezone.startsWith("SystemV/")) {
+        for (String tz : allTimezones) {
+            if (tz.contains("/")) {
+                this.timezones.put(tz, tz);
+            } else if (tz.startsWith("Etc/")) {
                 continue;
-            } else if (timezone.startsWith("Etc/")) {
+            } else if (tz.startsWith("SystemV/")) {
                 continue;
-            } else if (timezone.contains("/")) {
-                this.timezones.put(timezone, timezone);
             } else {
                 continue;
             }

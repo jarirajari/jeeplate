@@ -2,6 +2,9 @@
 <application version="7" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/application_7.xsd">
     <display-name>jeeplate-ear</display-name>
     <module>
+        <ejb>/jeeplate-app-1.0.0-SNAPSHOT.jar</ejb>
+    </module>
+    <module>
         <ejb>/jeeplate-ejb-1.0.0-SNAPSHOT.jar</ejb>
     </module>
     <module>

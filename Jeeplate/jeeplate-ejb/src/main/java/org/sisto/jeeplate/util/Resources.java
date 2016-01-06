@@ -26,6 +26,10 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import org.apache.shiro.SecurityUtils;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.util.Factory;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.config.IniSecurityManagerFactory;
 
 @Dependent
 public class Resources {
@@ -43,4 +47,14 @@ public class Resources {
         return (new StringLogger(name));
     }
     
+    @Produces @Default
+    public SecurityManager securityManager() {
+        final String SHIRO_CONFIG = "classpath:shiro.ini";
+        Factory<SecurityManager> factory = new IniSecurityManagerFactory(SHIRO_CONFIG);
+        SecurityManager securityManager = factory.getInstance();
+        SecurityUtils.setSecurityManager(securityManager);
+        
+        return (SecurityUtils.getSecurityManager());
+    }
+
 }

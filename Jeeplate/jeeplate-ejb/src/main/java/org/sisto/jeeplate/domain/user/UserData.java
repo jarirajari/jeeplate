@@ -19,7 +19,6 @@
 package org.sisto.jeeplate.domain.user;
 
 import java.io.Serializable;
-import java.util.Locale;
 import java.util.Map;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
@@ -30,7 +29,6 @@ import org.sisto.jeeplate.domain.base.DomainEntity;
 import org.sisto.jeeplate.domain.space.DomainSpaceData;
 import org.sisto.jeeplate.domain.user.account.UserAccountData;
 import org.sisto.jeeplate.domain.user.account.UserAccountEntity;
-import org.sisto.jeeplate.util.EmailMessage;
 
 @Dependent
 public class UserData extends BusinessBean<UserData, UserEntity> implements Serializable {
@@ -214,9 +212,9 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         ua.setFirstName(userFirstName);
         ua.setLastName(userLastName);
         if (DomainEntity.isRootDomain(domainFQDN)) {
-            ue.asSystemUser();
+            ue.setType(UserType.SYSTEM);
         } else {
-            ue.asApplicationUser();
+            ue.setType(UserType.APPLICATION);
         }
         
         // add to the all group of the domain of domainFQDN

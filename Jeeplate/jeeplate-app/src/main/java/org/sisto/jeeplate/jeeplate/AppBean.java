@@ -16,18 +16,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.sisto.jeeplate.domain.user;
+package org.sisto.jeeplate.jeeplate;
 
-public enum UserType {
-    SYSTEM("system"),
-    APPLICATION("application"),
-    UNKNOWN("unknown");
+import java.io.Serializable;
+import javax.ejb.Stateless;
+
+@Stateless
+public class AppBean implements Serializable {
+
+    public AppBean() {}
     
-    private String type = "";
-    
-    UserType(String s) {
-        this.type = s;
-    }
-    
-    
+    public void callMe() {}
 }

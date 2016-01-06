@@ -29,6 +29,8 @@ import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -67,6 +69,8 @@ public class UserEntity extends BusinessEntity implements Serializable {
     @TernaryKeyField(keyname="mobile", description = "Mobile phone MSISDN")
     @Digits(integer = 15, fraction = 0)
     protected Long mobile;
+    @Enumerated(EnumType.STRING)
+    protected UserType type;
     @Embedded
     protected UserCredential credential;
     @Embedded
@@ -83,6 +87,7 @@ public class UserEntity extends BusinessEntity implements Serializable {
         this.id = DEFAULT_ID;
         this.username = "";
         this.mobile = 0L;
+        this.type = UserType.UNKNOWN;
         this.credential = new UserCredential();
         this.appRole = new ApplicationRoles();
         this.sysRole = new SystemRoles();
@@ -115,6 +120,14 @@ public class UserEntity extends BusinessEntity implements Serializable {
         this.mobile = mobile;
         
         return this;
+    }
+
+    public UserType getType() {
+        return type;
+    }
+
+    public void setType(UserType type) {
+        this.type = type;
     }
 
     public UserCredential getCredential() {
@@ -217,7 +230,8 @@ public class UserEntity extends BusinessEntity implements Serializable {
         
         return roleName;
     }
-    
+    /*
+    // OLD
     public Boolean isApplicationUserThereforeNotSystemUser() {
         final SystemRole userSysRole = this.sysRole.getCurrentRole();
         final BitSet userAssignedGroup = this.getAppRole().getRoleGroup();
@@ -231,6 +245,11 @@ public class UserEntity extends BusinessEntity implements Serializable {
         }
         
         return isAppUsr;
+    }
+    */
+    // NEW 
+    public Boolean isApplicationUserThereforeNotSystemUser() {
+        return (this.getType() == UserType.APPLICATION);
     }
     
     public Map<String, String> assignedRolesForUser() {

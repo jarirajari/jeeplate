@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.web.filter.authc.UserFilter;
@@ -31,10 +30,12 @@ public class FacesAjaxAwareUserFilter extends UserFilter {
 
     private String name = "FacesAjaxAwareUserFilter";
     
+    @Override
     public void setName(String name) {
         this.name = name;
     }
     
+    @Override
     public String getName() {
         return (this.name);
     }
