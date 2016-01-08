@@ -404,7 +404,7 @@
         </p:dialog><!-- /Account dialog -->
         <!-- First login dialog: lazy load with "dynamic=true" -->
         <p:dialog widgetVar="firstDlg" rendered="#{mgr.authenticated() and firstLogin.isFirstLogin()}" closable="false" 
-		          dynamic="true" modal="true" header="#{msg['header.tmpl.form.first.dialog.text']}"  styleClass="disable-scroll" >
+		  dynamic="true" modal="true" header="#{msg['header.tmpl.form.first.dialog.text']}"  styleClass="disable-scroll" >
             <h:form id="firstForm" prependId="false">
                 <p:messages showDetail="false" showIcon="false" closable="true"/>
                 <h:panelGrid columns="2" columnClasses="label, value">
