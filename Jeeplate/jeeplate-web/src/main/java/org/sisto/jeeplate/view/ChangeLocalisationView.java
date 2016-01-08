@@ -81,11 +81,11 @@ public class ChangeLocalisationView extends AbstractView implements Serializable
         // the pattern is always the same: first data is read and populated, 
         // everything else comes after this...
         
-        UserAccountEntity ue = this.registrationFlow.findUser().getDataModel().getOneAccount();
-        this.setLanguage(ue.getLang());
-        this.setCountry(ue.getCountry());
-        this.setCity(ue.getCity());
-        this.setTimezone(ue.getTimezone());
+        UserAccountEntity ue = this.user.getData().getDataModel().getOneAccount();
+        this.setLanguage((ue == null) ? "" : ue.getLang());
+        this.setCountry((ue == null) ? "" : ue.getCountry());
+        this.setCity((ue == null) ? "" : ue.getCity());
+        this.setTimezone((ue == null) ? "" : ue.getTimezone());
     }
     
     public String getLanguage() {

@@ -55,10 +55,18 @@ public class UserLogic implements Serializable {
         SecurityUtils.setSecurityManager(securityManager);
     }
     
-    public String authenticatedAndAuthorizedUser() {
-        Subject s = SecurityUtils.getSubject();
+    public String testAppBean(String username) {
+        
+        this.user.getData().findLoggedInUser(username);
         String un = user.getData().getDataModel().getUsername();
         String pw = user.getData().getDataModel().getCredential().getPassword();
+        
+        return (this.authenticatedAndAuthorizedUser(un, pw));
+    }
+    
+    public String authenticatedAndAuthorizedUser(String un, String pw) {
+        Subject s = SecurityUtils.getSubject();
+        
         String ret = "";
         if (s != null) {
             // OK s.login(new UsernamePasswordToken("tortoise", "shell", false));
@@ -71,12 +79,9 @@ public class UserLogic implements Serializable {
             ret = "error";
         }
         
-        return ret;
-    }
-    
-    public String testAppBean() {
         this.app.callMe();
-        return (this.authenticatedAndAuthorizedUser());
+        
+        return ret;
     }
     
     public void userForRoleSwitch(UserData data, String recipient, String locale) {

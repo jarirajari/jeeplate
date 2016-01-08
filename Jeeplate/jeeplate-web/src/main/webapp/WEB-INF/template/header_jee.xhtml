@@ -47,7 +47,7 @@
 
                         <c:forEach var="i" items="#{switchRoleMenu.allUserRoles()}">
                             <!-- user only javascript! mixes threads otherwise! -->
-                            <p:menuitem value="#{i}" onclick="JS.authenticatedUserSignAsRole('#{i}')" icon="ui-icon-arrowrefresh-1-w" styleClass="headerMenuItems"/>
+                            <p:menuitem value="#{i.value}" onclick="JS.authenticatedUserSignAsRole('#{i.key}', '#{i.value}')" icon="ui-icon-arrowrefresh-1-w" styleClass="headerMenuItems"/>
                         </c:forEach>
                     </p:splitButton>
 
@@ -322,7 +322,7 @@
         <!-- 2FA for role change -->
         <p:dialog modal="true" header="#{msg['header.tmpl.form.role.dialog.text']}" widgetVar="fa2Dlg" resizable="false" closable="true">
             <h:form id="fa2Form" >
-                <p:remoteCommand name="requires2FARemCmd" actionListener="#{switchRoleMenu.requires2FA}"/>
+                <p:remoteCommand name="requires2FARemCmd" actionListener="#{switchRoleMenu.requires2FA}" />
                 <h:panelGrid columns="2" columnClasses="label, value">
                     <f:facet name="header">
                         <p:row>
@@ -337,7 +337,7 @@
                     <p:inputText id="fa2role" readonly="true" value="#{switchRoleMenu.role}" />
                     <p:outputLabel for="fa2PIN" value="#{msg['header.tmpl.form.role.text.pin']}" />
                     <p:inputText id="fa2PIN" value="#{switchRoleMenu.pin}" required="false" readonly="false" maxlength="8" disabled="#{not switchRoleMenu.requiresPIN}"/>
-                    <p:outputLabel value="" />
+                    <p:inputText type="hidden" id="fa2roleHidden" />
                     <p:outputPanel>
                         <p:commandButton value="#{msg['header.tmpl.button.cancel']}" onclick="PF('fa2Dlg').hide();"/>
                         <p:commandButton value="#{msg['header.tmpl.form.role.button.change']}" action="#{switchRoleMenu.submit()}" update="@all"/>
@@ -422,7 +422,7 @@
                     <p:outputLabel for="firstMobileNumber" value="#{msg['header.tmpl.form.first.text.mobile-number']}" />
                     <p:inputText id="firstMobileNumber" value="#{firstLogin.mobileNumber}" readonly="true" />
                     <p:outputLabel for="firstDomain" value="#{msg['header.tmpl.form.first.text.domain-name']}"/>
-                    <p:autoComplete id="firstDomain" queryDelay="2000" forceSelection="false" value="#{firstLogin.domain}" completeMethod="#{firstLogin.completeDomain}" />
+                    <p:autoComplete id="firstDomain" queryDelay="1000" forceSelection="false" value="#{firstLogin.domain}" completeMethod="#{firstLogin.completeDomain}" />
                     <p:outputLabel for="firstFirstName" value="#{msg['header.tmpl.form.first.text.first-name']}" />
                     <p:inputText id="firstFirstName" value="#{firstLogin.firstName}" required="true" requiredMessage="#{msg['header.tmpl.form.first.text.first-name.required']}"/>
                     <p:outputLabel for="firstLastName" value="#{msg['header.tmpl.form.first.text.last-name']}" />

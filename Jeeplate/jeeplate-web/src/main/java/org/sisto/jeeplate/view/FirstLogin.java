@@ -118,14 +118,14 @@ public class FirstLogin extends AbstractView implements Serializable {
     }
     
     public Boolean isFirstLogin() {
-        final UserEntity ue = this.registrationFlow.findUser().getDataModel();
-        final Boolean userHasNotRegistered = (! ue.userHasRegistered());
+        final UserEntity ue = this.registrationFlow.forUser(this.currentUser()).findUser().getDataModel();
+        Boolean userHasNotRegistered = (! ue.userHasRegistered());
         
-        if (userHasNotRegistered) {
-            this.populateData(ue); // A hack.
-            RequestContext.getCurrentInstance().execute("PF('firstDlg').show()");
-        }
         
+        this.populateData(ue); // A hack.
+        RequestContext.getCurrentInstance().execute("PF('firstDlg').show()");
+        
+        System.out.println("\n\n\n+++"+String.valueOf(userHasNotRegistered));
         return userHasNotRegistered;
     }
     

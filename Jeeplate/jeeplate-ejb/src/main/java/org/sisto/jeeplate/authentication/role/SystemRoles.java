@@ -89,7 +89,7 @@ public class SystemRoles implements Serializable {
         this.setCurrentRole(newRole);
     }
     
-    public Map<String, String> assignedRoles() {
+    public Map<String, String> assignedRoles(Boolean excludeCurrent) {
         final SystemRole[] allRoles = SystemRole.values();
         HashMap assigned = new HashMap<>();
         
@@ -97,7 +97,10 @@ public class SystemRoles implements Serializable {
             if (sysrole == SystemRole.GUEST_USER) {
                 continue; // we don't want guest user
             }
-            assigned.put(sysrole.toString(), sysrole.name());
+            if (excludeCurrent && (sysrole == this.currentRole)) {
+                continue; // skip current role
+            }
+            assigned.put(sysrole.name(), sysrole.getRole());
         }
         
         return assigned;

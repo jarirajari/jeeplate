@@ -39,13 +39,17 @@ var JS = {
         jq.html(role);
         pf.show();
     },
-    authenticatedUserSignAsRole: function (role) {
-        var elem = "#{0}".format("fa2Form:fa2role").replace(/:/g, "\\:");
+    authenticatedUserSignAsRole: function (rolek, rolev) {
         var pf = PF("fa2Dlg");
-        var jq = $(elem);
+        var elemk = "#{0}".format("fa2Form:fa2roleHidden").replace(/:/g, "\\:");
+        var elemv = "#{0}".format("fa2Form:fa2role").replace(/:/g, "\\:");
+        var jqk = $(elemk);
+        var jqv = $(elemv);
         
-        jq.val(role);
-        requires2FARemCmd([{name: 'newRole', value: role}]);
+        console.log('switching to role', rolek, rolev);
+        jqk.val(rolek);
+        jqv.val(rolev);
+        requires2FARemCmd([{'newRoleKey':rolek,'newRoleVal':rolev}]);
         pf.show();
     }
 };

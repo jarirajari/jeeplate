@@ -19,8 +19,6 @@
 package org.sisto.jeeplate.view.menu;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.component.UIOutput;
@@ -76,11 +74,10 @@ public class SwitchRoleMenu extends AbstractView implements Serializable {
         this.requiresPIN = requiresPIN;
     }
     
-    public List<String> allUserRoles() {
+    public Map<String,String> allUserRoles() {
         Map<String, String> roles = this.registrationFlow.findUser().assignedRolesForUser();
-        roles.remove(this.currentRole());
         
-        return (new ArrayList<>(roles.keySet()));
+        return roles;
     }
     
     public void flushPIN(AjaxBehaviorEvent event){
@@ -95,8 +92,9 @@ public class SwitchRoleMenu extends AbstractView implements Serializable {
     // external context function called from javascript
     public Boolean requires2FA() {
         Map<String,String> requestParams = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-        String nr = requestParams.get("newRole");
-        final Boolean requiresTwoFactorAuth = (this.registrationFlow.findUser().requiresTwoFactorAuth(nr));
+        String nrk = requestParams.get("newRoleKey");
+        String nrv = requestParams.get("newRoleVal");
+        final Boolean requiresTwoFactorAuth = (this.registrationFlow.findUser().requiresTwoFactorAuth(nrk));
         final String alwaysPIN = this.generatePIN();
         
         if (requiresTwoFactorAuth) {
@@ -111,8 +109,8 @@ public class SwitchRoleMenu extends AbstractView implements Serializable {
     
     public String submit() {
         Map<String,String> requestParams = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-        String r = requestParams.get("fa2Form:fa2role");
-        String p =  requestParams.get("fa2Form:fa2PIN");
+        String r = requestParams.get("fa2Form:fa2roleHidden");
+        String p = requestParams.get("fa2Form:fa2PIN");
         
         trySwitchingRoleNow(r, p);
         
@@ -121,6 +119,7 @@ public class SwitchRoleMenu extends AbstractView implements Serializable {
     
     public void trySwitchingRoleNow(String newRole, String pin) {
         Boolean switched = this.registrationFlow.switchCurrentUserRole(newRole, pin);
+        
     }
     
     public String currentUser() {

@@ -88,14 +88,14 @@
                     </p:commandButton>
                 </h:form>
                 <p>
-                    NEXT: as root add domain =&gt; create domain plus all-group for it<br/>
-                    NEXT: then finish new user registration flow (management for root for old users). Reg requires fqdn and domain secret in wizard.<br/>
-                    NEXT: admins can then add users to become members to certain domain groups in addition to all-group
-                    NEXT: domain group members can create and manage RESOURCES of the group
-                    NEXT: homepage for the group is ok
+                    Domain concept is for either
+                    a) different users with exactly same grouped permissions, or
+                    b) domain allows aspects like different stakeholders to be grouped 
+                    !! Domains can be added dynamically, but groups are manually coded
+                    !! But when a domain is created a admin assign certain groups to it (not all)
                     
                     <br />
-                    Testing appBean: <h:outputText value="${restrictedView.testAppBean()}"></h:outputText>
+                    Testing appBean: <h:outputText value="#{restrictedView.testAppBean()}"></h:outputText>
                     <br />
                 </p>
             </ui:define>

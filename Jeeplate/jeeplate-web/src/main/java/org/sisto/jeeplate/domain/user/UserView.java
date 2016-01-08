@@ -24,7 +24,6 @@ import javax.enterprise.context.RequestScoped;
 import org.sisto.jeeplate.rules.GenericRule;
 
 @Named
-@RequestScoped
 public class UserView {
     @Inject
     private GenericRule rules; // what should be rendered

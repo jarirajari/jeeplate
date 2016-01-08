@@ -57,6 +57,8 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
         return Boolean.TRUE;
     }
     
+    
+    
     public UserData() {
         super(UserData.class, UserEntity.class);
     }
@@ -66,7 +68,7 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     }
     
     public Map<String, String> assignedRolesForUser() {
-        return (this.getDataModel().assignedRolesForUser());
+        return (this.getDataModel().assignedRolesForUser(true));
     }
     
     public String currentRoleForUser() {
@@ -106,6 +108,7 @@ public class UserData extends BusinessBean<UserData, UserEntity> implements Seri
     }
     
     public Boolean requiresTwoFactorAuth(String newRoleName) {
+        System.out.println("\n\n\n***"+newRoleName+", "+ApplicationRole.convert(newRoleName).toString());
         return (this.getDataModel().requiresTwoFactorAuth(ApplicationRole.convert(newRoleName)));
     }
     

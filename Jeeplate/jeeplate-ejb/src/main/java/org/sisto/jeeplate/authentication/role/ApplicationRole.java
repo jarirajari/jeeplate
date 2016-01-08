@@ -29,14 +29,18 @@ public enum ApplicationRole {
     ACTOR           ("actor"        , 0, 0b001),
     VISITOR         ("visitor"      , 0, 0b000);
 
-    String name;
+    String role;
     int bindex;
     int bvalue;
 
-    ApplicationRole(String sname, int bindex, int bvalue) {
-        this.name = sname;
+    ApplicationRole(String name, int bindex, int bvalue) {
+        this.role = name;
         this.bindex = bindex;
         this.bvalue = bvalue;
+    }
+    
+    public String getRole() {
+        return this.role;
     }
     
     public int toValue() {

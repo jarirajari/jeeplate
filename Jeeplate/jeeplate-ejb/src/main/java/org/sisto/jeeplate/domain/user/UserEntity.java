@@ -226,9 +226,9 @@ public class UserEntity extends BusinessEntity implements Serializable {
         String roleName;
         
         if (isApplicationUserThereforeNotSystemUser()) {
-            roleName = userAppRole.name();
+            roleName = userAppRole.getRole();
         } else {
-            roleName = userSysRole.name();
+            roleName = userSysRole.getRole();
         }
         
         return roleName;
@@ -255,13 +255,13 @@ public class UserEntity extends BusinessEntity implements Serializable {
         return (this.getType() == UserType.APPLICATION);
     }
     
-    public Map<String, String> assignedRolesForUser() {
+    public Map<String, String> assignedRolesForUser(Boolean excludeCurrentRole) {
         final Map<String, String> usersRoles = new HashMap<>();
         
         if (isApplicationUserThereforeNotSystemUser()) {
-            usersRoles.putAll(this.getAppRole().assignedRoles());
+            usersRoles.putAll(this.getAppRole().assignedRoles(excludeCurrentRole));
         } else {
-            usersRoles.putAll(this.getSysRole().assignedRoles());
+            usersRoles.putAll(this.getSysRole().assignedRoles(excludeCurrentRole));
         }
         
         return usersRoles;
@@ -313,6 +313,16 @@ public class UserEntity extends BusinessEntity implements Serializable {
     }
     
     public Boolean userHasRegistered() {
-        return (this.getOneAccount().getRegistrationCompleted());
+        Boolean registered = false;
+        
+        if (this.getOneAccount() == null) {
+            registered = false;
+        } else if (this.getOneAccount().getRegistrationCompleted()) {
+            registered = (this.getOneAccount().getRegistrationCompleted());
+        } else {
+            registered = false;
+        }
+        
+        return registered;
     }
 }

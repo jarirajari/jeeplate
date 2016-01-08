@@ -38,6 +38,7 @@ import org.sisto.jeeplate.domain.group.DomainGroupData;
 import org.sisto.jeeplate.domain.group.membership.DomainGroupMembershipData;
 import org.sisto.jeeplate.domain.space.DomainSpaceData;
 import org.sisto.jeeplate.domain.user.User;
+import org.sisto.jeeplate.domain.user.UserData;
 import org.sisto.jeeplate.domain.user.UserLogic;
 import org.sisto.jeeplate.logging.StringLogger;
 import org.sisto.jeeplate.util.MultiValidator;
@@ -138,7 +139,10 @@ public class RestrictedView extends AbstractView implements Serializable {
     }
     
     public String testAppBean() {
-        return (user.getLogic().testAppBean());
+        String username = this.currentUser();
+        
+        log.info("testAppBean -> "+ username);
+        return (user.getLogic().testAppBean(username));
     }
     
     public Boolean showConfigureApplication() {

@@ -119,7 +119,7 @@ public class ApplicationRoles implements Serializable {
     
     public Boolean requires2FAwhenRoleChange(ApplicationRole newRole) {
         final Boolean newLevelHigher = (newRole.bitIndex()) > (this.currentRole.bitIndex());
-        
+        System.out.println("wtf! requires2FAwhenRoleChange"+String.valueOf(newLevelHigher));
         return newLevelHigher;
     }
     
@@ -127,7 +127,7 @@ public class ApplicationRoles implements Serializable {
         this.setCurrentRole(newRole);
     }
     
-    public Map<String, String> assignedRoles() {
+    public Map<String, String> assignedRoles(boolean excludeCurrentRole) {
         final ApplicationRole[] allRoles = ApplicationRole.values();
         HashMap assigned = new HashMap<>();
         
@@ -135,10 +135,13 @@ public class ApplicationRoles implements Serializable {
             if (role == ApplicationRole.VISITOR) {
                 continue; // we don't want visitor user
             }
+            if (excludeCurrentRole && (role == this.currentRole)) {
+                continue; // exclude current
+            }
             BitSet test = (BitSet) getRoleGroup().clone();
             test.and(role.bitSet());
             if (! test.isEmpty()) {
-                assigned.put(role.toString(), role.name());
+                assigned.put(role.name(), role.getRole());
             }
         }
         
